@@ -25,8 +25,8 @@
     private static void m_34920_(Brain<Piglin> p_34921_) {
        p_34921_.m_21895_(Activity.f_37989_, 10, ImmutableList.of(m_34917_(), new SetEntityLookTarget(PiglinAi::m_34883_, 14.0F), new StartAttacking<Piglin>(AbstractPiglin::m_34667_, PiglinAi::m_35000_), new RunIf<Piglin>((p_34804_) -> {
           return !p_34804_.m_34771_();
--      }, new GoToCelebrateLocation<>(2, 1.0F)), new RunIf<Piglin>(Piglin::m_34771_, new GoToCelebrateLocation<>(4, 0.6F)), new RunOne(ImmutableList.of(Pair.of(new SetEntityLookTarget(EntityType.f_20511_, 8.0F), 1), Pair.of(new RandomStroll(0.6F, 2, 1), 1), Pair.of(new DoNothing(10, 20), 1)))), MemoryModuleType.f_26341_);
-+      }, new GoToCelebrateLocation<>(2, 1.0F)), new RunIf<Piglin>(Piglin::m_34771_, new GoToCelebrateLocation<>(4, 0.6F)), new RunOne<>(ImmutableList.of(Pair.of(new SetEntityLookTarget(EntityType.f_20511_, 8.0F), 1), Pair.of(new RandomStroll(0.6F, 2, 1), 1), Pair.of(new DoNothing(10, 20), 1)))), MemoryModuleType.f_26341_);
+-      }, new GoToTargetLocation<>(MemoryModuleType.f_26341_, 2, 1.0F)), new RunIf<Piglin>(Piglin::m_34771_, new GoToTargetLocation<>(MemoryModuleType.f_26341_, 4, 0.6F)), new RunOne(ImmutableList.of(Pair.of(new SetEntityLookTarget(EntityType.f_20511_, 8.0F), 1), Pair.of(new RandomStroll(0.6F, 2, 1), 1), Pair.of(new DoNothing(10, 20), 1)))), MemoryModuleType.f_26341_);
++      }, new GoToTargetLocation<>(MemoryModuleType.f_26341_, 2, 1.0F)), new RunIf<Piglin>(Piglin::m_34771_, new GoToTargetLocation<>(MemoryModuleType.f_26341_, 4, 0.6F)), new RunOne<>(ImmutableList.of(Pair.of(new SetEntityLookTarget(EntityType.f_20511_, 8.0F), 1), Pair.of(new RandomStroll(0.6F, 2, 1), 1), Pair.of(new DoNothing(10, 20), 1)))), MemoryModuleType.f_26341_);
     }
  
     private static void m_34940_(Brain<Piglin> p_34941_) {

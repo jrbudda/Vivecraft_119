@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\world\entity\monster\piglin\PiglinBrute.java minecraft_patched\net\minecraft\world\entity\monster\piglin\PiglinBrute.java
 --- minecraft\net\minecraft\world\entity\monster\piglin\PiglinBrute.java
 +++ minecraft_patched\net\minecraft\world\entity\monster\piglin\PiglinBrute.java
-@@ -64,7 +64,7 @@
+@@ -65,7 +65,7 @@
     }
  
     public Brain<PiglinBrute> m_6274_() {

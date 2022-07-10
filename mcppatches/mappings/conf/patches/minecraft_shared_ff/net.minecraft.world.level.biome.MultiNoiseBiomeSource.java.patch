@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\world\level\biome\MultiNoiseBiomeSource.java minecraft_patched\net\minecraft\world\level\biome\MultiNoiseBiomeSource.java
 --- minecraft\net\minecraft\world\level\biome\MultiNoiseBiomeSource.java
 +++ minecraft_patched\net\minecraft\world\level\biome\MultiNoiseBiomeSource.java
-@@ -25,16 +25,16 @@
+@@ -28,16 +28,16 @@
  
  public class MultiNoiseBiomeSource extends BiomeSource {
     public static final MapCodec<MultiNoiseBiomeSource> f_48424_ = RecordCodecBuilder.mapCodec((p_187070_) -> {

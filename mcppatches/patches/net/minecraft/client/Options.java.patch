@@ -1,0 +1,11 @@
+--- a/net/minecraft/client/Options.java
++++ b/net/minecraft/client/Options.java
+@@ -2718,7 +2718,7 @@
+         }
+         else if (par1EnumOptions.isProgressOption())
+         {
+-            double d0 = par1EnumOptions.get();
++            double d0 = (double) par1EnumOptions.get();
+             return d0 == 0.0D ? s + I18n.a("options.off") : s + (int)(d0 * 100.0D) + "%";
+         }
+         else

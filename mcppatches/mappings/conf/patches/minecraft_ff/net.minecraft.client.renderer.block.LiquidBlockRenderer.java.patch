@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\client\renderer\block\LiquidBlockRenderer.java minecraft_patched\net\minecraft\client\renderer\block\LiquidBlockRenderer.java
 --- minecraft\net\minecraft\client\renderer\block\LiquidBlockRenderer.java
 +++ minecraft_patched\net\minecraft\client\renderer\block\LiquidBlockRenderer.java
-@@ -324,7 +324,7 @@
+@@ -317,7 +317,7 @@
           p_203189_[1] += 10.0F;
        } else if (p_203190_ >= 0.0F) {
           p_203189_[0] += p_203190_;

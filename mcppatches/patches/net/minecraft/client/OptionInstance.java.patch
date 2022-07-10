@@ -1,0 +1,177 @@
+--- a/net/minecraft/client/OptionInstance.java
++++ b/net/minecraft/client/OptionInstance.java
+@@ -146,12 +146,12 @@
+         {
+             if (this.value instanceof Integer)
+             {
+-                return (T)(int)sliderpercentageoptionof.getOptionValue();
++                return (T)(Integer)(int)sliderpercentageoptionof.getOptionValue();
+             }
+ 
+             if (this.value instanceof Double)
+             {
+-                return (T)sliderpercentageoptionof.getOptionValue();
++                return (T)(Double)sliderpercentageoptionof.getOptionValue();
+             }
+         }
+ 
+@@ -208,7 +208,7 @@
+ 
+         if (optioninstance$intrangebase != null)
+         {
+-            return (T)optioninstance$intrangebase.minInclusive();
++            return (T)(Integer)optioninstance$intrangebase.minInclusive();
+         }
+         else
+         {
+@@ -222,7 +222,7 @@
+ 
+         if (optioninstance$intrangebase != null)
+         {
+-            return (T)optioninstance$intrangebase.maxInclusive();
++            return (T)(Integer)optioninstance$intrangebase.maxInclusive();
+         }
+         else
+         {
+@@ -250,12 +250,6 @@
+ 
+     public static record AltEnum<T>(List<T> values, List<T> altValues, BooleanSupplier altCondition, OptionInstance.CycleableValueSet.ValueSetter<T> valueSetter, Codec<T> codec) implements OptionInstance.CycleableValueSet<T>
+     {
+-        private final List<T> values;
+-        private final List<T> altValues;
+-        private final BooleanSupplier altCondition;
+-        private final OptionInstance.CycleableValueSet.ValueSetter<T> valueSetter;
+-        private final Codec<T> codec;
+-
+         public CycleButton.ValueListSupplier<T> valueListSupplier()
+         {
+             return CycleButton.ValueListSupplier.create(this.altCondition, this.values, this.altValues);
+@@ -265,41 +259,6 @@
+         {
+             return (this.altCondition.getAsBoolean() ? this.altValues : this.values).contains(p_231570_) ? Optional.of(p_231570_) : Optional.empty();
+         }
+-
+-        public OptionInstance.CycleableValueSet.ValueSetter<T> valueSetter()
+-        {
+-            return this.valueSetter;
+-        }
+-
+-        public Codec<T> codec()
+-        {
+-            return this.codec;
+-        }
+-
+-        public List<T> values()
+-        {
+-            return this.values;
+-        }
+-
+-        public List<T> altValues()
+-        {
+-            return this.altValues;
+-        }
+-
+-        public BooleanSupplier altCondition()
+-        {
+-            return this.altCondition;
+-        }
+-
+-        public OptionInstance.CycleableValueSet.ValueSetter<T> valueSetter()
+-        {
+-            return this.valueSetter;
+-        }
+-
+-        public Codec<T> codec()
+-        {
+-            return this.codec;
+-        }
+     }
+ 
+     public interface CaptionBasedToString<T>
+@@ -309,9 +268,6 @@
+ 
+     public static record ClampingLazyMaxIntRange(int minInclusive, IntSupplier maxSupplier) implements OptionInstance.IntRangeBase, OptionInstance.SliderableOrCyclableValueSet<Integer>
+     {
+-        private final int minInclusive;
+-        private final IntSupplier maxSupplier;
+-
+         public Optional<Integer> validateValue(Integer p_231590_)
+         {
+             return Optional.of(Mth.clamp(p_231590_, this.minInclusive(), this.maxInclusive()));
+@@ -381,9 +337,6 @@
+ 
+     public static record Enum<T>(List<T> values, Codec<T> codec) implements OptionInstance.CycleableValueSet<T>
+     {
+-        private final List<T> values;
+-        private final Codec<T> codec;
+-
+         public Optional<T> validateValue(T p_231632_)
+         {
+             return this.values.contains(p_231632_) ? Optional.of(p_231632_) : Optional.empty();
+@@ -393,28 +346,10 @@
+         {
+             return CycleButton.ValueListSupplier.create(this.values);
+         }
+-
+-        public Codec<T> codec()
+-        {
+-            return this.codec;
+-        }
+-
+-        public List<T> values()
+-        {
+-            return this.values;
+-        }
+-
+-        public Codec<T> codec()
+-        {
+-            return this.codec;
+-        }
+     }
+ 
+     public static record IntRange(int minInclusive, int maxInclusive) implements OptionInstance.IntRangeBase
+     {
+-        private final int minInclusive;
+-        private final int maxInclusive;
+-
+         public Optional<Integer> validateValue(Integer p_231645_)
+         {
+             return p_231645_.compareTo(this.minInclusive()) >= 0 && p_231645_.compareTo(this.maxInclusive()) <= 0 ? Optional.of(p_231645_) : Optional.empty();
+@@ -482,10 +417,6 @@
+ 
+     public static record LazyEnum<T>(Supplier<List<T>> values, Function<T, Optional<T>> validateValue, Codec<T> codec) implements OptionInstance.CycleableValueSet<T>
+     {
+-        private final Supplier<List<T>> values;
+-        private final Function<T, Optional<T>> validateValue;
+-        private final Codec<T> codec;
+-
+         public Optional<T> validateValue(T p_231689_)
+         {
+             return this.validateValue.apply(p_231689_);
+@@ -495,26 +426,6 @@
+         {
+             return CycleButton.ValueListSupplier.create(this.values.get());
+         }
+-
+-        public Codec<T> codec()
+-        {
+-            return this.codec;
+-        }
+-
+-        public Supplier<List<T>> values()
+-        {
+-            return this.values;
+-        }
+-
+-        public Function<T, Optional<T>> validateValue()
+-        {
+-            return this.validateValue;
+-        }
+-
+-        public Codec<T> codec()
+-        {
+-            return this.codec;
+-        }
+     }
+ 
+     static final class OptionInstanceSliderButton<N> extends AbstractOptionSliderButton implements TooltipAccessor, IOptionControl

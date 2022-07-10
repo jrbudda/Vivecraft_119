@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/resources/model/ModelBakery.java
 +++ b/net/minecraft/client/resources/model/ModelBakery.java
-@@ -588,7 +588,7 @@
+@@ -562,7 +562,7 @@
                      });
                      map3.forEach((keyIn, setIn) ->
                      {
@@ -9,7 +9,7 @@
  
                          while (iterator.hasNext())
                          {
-@@ -601,9 +601,9 @@
+@@ -575,9 +575,9 @@
                              }
                          }
  

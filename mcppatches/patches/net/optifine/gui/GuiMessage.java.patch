@@ -1,6 +1,6 @@
 --- a/net/optifine/gui/GuiMessage.java
 +++ b/net/optifine/gui/GuiMessage.java
-@@ -62,7 +62,7 @@
+@@ -60,7 +60,7 @@
      {
          this.ticksUntilEnable = ticksUntilEnable;
  
@@ -9,7 +9,7 @@
          {
              button.active = false;
          }
-@@ -74,7 +74,7 @@
+@@ -72,7 +72,7 @@
  
          if (--this.ticksUntilEnable == 0)
          {

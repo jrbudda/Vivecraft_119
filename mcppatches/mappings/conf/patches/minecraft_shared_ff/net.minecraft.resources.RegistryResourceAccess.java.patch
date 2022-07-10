@@ -1,0 +1,13 @@
+﻿diff -r -U 3 minecraft\net\minecraft\resources\RegistryResourceAccess.java minecraft_patched\net\minecraft\resources\RegistryResourceAccess.java
+--- minecraft\net\minecraft\resources\RegistryResourceAccess.java
++++ minecraft_patched\net\minecraft\resources\RegistryResourceAccess.java
+@@ -150,7 +150,7 @@
+          return this.f_195913_.entrySet().stream().filter((p_214277_) -> {
+             return p_214277_.getKey().m_135783_(p_214274_);
+          }).collect(Collectors.toMap((p_214287_) -> {
+-            return p_214287_.getKey();
++            return (ResourceKey<E>)p_214287_.getKey();
+          }, (p_214283_) -> {
+             return p_214283_.getValue()::m_214288_;
+          }));
+

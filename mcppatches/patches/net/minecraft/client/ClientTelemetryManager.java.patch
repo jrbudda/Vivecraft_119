@@ -1,20 +1,16 @@
 --- a/net/minecraft/client/ClientTelemetryManager.java
 +++ b/net/minecraft/client/ClientTelemetryManager.java
-@@ -150,13 +150,6 @@
+@@ -150,8 +150,7 @@
  
      static record PlayerInfo(GameType gameType, boolean hardcore)
      {
 -        private final GameType gameType;
 -        private final boolean hardcore;
--        PlayerInfo(GameType gameType, boolean hardcore)
--        {
--            this.gameType = gameType;
--            this.hardcore = hardcore;
--        }
++
          public int getGameModeId()
          {
              if (this.hardcore && this.gameType == GameType.SURVIVAL)
-@@ -192,13 +185,5 @@
+@@ -187,13 +186,5 @@
                  return b0;
              }
          }

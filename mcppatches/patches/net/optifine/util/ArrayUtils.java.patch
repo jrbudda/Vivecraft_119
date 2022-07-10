@@ -36,7 +36,7 @@
              return coll.toArray(aobject);
          }
      }
-@@ -447,7 +447,7 @@
+@@ -470,7 +470,7 @@
  
      public static Object[] newObject(int len, Object val)
      {

@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\util\ExtraCodecs.java minecraft_patched\net\minecraft\util\ExtraCodecs.java
 --- minecraft\net\minecraft\util\ExtraCodecs.java
 +++ minecraft_patched\net\minecraft\util\ExtraCodecs.java
-@@ -53,7 +53,7 @@
+@@ -93,7 +93,7 @@
        }, (p_184459_) -> {
           return ImmutableList.of(p_184366_.apply(p_184459_), p_184367_.apply(p_184459_));
        });

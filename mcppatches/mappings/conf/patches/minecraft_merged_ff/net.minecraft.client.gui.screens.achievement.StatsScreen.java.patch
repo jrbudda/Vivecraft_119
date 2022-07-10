@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\client\gui\screens\achievement\StatsScreen.java minecraft_patched\net\minecraft\client\gui\screens\achievement\StatsScreen.java
 --- minecraft\net\minecraft\client\gui\screens\achievement\StatsScreen.java
 +++ minecraft_patched\net\minecraft\client\gui\screens\achievement\StatsScreen.java
-@@ -446,11 +446,11 @@
+@@ -444,11 +444,11 @@
                 i = 0;
                 j = 0;
              } else if (ItemStatisticsList.this.f_97021_.contains(ItemStatisticsList.this.f_97026_)) {

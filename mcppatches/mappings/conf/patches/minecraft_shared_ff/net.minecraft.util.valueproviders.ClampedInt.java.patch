@@ -2,7 +2,7 @@
 --- minecraft\net\minecraft\util\valueproviders\ClampedInt.java
 +++ minecraft_patched\net\minecraft\util\valueproviders\ClampedInt.java
 @@ -8,7 +8,7 @@
- import net.minecraft.util.Mth;
+ import net.minecraft.util.RandomSource;
  
  public class ClampedInt extends IntProvider {
 -   public static final Codec<ClampedInt> f_146383_ = RecordCodecBuilder.create((p_146400_) -> {

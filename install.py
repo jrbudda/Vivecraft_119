@@ -267,47 +267,27 @@ def download_deps( mcp_dir, download_mc, forgedep=False ):
             if skip:
                 print 'File: %s\nSkipping due to rules' % libname
                 continue
-                
-            group,artifact,version = lib["name"].split(":")
+            filepath=""
+
+            if len(lib["name"].split(":"))==4:
+                group,artifact,version,natives = lib["name"].split(":")
+            else:
+                group,artifact,version = lib["name"].split(":")
+            
             if "url" in lib:
-                repo = lib["url"]
+                url = lib["url"]
+                filepath = group.replace(".","/")+ "/"+artifact+"/"+version +"/"+artifact+"-"+version+".jar"
+            elif "downloads" in lib:
+                url = lib["downloads"]["artifact"]["url"]
+                filepath = lib["downloads"]["artifact"]["path"]
             else:
-                repo = "https://libraries.minecraft.net/"
-
-            if "natives" in lib:
-                url = group.replace(".","/")+ "/"+artifact+"/"+version +"/"+artifact+"-"+version+"-"+lib["natives"][native]+".jar"
-            else:
-                url = group.replace(".","/")+ "/"+artifact+"/"+version +"/"+artifact+"-"+version+".jar"
-
-            index = url.find('${arch}')
-            if index > -1:
-                # Get both 32 and 64 bit versions
-                url32 = url.replace('${arch}', '32')
-                file32 = os.path.join(jars,"libraries",url32.replace("/",os.sep))
-                mkdir_p(os.path.dirname(file32))
-                download_file( repo + url32, file32 )
-                shutil.copy(file32,os.path.join(flat_lib_dir, os.path.basename(file32)))
+                url = "unknown"     
                 
-                url64 = url.replace('${arch}', '64')
-                file64 = os.path.join(jars,"libraries",url64.replace("/",os.sep))
-                mkdir_p(os.path.dirname(file64))
-                download_file(repo + url64, file64)
-                shutil.copy(file64,os.path.join(flat_lib_dir, os.path.basename(file64)))                
-
-                # Use preferred architecture to choose which natives to extract.
-                if preferredarch is '32':
-                    print '    Using preferred arch 32bit'
-                    extractnatives( lib, jars, file32, flat_native_dir )
-                else:
-                    print '    Using preferred arch 64bit'
-                    extractnatives( lib, jars, file64, flat_native_dir )                
-               
-            else:
-                file = os.path.join(jars,"libraries",url.replace("/",os.sep))
-                mkdir_p(os.path.dirname(file))
-                if download_file( repo + url, file ) == True:
-                    shutil.copy(file,os.path.join(flat_lib_dir, os.path.basename(file)))  
-                    extractnatives( lib, jars, file, flat_native_dir )
+            file = os.path.join(jars,"libraries",filepath.replace("/",os.sep))
+            mkdir_p(os.path.dirname(file))
+            if download_file(url, file ) == True:
+                shutil.copy(file,os.path.join(flat_lib_dir, os.path.basename(file)))  
+                extractnatives( lib, jars, file, flat_native_dir )      
                 
             newlibs.append( lib )
         json_obj['libraries'] = newlibs

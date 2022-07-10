@@ -7,7 +7,7 @@
        super.m_7856_();
 -      this.f_98375_ = this.m_142416_(CycleButton.m_168894_((p_169719_) -> {
 +      this.f_98375_ = this.m_142416_(CycleButton.<CommandBlockEntity.Mode>m_168894_((p_169719_) -> {
-          switch(p_169719_) {
-          case SEQUENCE:
-             return new TranslatableComponent("advMode.mode.sequence");
+          switch (p_169719_) {
+             case SEQUENCE:
+                return Component.m_237115_("advMode.mode.sequence");
 

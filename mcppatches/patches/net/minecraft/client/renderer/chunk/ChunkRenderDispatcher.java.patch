@@ -1,7 +1,7 @@
 --- a/net/minecraft/client/renderer/chunk/ChunkRenderDispatcher.java
 +++ b/net/minecraft/client/renderer/chunk/ChunkRenderDispatcher.java
-@@ -1199,7 +1199,7 @@
-                     Random random = new Random();
+@@ -1186,7 +1186,7 @@
+                     RandomSource randomsource = RandomSource.create();
                      BlockRenderDispatcher blockrenderdispatcher = Minecraft.getInstance().getBlockRenderer();
  
 -                    for (BlockPosM blockposm : BlockPosM.getAllInBoxMutable(blockpos, blockpos1))

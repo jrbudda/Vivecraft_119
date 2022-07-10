@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\world\entity\ai\village\poi\PoiSection.java minecraft_patched\net\minecraft\world\entity\ai\village\poi\PoiSection.java
 --- minecraft\net\minecraft\world\entity\ai\village\poi\PoiSection.java
 +++ minecraft_patched\net\minecraft\world\entity\ai\village\poi\PoiSection.java
-@@ -30,7 +30,7 @@
+@@ -31,7 +31,7 @@
     private boolean f_27264_;
  
     public static Codec<PoiSection> m_27295_(Runnable p_27296_) {

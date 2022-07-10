@@ -1,0 +1,21 @@
+--- a/net/minecraft/client/gui/font/providers/BitmapProvider.java
++++ b/net/minecraft/client/gui/font/providers/BitmapProvider.java
+@@ -242,17 +242,8 @@
+         }
+     }
+ 
+-    static record Glyph(float scale, NativeImage texture, int unpackSkipPixels, int unpackSkipRows, int width, int height, int advanceWidth, int ascent, float offsetBold) implements GlyphInfo
++    static record Glyph(float scale, NativeImage image, int offsetX, int offsetY, int width, int height, int advance, int ascent, float offsetBold) implements GlyphInfo
+     {
+-        private final float scale;
+-        private final NativeImage image;
+-        private final int offsetX;
+-        private final int offsetY;
+-        private final int width;
+-        private final int height;
+-        private final int advance;
+-        private final int ascent;
+-
+         public Glyph(float scale, NativeImage image, int offsetX, int offsetY, int width, int height, int advance, int ascent)
+         {
+             this(scale, image, offsetX, offsetY, width, height, advance, ascent, 1.0F);

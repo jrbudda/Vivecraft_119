@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/state/StateHolder.java
 +++ b/net/minecraft/world/level/block/state/StateHolder.java
-@@ -93,7 +93,7 @@
+@@ -92,7 +92,7 @@
          return stringbuilder.toString();
      }
  

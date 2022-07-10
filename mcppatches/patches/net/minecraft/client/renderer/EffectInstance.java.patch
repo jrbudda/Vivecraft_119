@@ -1,0 +1,14 @@
+--- a/net/minecraft/client/renderer/EffectInstance.java
++++ b/net/minecraft/client/renderer/EffectInstance.java
+@@ -178,9 +178,9 @@
+                     {
+                         reader.close();
+                     }
+-                    catch (Throwable throwable1)
++                    catch (Throwable throwable2)
+                     {
+-                        throwable1.addSuppressed(throwable1);
++                        throwable1.addSuppressed(throwable2);
+                     }
+                 }
+ 

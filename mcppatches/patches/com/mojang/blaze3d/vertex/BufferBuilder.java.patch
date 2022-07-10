@@ -1,0 +1,19 @@
+--- a/com/mojang/blaze3d/vertex/BufferBuilder.java
++++ b/com/mojang/blaze3d/vertex/BufferBuilder.java
+@@ -893,15 +893,8 @@
+         return MemoryUtil.memSlice(this.buffer, p_231170_, p_231171_ - p_231170_);
+     }
+ 
+-    public static record DrawState(VertexFormat format, int vertexCount, int indexCount, VertexFormat.Mode drawMode, VertexFormat.IndexType indexType, boolean indexOnly, boolean sequentialIndex, MultiTextureData multiTextureData)
++    public static record DrawState(VertexFormat format, int vertexCount, int indexCount, VertexFormat.Mode mode, VertexFormat.IndexType indexType, boolean indexOnly, boolean sequentialIndex, MultiTextureData multiTextureData)
+     {
+-        private final VertexFormat format;
+-        private final int vertexCount;
+-        private final int indexCount;
+-        private final VertexFormat.Mode mode;
+-        private final VertexFormat.IndexType indexType;
+-        private final boolean indexOnly;
+-        private final boolean sequentialIndex;
+         public DrawState(VertexFormat format, int vertexCount, int indexCount, VertexFormat.Mode mode, VertexFormat.IndexType indexType, boolean indexOnly, boolean sequentialIndex)
+         {
+             this(format, vertexCount, indexCount, mode, indexType, indexOnly, sequentialIndex, (MultiTextureData)null);

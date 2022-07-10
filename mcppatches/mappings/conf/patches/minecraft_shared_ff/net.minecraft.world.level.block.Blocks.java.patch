@@ -1,0 +1,13 @@
+﻿diff -r -U 3 minecraft\net\minecraft\world\level\block\Blocks.java minecraft_patched\net\minecraft\world\level\block\Blocks.java
+--- minecraft\net\minecraft\world\level\block\Blocks.java
++++ minecraft_patched\net\minecraft\world\level\block\Blocks.java
+@@ -1091,7 +1091,7 @@
+    }
+ 
+    private static Boolean m_50821_(BlockState p_50822_, BlockGetter p_50823_, BlockPos p_50824_, EntityType<?> p_50825_) {
+-      return (boolean)p_50825_ == EntityType.f_20505_ || p_50825_ == EntityType.f_20508_;
++      return (boolean)(p_50825_ == EntityType.f_20505_ || p_50825_ == EntityType.f_20508_);
+    }
+ 
+    private static BedBlock m_50764_(DyeColor p_50765_) {
+

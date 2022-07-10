@@ -2,7 +2,7 @@
 --- minecraft\net\minecraft\util\valueproviders\TrapezoidFloat.java
 +++ minecraft_patched\net\minecraft\util\valueproviders\TrapezoidFloat.java
 @@ -7,7 +7,7 @@
- import java.util.function.Function;
+ import net.minecraft.util.RandomSource;
  
  public class TrapezoidFloat extends FloatProvider {
 -   public static final Codec<TrapezoidFloat> f_146561_ = RecordCodecBuilder.create((p_146578_) -> {

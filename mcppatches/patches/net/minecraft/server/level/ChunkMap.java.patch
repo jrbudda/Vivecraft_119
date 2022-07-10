@@ -1,0 +1,11 @@
+--- a/net/minecraft/server/level/ChunkMap.java
++++ b/net/minecraft/server/level/ChunkMap.java
+@@ -682,7 +682,7 @@
+ 
+                 return flag;
+             });
+-        }).thenApplyAsync((p_214889_2_) ->
++        }).<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>thenApplyAsync((p_214889_2_) ->
+         {
+             this.level.getProfiler().incrementCounter("chunkLoad");
+ 

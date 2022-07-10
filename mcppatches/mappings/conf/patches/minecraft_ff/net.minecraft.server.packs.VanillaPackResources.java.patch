@@ -1,0 +1,13 @@
+﻿diff -r -U 3 minecraft\net\minecraft\server\packs\VanillaPackResources.java minecraft_patched\net\minecraft\server\packs\VanillaPackResources.java
+--- minecraft\net\minecraft\server\packs\VanillaPackResources.java
++++ minecraft_patched\net\minecraft\server\packs\VanillaPackResources.java
+@@ -166,7 +166,7 @@
+       try {
+          stream.filter((p_215351_) -> {
+             return !p_215351_.endsWith(".mcmeta") && Files.isRegularFile(p_215351_);
+-         }).mapMulti((p_215355_, p_215356_) -> {
++         }).<ResourceLocation>mapMulti((p_215355_, p_215356_) -> {
+             String s = path.relativize(p_215355_).toString().replaceAll("\\\\", "/");
+             ResourceLocation resourcelocation = ResourceLocation.m_214293_(p_215359_, s);
+             if (resourcelocation == null) {
+

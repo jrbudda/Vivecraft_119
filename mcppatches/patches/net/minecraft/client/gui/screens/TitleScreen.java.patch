@@ -1,13 +1,13 @@
 --- a/net/minecraft/client/gui/screens/TitleScreen.java
 +++ b/net/minecraft/client/gui/screens/TitleScreen.java
-@@ -586,10 +586,6 @@
+@@ -544,10 +544,6 @@
  
-     static record Warning32Bit(MultiLineLabel label, int x, int y, CompletableFuture<Boolean> realmsSubscriptionFuture)
+     static record WarningLabel(Font font, MultiLineLabel label, int x, int y)
      {
+-        private final Font font;
 -        private final MultiLineLabel label;
 -        private final int x;
 -        private final int y;
--        private final CompletableFuture<Boolean> realmsSubscriptionFuture;
-         Warning32Bit(MultiLineLabel label, int x, int y, CompletableFuture<Boolean> realmsSubscriptionFuture)
+         public void render(PoseStack p_232791_, int p_232792_)
          {
-             this.label = label;
+             this.label.renderBackgroundCentered(p_232791_, this.x, this.y, 9, 2, 1428160512);

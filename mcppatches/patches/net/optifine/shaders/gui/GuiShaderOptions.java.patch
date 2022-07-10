@@ -8,12 +8,12 @@
  import com.mojang.blaze3d.vertex.PoseStack;
  import net.minecraft.client.Options;
  import net.minecraft.client.gui.Font;
-@@ -226,7 +228,7 @@
+@@ -222,7 +224,7 @@
  
      private void updateAllButtons()
      {
 -        for (Button button : this.getButtonList())
 +        for (Button button : (List<Button>)(List<?>)this.getButtonList())
          {
-             if (button instanceof GuiButtonShaderOption)
+             if (button instanceof GuiButtonShaderOption guibuttonshaderoption)
              {

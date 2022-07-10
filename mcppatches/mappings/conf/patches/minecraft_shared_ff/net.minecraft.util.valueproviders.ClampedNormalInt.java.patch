@@ -2,7 +2,7 @@
 --- minecraft\net\minecraft\util\valueproviders\ClampedNormalInt.java
 +++ minecraft_patched\net\minecraft\util\valueproviders\ClampedNormalInt.java
 @@ -8,7 +8,7 @@
- import net.minecraft.util.Mth;
+ import net.minecraft.util.RandomSource;
  
  public class ClampedNormalInt extends IntProvider {
 -   public static final Codec<ClampedNormalInt> f_185867_ = RecordCodecBuilder.create((p_185887_) -> {

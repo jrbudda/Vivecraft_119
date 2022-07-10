@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/LevelAccessor.java
 +++ b/net/minecraft/world/level/LevelAccessor.java
-@@ -33,12 +33,12 @@
+@@ -37,12 +37,12 @@
  
      private <T> ScheduledTick<T> createTick(BlockPos p_186483_, T p_186484_, int p_186485_, TickPriority p_186486_)
      {

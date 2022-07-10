@@ -2,7 +2,7 @@
 --- minecraft\net\minecraft\util\valueproviders\BiasedToBottomInt.java
 +++ minecraft_patched\net\minecraft\util\valueproviders\BiasedToBottomInt.java
 @@ -7,7 +7,7 @@
- import java.util.function.Function;
+ import net.minecraft.util.RandomSource;
  
  public class BiasedToBottomInt extends IntProvider {
 -   public static final Codec<BiasedToBottomInt> f_146359_ = RecordCodecBuilder.create((p_146373_) -> {

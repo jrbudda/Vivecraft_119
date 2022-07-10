@@ -1,6 +1,6 @@
 --- a/net/minecraft/util/datafix/fixes/LeavesFix.java
 +++ b/net/minecraft/util/datafix/fixes/LeavesFix.java
-@@ -278,7 +278,7 @@
+@@ -277,7 +277,7 @@
  
              for (int i = 0; i < this.palette.size(); ++i)
              {
@@ -9,7 +9,7 @@
                  String s = dynamic.get("Name").asString("");
  
                  if (LeavesFix.LEAVES.containsKey(s))
-@@ -320,12 +320,12 @@
+@@ -319,12 +319,12 @@
  
          int getDistance(int p_16279_)
          {
@@ -24,7 +24,7 @@
              String s = dynamic.get("Name").asString("");
              boolean flag = Objects.equals(dynamic.get("Properties").get("persistent").asString(""), "true");
              int i = this.getStateId(s, flag, p_16262_);
-@@ -363,7 +363,7 @@
+@@ -362,7 +362,7 @@
          protected static final String PROPERTIES_TAG = "Properties";
          private final Type < Pair < String, Dynamic<? >>> blockStateType = DSL.named(References.BLOCK_STATE.typeName(), DSL.remainderType());
          protected final OpticFinder < List < Pair < String, Dynamic<? >>> > paletteFinder = DSL.fieldFinder("Palette", DSL.list(this.blockStateType));
@@ -33,7 +33,7 @@
          protected final int index;
          @Nullable
          protected PackedBitStorage storage;
-@@ -400,13 +400,13 @@
+@@ -399,13 +399,13 @@
                  this.storage = new PackedBitStorage(i, 4096, along);
              }
          }

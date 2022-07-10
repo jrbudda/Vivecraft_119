@@ -1,11 +1,11 @@
 --- a/net/minecraft/world/level/levelgen/blending/Blender.java
 +++ b/net/minecraft/world/level/levelgen/blending/Blender.java
-@@ -447,8 +447,6 @@
+@@ -471,8 +471,6 @@
  
      public static record BlendingOutput(double alpha, double blendingOffset)
      {
 -        private final double alpha;
 -        private final double blendingOffset;
-         public BlendingOutput(double alpha, double blendingOffset)
+         public double alpha()
          {
-             this.alpha = alpha;
+             return this.alpha;

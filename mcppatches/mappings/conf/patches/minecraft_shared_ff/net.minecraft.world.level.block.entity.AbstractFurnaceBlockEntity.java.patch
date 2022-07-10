@@ -1,22 +1,22 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\world\level\block\entity\AbstractFurnaceBlockEntity.java minecraft_patched\net\minecraft\world\level\block\entity\AbstractFurnaceBlockEntity.java
 --- minecraft\net\minecraft\world\level\block\entity\AbstractFurnaceBlockEntity.java
 +++ minecraft_patched\net\minecraft\world\level\block\entity\AbstractFurnaceBlockEntity.java
-@@ -240,7 +240,7 @@
+@@ -105,7 +105,7 @@
  
-       ItemStack itemstack = p_155017_.f_58310_.get(1);
-       if (p_155017_.m_58425_() || !itemstack.m_41619_() && !p_155017_.f_58310_.get(0).m_41619_()) {
--         Recipe<?> recipe = p_155014_.m_7465_().m_44015_(p_155017_.f_58312_, p_155017_, p_155014_).orElse((AbstractCookingRecipe)null);
-+         Recipe<?> recipe = p_155014_.m_7465_().m_44015_((RecipeType<AbstractCookingRecipe>)p_155017_.f_58312_, p_155017_, p_155014_).orElse((AbstractCookingRecipe)null);
-          int i = p_155017_.m_6893_();
-          if (!p_155017_.m_58425_() && m_155005_(recipe, p_155017_.f_58310_, i)) {
-             p_155017_.f_58316_ = p_155017_.m_7743_(itemstack);
-@@ -342,7 +342,7 @@
+    protected AbstractFurnaceBlockEntity(BlockEntityType<?> p_154991_, BlockPos p_154992_, BlockState p_154993_, RecipeType<? extends AbstractCookingRecipe> p_154994_) {
+       super(p_154991_, p_154992_, p_154993_);
+-      this.f_222691_ = RecipeManager.m_220267_(p_154994_);
++      this.f_222691_ = RecipeManager.m_220267_((RecipeType)p_154994_);
     }
  
-    private static int m_155009_(Level p_155010_, RecipeType<? extends AbstractCookingRecipe> p_155011_, Container p_155012_) {
--      return p_155010_.m_7465_().m_44015_(p_155011_, p_155012_, p_155010_).map(AbstractCookingRecipe::m_43753_).orElse(200);
-+      return p_155010_.m_7465_().m_44015_((RecipeType<AbstractCookingRecipe>)p_155011_, p_155012_, p_155010_).map(AbstractCookingRecipe::m_43753_).orElse(200);
-    }
- 
-    public static boolean m_58399_(ItemStack p_58400_) {
+    public static Map<Item, Integer> m_58423_() {
+@@ -248,7 +248,7 @@
+       if (p_155017_.m_58425_() || flag3 && flag2) {
+          Recipe<?> recipe;
+          if (flag2) {
+-            recipe = p_155017_.f_222691_.m_213657_(p_155017_, p_155014_).orElse((AbstractCookingRecipe)null);
++            recipe = p_155017_.f_222691_.m_213657_(p_155017_, p_155014_).orElse(null);
+          } else {
+             recipe = null;
+          }
 

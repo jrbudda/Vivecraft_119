@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\client\PeriodicNotificationManager.java minecraft_patched\net\minecraft\client\PeriodicNotificationManager.java
 --- minecraft\net\minecraft\client\PeriodicNotificationManager.java
 +++ minecraft_patched\net\minecraft\client\PeriodicNotificationManager.java
-@@ -34,7 +34,7 @@
+@@ -30,7 +30,7 @@
  
  @OnlyIn(Dist.CLIENT)
  public class PeriodicNotificationManager extends SimplePreparableReloadListener<Map<String, List<PeriodicNotificationManager.Notification>>> implements AutoCloseable {

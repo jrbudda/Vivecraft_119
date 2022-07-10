@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\data\info\RegistryDumpReport.java minecraft_patched\net\minecraft\data\info\RegistryDumpReport.java
 --- minecraft\net\minecraft\data\info\RegistryDumpReport.java
 +++ minecraft_patched\net\minecraft\data\info\RegistryDumpReport.java
-@@ -37,7 +37,7 @@
+@@ -34,7 +34,7 @@
           jsonobject.addProperty("default", resourcelocation.toString());
        }
  

@@ -1,0 +1,13 @@
+﻿diff -r -U 3 minecraft\net\minecraft\world\entity\animal\frog\Tadpole.java minecraft_patched\net\minecraft\world\entity\animal\frog\Tadpole.java
+--- minecraft\net\minecraft\world\entity\animal\frog\Tadpole.java
++++ minecraft_patched\net\minecraft\world\entity\animal\frog\Tadpole.java
+@@ -63,7 +63,7 @@
+    }
+ 
+    public Brain<Tadpole> m_6274_() {
+-      return super.m_6274_();
++      return (Brain<Tadpole>)super.m_6274_();
+    }
+ 
+    protected SoundEvent m_5699_() {
+

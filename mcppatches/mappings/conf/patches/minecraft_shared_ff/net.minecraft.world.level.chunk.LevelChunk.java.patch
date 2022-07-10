@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\world\level\chunk\LevelChunk.java minecraft_patched\net\minecraft\world\level\chunk\LevelChunk.java
 --- minecraft\net\minecraft\world\level\chunk\LevelChunk.java
 +++ minecraft_patched\net\minecraft\world\level\chunk\LevelChunk.java
-@@ -572,7 +572,7 @@
+@@ -586,7 +586,7 @@
  
     private <T extends BlockEntity> void m_156406_(T p_156407_) {
        BlockState blockstate = p_156407_.m_58900_();

@@ -1,14 +1,5 @@
 --- a/optifine/Utils.java
 +++ b/optifine/Utils.java
-@@ -42,7 +42,7 @@
-         String s = System.getProperty("user.home", ".");
-         File file1 = null;
- 
--        switch ($SWITCH_TABLE$optifine$Utils$OS()[getPlatform().ordinal()])
-+        switch (getPlatform().ordinal())
-         {
-             case 1:
-             case 2:
 @@ -175,7 +175,7 @@
              list.add(s);
          }

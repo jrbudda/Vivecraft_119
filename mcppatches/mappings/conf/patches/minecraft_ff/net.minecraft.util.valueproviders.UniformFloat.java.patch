@@ -2,7 +2,7 @@
 --- minecraft\net\minecraft\util\valueproviders\UniformFloat.java
 +++ minecraft_patched\net\minecraft\util\valueproviders\UniformFloat.java
 @@ -8,7 +8,7 @@
- import net.minecraft.util.Mth;
+ import net.minecraft.util.RandomSource;
  
  public class UniformFloat extends FloatProvider {
 -   public static final Codec<UniformFloat> f_146590_ = RecordCodecBuilder.create((p_146601_) -> {
