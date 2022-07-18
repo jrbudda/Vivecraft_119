@@ -1,14 +1,6 @@
 --- a/net/minecraft/client/Options.java
 +++ b/net/minecraft/client/Options.java
-@@ -203,6 +203,7 @@
-     public float fovEffectScale = 1.0F;
-     public double gamma;
-     public int guiScale;
-+    public int guiScaleUser;
-     public ParticleStatus particles = ParticleStatus.ALL;
-     public NarratorStatus narratorStatus = NarratorStatus.OFF;
-     public String languageCode = "en_us";
-@@ -215,7 +216,7 @@
+@@ -696,7 +696,7 @@
      public boolean ofSmoothFps = false;
      public boolean ofSmoothWorld = Config.isSingleProcessor();
      public boolean ofLazyChunkLoading = Config.isSingleProcessor();
@@ -17,7 +9,7 @@
      public boolean ofSmartAnimations = false;
      public double ofAoLevel = 1.0D;
      public int ofAaLevel = 0;
-@@ -252,7 +253,7 @@
+@@ -733,7 +733,7 @@
      public boolean ofFastRender = false;
      public boolean ofDynamicFov = true;
      public boolean ofAlternateBlocks = true;
@@ -26,26 +18,17 @@
      public boolean ofCustomEntityModels = true;
      public boolean ofCustomGuis = true;
      public boolean ofShowGlErrors = true;
-@@ -338,6 +339,7 @@
+@@ -1152,6 +1152,9 @@
+         this.framerateLimit().set(this.framerateLimit().getMaxValue());
          this.ofKeyBindZoom = new KeyMapping("of.key.zoom", 67, "key.categories.misc");
          this.keyMappings = ArrayUtils.add(this.keyMappings, this.ofKeyBindZoom);
-         KeyUtils.fixKeyConflicts(this.keyMappings, new KeyMapping[] {this.ofKeyBindZoom});
-+        this.keyMappings = this.minecraft.vr.initializeBindings(this.keyMappings);
-         this.renderDistance = 8;
-         this.load();
-         Config.initGameSettings(this);
-@@ -405,7 +407,9 @@
-         this.renderDistance = (int)Mth.clamp((double)p_168428_.process("renderDistance", this.renderDistance), Option.RENDER_DISTANCE.getMinValue(), Option.RENDER_DISTANCE.getMaxValue());
-         this.simulationDistance = (int)Mth.clamp((double)p_168428_.process("simulationDistance", this.simulationDistance), Option.SIMULATION_DISTANCE.getMinValue(), Option.SIMULATION_DISTANCE.getMaxValue());
-         this.entityDistanceScaling = p_168428_.process("entityDistanceScaling", this.entityDistanceScaling);
--        this.guiScale = p_168428_.process("guiScale", this.guiScale);
 +        //Vivecraft
-+        this.guiScaleUser = p_168428_.process("guiScale", this.guiScaleUser);
-+        //
-         this.particles = p_168428_.process("particles", this.particles, ParticleStatus::byId, ParticleStatus::getId);
-         this.framerateLimit = p_168428_.process("maxFps", this.framerateLimit);
- 
-@@ -843,9 +847,9 @@
++        this.keyMappings = this.minecraft.vr.initializeBindings(this.keyMappings);
++		//    
+         KeyUtils.fixKeyConflicts(this.keyMappings, new KeyMapping[] {this.ofKeyBindZoom});
+         this.renderDistance.set(8);
+         this.load();
+@@ -1631,9 +1634,9 @@
  
                  printwriter.close();
              }
@@ -57,114 +40,19 @@
              }
  
              this.saveOptions = false;
-@@ -913,22 +917,22 @@
-         return this.useNativeTransport;
-     }
- 
--    public void setOptionFloatValueOF(Option option, double val)
-+    public void setOptionFloatValueOF(Option p_setOptionFloatValueOF_1_, double p_setOptionFloatValueOF_2_)
-     {
--        if (option == Option.CLOUD_HEIGHT)
-+        if (p_setOptionFloatValueOF_1_ == Option.CLOUD_HEIGHT)
-         {
--            this.ofCloudsHeight = val;
-+            this.ofCloudsHeight = p_setOptionFloatValueOF_2_;
-         }
- 
--        if (option == Option.AO_LEVEL)
-+        if (p_setOptionFloatValueOF_1_ == Option.AO_LEVEL)
-         {
--            this.ofAoLevel = val;
-+            this.ofAoLevel = p_setOptionFloatValueOF_2_;
-             this.minecraft.levelRenderer.allChanged();
-         }
- 
--        if (option == Option.AA_LEVEL)
-+        if (p_setOptionFloatValueOF_1_ == Option.AA_LEVEL)
-         {
--            int i = (int)val;
-+            int i = (int)p_setOptionFloatValueOF_2_;
- 
-             if (i > 0 && Config.isShaders())
-             {
-@@ -944,60 +948,61 @@
- 
-             this.ofAaLevel = i;
-             this.ofAaLevel = Config.limit(this.ofAaLevel, 0, 16);
-+            this.ofAaLevel = 0;
-         }
- 
--        if (option == Option.AF_LEVEL)
-+        if (p_setOptionFloatValueOF_1_ == Option.AF_LEVEL)
-         {
--            int j = (int)val;
-+            int j = (int)p_setOptionFloatValueOF_2_;
-             this.ofAfLevel = j;
-             this.ofAfLevel = Config.limit(this.ofAfLevel, 1, 16);
-             this.minecraft.delayTextureReload();
-             Shaders.uninit();
-         }
- 
--        if (option == Option.MIPMAP_TYPE)
-+        if (p_setOptionFloatValueOF_1_ == Option.MIPMAP_TYPE)
-         {
--            int k = (int)val;
-+            int k = (int)p_setOptionFloatValueOF_2_;
-             this.ofMipmapType = Config.limit(k, 0, 3);
-             this.updateMipmaps();
+@@ -1775,9 +1778,9 @@
          }
      }
  
--    public double getOptionFloatValueOF(Option settingOption)
-+    public double getOptionFloatValueOF(Option p_getOptionFloatValueOF_1_)
-     {
--        if (settingOption == Option.CLOUD_HEIGHT)
-+        if (p_getOptionFloatValueOF_1_ == Option.CLOUD_HEIGHT)
-         {
-             return this.ofCloudsHeight;
-         }
--        else if (settingOption == Option.AO_LEVEL)
-+        else if (p_getOptionFloatValueOF_1_ == Option.AO_LEVEL)
-         {
-             return this.ofAoLevel;
-         }
--        else if (settingOption == Option.AA_LEVEL)
-+        else if (p_getOptionFloatValueOF_1_ == Option.AA_LEVEL)
-         {
-             return (double)this.ofAaLevel;
-         }
--        else if (settingOption == Option.AF_LEVEL)
-+        else if (p_getOptionFloatValueOF_1_ == Option.AF_LEVEL)
-         {
-             return (double)this.ofAfLevel;
-         }
--        else if (settingOption == Option.MIPMAP_TYPE)
-+        else if (p_getOptionFloatValueOF_1_ == Option.MIPMAP_TYPE)
-         {
-             return (double)this.ofMipmapType;
-         }
--        else if (settingOption == Option.FRAMERATE_LIMIT)
-+        else if (p_getOptionFloatValueOF_1_ != Option.FRAMERATE_LIMIT)
-         {
--            return (double)this.framerateLimit == Option.FRAMERATE_LIMIT.getMaxValue() && this.enableVsync ? 0.0D : (double)this.framerateLimit;
-+            return (double)Float.MAX_VALUE;
-         }
-         else
-         {
--            return (double)Float.MAX_VALUE;
-+            return (double)this.framerateLimit == Option.FRAMERATE_LIMIT.getMaxValue() && this.enableVsync ? 0.0D : (double)this.framerateLimit;
-         }
-     }
- 
--    public void setOptionValueOF(Option par1EnumOptions, int par2)
-+    public void setOptionValueOF(Option p_setOptionValueOF_1_, int p_setOptionValueOF_2_)
+-    public void setOptionValueOF(OptionInstance par1EnumOptions, int par2)
++    public void setOptionValueOF(OptionInstance p_setOptionValueOF_1_, int par2)
      {
 -        if (par1EnumOptions == Option.FOG_FANCY)
 +        if (p_setOptionValueOF_1_ == Option.FOG_FANCY)
          {
              switch (this.ofFogType)
              {
-@@ -1010,7 +1015,7 @@
+@@ -1790,7 +1793,7 @@
              }
          }
  
@@ -173,7 +61,7 @@
          {
              this.ofFogStart += 0.2F;
  
-@@ -1020,18 +1025,18 @@
+@@ -1800,18 +1803,18 @@
              }
          }
  
@@ -195,7 +83,7 @@
          {
              ++this.ofClouds;
  
-@@ -1043,13 +1048,13 @@
+@@ -1823,13 +1826,13 @@
              this.updateRenderClouds();
          }
  
@@ -211,7 +99,7 @@
          {
              ++this.ofRain;
  
-@@ -1059,7 +1064,7 @@
+@@ -1839,7 +1842,7 @@
              }
          }
  
@@ -220,7 +108,7 @@
          {
              ++this.ofAnimatedWater;
  
-@@ -1074,7 +1079,7 @@
+@@ -1854,7 +1857,7 @@
              }
          }
  
@@ -229,7 +117,7 @@
          {
              ++this.ofAnimatedLava;
  
-@@ -1089,92 +1094,92 @@
+@@ -1869,92 +1872,92 @@
              }
          }
  
@@ -340,7 +228,7 @@
          {
              int i = 900;
              this.ofAutoSaveTicks = Math.max(this.ofAutoSaveTicks / i * i, i);
-@@ -1186,7 +1191,7 @@
+@@ -1966,7 +1969,7 @@
              }
          }
  
@@ -349,7 +237,7 @@
          {
              ++this.ofBetterGrass;
  
-@@ -1198,7 +1203,7 @@
+@@ -1978,7 +1981,7 @@
              this.minecraft.levelRenderer.allChanged();
          }
  
@@ -358,7 +246,7 @@
          {
              ++this.ofConnectedTextures;
  
-@@ -1217,27 +1222,27 @@
+@@ -1997,27 +2000,27 @@
              }
          }
  
@@ -391,7 +279,7 @@
          {
              ++this.ofVignette;
  
-@@ -1247,7 +1252,7 @@
+@@ -2027,7 +2030,7 @@
              }
          }
  
@@ -400,7 +288,7 @@
          {
              ++this.ofChunkUpdates;
  
-@@ -1257,12 +1262,12 @@
+@@ -2037,12 +2040,12 @@
              }
          }
  
@@ -415,7 +303,7 @@
          {
              ++this.ofTime;
  
-@@ -1272,119 +1277,119 @@
+@@ -2052,119 +2055,119 @@
              }
          }
  
@@ -555,7 +443,7 @@
          {
              ++this.ofScreenshotSize;
  
-@@ -1394,34 +1399,34 @@
+@@ -2174,34 +2177,34 @@
              }
          }
  
@@ -596,7 +484,7 @@
          {
              if (this.ofChatBackground == 0)
              {
-@@ -1437,12 +1442,12 @@
+@@ -2217,12 +2220,12 @@
              }
          }
  
@@ -611,7 +499,7 @@
          {
              this.ofTelemetry = nextValue(this.ofTelemetry, OF_TELEMETRY);
          }
-@@ -2366,16 +2371,19 @@
+@@ -3140,16 +3143,19 @@
                          this.ofKeyBindZoom.setKey(InputConstants.getKey(astring[1]));
                      }
                  }
@@ -633,7 +521,7 @@
          }
          catch (Exception exception11)
          {
-@@ -2461,10 +2469,10 @@
+@@ -3235,10 +3241,10 @@
              printwriter.println("key_" + this.ofKeyBindZoom.getName() + ":" + this.ofKeyBindZoom.saveString());
              printwriter.close();
          }
@@ -646,16 +534,7 @@
          }
      }
  
-@@ -2526,7 +2534,7 @@
-         this.renderClouds = CloudStatus.FANCY;
-         this.fov = 70.0D;
-         this.gamma = 0.0D;
--        this.guiScale = 0;
-+        this.guiScaleUser = 0;
-         this.particles = ParticleStatus.ALL;
-         this.heldItemTooltips = true;
-         this.forceUnicodeFont = false;
-@@ -2540,7 +2548,7 @@
+@@ -3314,7 +3320,7 @@
          Config.updateAvailableProcessors();
          this.ofSmoothWorld = Config.isSingleProcessor();
          this.ofLazyChunkLoading = false;
@@ -664,94 +543,3 @@
          this.ofFastMath = false;
          this.ofFastRender = false;
          this.ofDynamicFov = true;
-@@ -2624,61 +2632,61 @@
-         this.minecraft.delayTextureReload();
-     }
- 
--    public void setAllAnimations(boolean flag)
-+    public void setAllAnimations(boolean p_setAllAnimations_1_)
-     {
--        int i = flag ? 0 : 2;
-+        int i = p_setAllAnimations_1_ ? 0 : 2;
-         this.ofAnimatedWater = i;
-         this.ofAnimatedLava = i;
--        this.ofAnimatedFire = flag;
--        this.ofAnimatedPortal = flag;
--        this.ofAnimatedRedstone = flag;
--        this.ofAnimatedExplosion = flag;
--        this.ofAnimatedFlame = flag;
--        this.ofAnimatedSmoke = flag;
--        this.ofVoidParticles = flag;
--        this.ofWaterParticles = flag;
--        this.ofRainSplash = flag;
--        this.ofPortalParticles = flag;
--        this.ofPotionParticles = flag;
--        this.ofFireworkParticles = flag;
--        this.particles = flag ? ParticleStatus.ALL : ParticleStatus.MINIMAL;
--        this.ofDrippingWaterLava = flag;
--        this.ofAnimatedTerrain = flag;
--        this.ofAnimatedTextures = flag;
-+        this.ofAnimatedFire = p_setAllAnimations_1_;
-+        this.ofAnimatedPortal = p_setAllAnimations_1_;
-+        this.ofAnimatedRedstone = p_setAllAnimations_1_;
-+        this.ofAnimatedExplosion = p_setAllAnimations_1_;
-+        this.ofAnimatedFlame = p_setAllAnimations_1_;
-+        this.ofAnimatedSmoke = p_setAllAnimations_1_;
-+        this.ofVoidParticles = p_setAllAnimations_1_;
-+        this.ofWaterParticles = p_setAllAnimations_1_;
-+        this.ofRainSplash = p_setAllAnimations_1_;
-+        this.ofPortalParticles = p_setAllAnimations_1_;
-+        this.ofPotionParticles = p_setAllAnimations_1_;
-+        this.ofFireworkParticles = p_setAllAnimations_1_;
-+        this.particles = p_setAllAnimations_1_ ? ParticleStatus.ALL : ParticleStatus.MINIMAL;
-+        this.ofDrippingWaterLava = p_setAllAnimations_1_;
-+        this.ofAnimatedTerrain = p_setAllAnimations_1_;
-+        this.ofAnimatedTextures = p_setAllAnimations_1_;
-     }
- 
--    private static int nextValue(int val, int[] vals)
-+    private static int nextValue(int p_nextValue_0_, int[] p_nextValue_1_)
-     {
--        int i = indexOf(val, vals);
-+        int i = indexOf(p_nextValue_0_, p_nextValue_1_);
- 
-         if (i < 0)
-         {
--            return vals[0];
-+            return p_nextValue_1_[0];
-         }
-         else
-         {
-             ++i;
- 
--            if (i >= vals.length)
-+            if (i >= p_nextValue_1_.length)
-             {
-                 i = 0;
-             }
- 
--            return vals[i];
-+            return p_nextValue_1_[i];
-         }
-     }
- 
--    private static int limit(int val, int[] vals)
-+    private static int limit(int p_limit_0_, int[] p_limit_1_)
-     {
--        int i = indexOf(val, vals);
--        return i < 0 ? vals[0] : val;
-+        int i = indexOf(p_limit_0_, p_limit_1_);
-+        return i < 0 ? p_limit_1_[0] : p_limit_0_;
-     }
- 
--    private static int indexOf(int val, int[] vals)
-+    private static int indexOf(int p_indexOf_0_, int[] p_indexOf_1_)
-     {
--        for (int i = 0; i < vals.length; ++i)
-+        for (int i = 0; i < p_indexOf_1_.length; ++i)
-         {
--            if (vals[i] == val)
-+            if (p_indexOf_1_[i] == p_indexOf_0_)
-             {
-                 return i;
-             }

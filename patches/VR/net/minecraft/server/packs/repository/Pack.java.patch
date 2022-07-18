@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/packs/repository/Pack.java
 +++ b/net/minecraft/server/packs/repository/Pack.java
-@@ -28,6 +28,7 @@
+@@ -27,6 +27,7 @@
      private final Pack.Position defaultPosition;
      private final boolean required;
      private final boolean fixedPosition;
@@ -8,16 +8,16 @@
      private final PackSource packSource;
  
      @Nullable
-@@ -45,7 +46,7 @@
+@@ -44,7 +45,7 @@
  
                      if (packmetadatasection != null)
                      {
--                        pack = p_10434_.create(p_10431_, new TextComponent(packresources.getName()), p_10432_, p_10433_, packmetadatasection, p_10435_, p_10436_);
-+                        pack = p_10434_.create(p_10431_, new TextComponent(packresources.getName()), p_10432_, p_10433_, packmetadatasection, p_10435_, p_10436_, false);
+-                        pack = p_10434_.create(p_10431_, Component.literal(packresources.getName()), p_10432_, p_10433_, packmetadatasection, p_10435_, p_10436_);
++                        pack = p_10434_.create(p_10431_, Component.literal(packresources.getName()), p_10432_, p_10433_, packmetadatasection, p_10435_, p_10436_, false);
                          break label54;
                      }
  
-@@ -90,7 +91,12 @@
+@@ -89,7 +90,12 @@
          }
      }
  
@@ -31,7 +31,7 @@
      {
          this.id = p_10420_;
          this.supplier = p_10422_;
-@@ -101,13 +107,17 @@
+@@ -100,13 +106,17 @@
          this.defaultPosition = p_10426_;
          this.fixedPosition = p_10427_;
          this.packSource = p_10428_;
@@ -50,7 +50,7 @@
      public Component getTitle()
      {
          return this.title;
-@@ -161,6 +171,7 @@
+@@ -160,6 +170,7 @@
          return this.packSource;
      }
  
@@ -58,7 +58,7 @@
      public boolean equals(Object p_10448_)
      {
          if (this == p_10448_)
-@@ -191,7 +202,8 @@
+@@ -186,7 +197,8 @@
      public interface PackConstructor
      {
          @Nullable

@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/Gui.java
 +++ b/net/minecraft/client/gui/Gui.java
-@@ -7,10 +7,12 @@
+@@ -6,15 +6,19 @@
  import com.mojang.blaze3d.platform.GlStateManager;
  import com.mojang.blaze3d.systems.RenderSystem;
  import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -13,35 +13,42 @@
  import com.mojang.datafixers.util.Pair;
  import com.mojang.math.Vector3f;
  import java.util.Collection;
-@@ -69,6 +71,7 @@
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Map;
++import java.util.Random;
+ import java.util.UUID;
+ import java.util.function.UnaryOperator;
+ import java.util.stream.Collectors;
+@@ -69,6 +73,7 @@
  import net.minecraft.world.entity.player.Player;
  import net.minecraft.world.food.FoodData;
  import net.minecraft.world.item.ItemStack;
 +import net.minecraft.world.item.Items;
+ import net.minecraft.world.item.Rarity;
  import net.minecraft.world.level.GameType;
  import net.minecraft.world.level.Level;
- import net.minecraft.world.level.block.Blocks;
-@@ -94,7 +97,7 @@
+@@ -95,7 +100,7 @@
      private static final ResourceLocation VIGNETTE_LOCATION = new ResourceLocation("textures/misc/vignette.png");
      private static final ResourceLocation WIDGETS_LOCATION = new ResourceLocation("textures/gui/widgets.png");
      private static final ResourceLocation PUMPKIN_BLUR_LOCATION = new ResourceLocation("textures/misc/pumpkinblur.png");
 -    private static final ResourceLocation SPYGLASS_SCOPE_LOCATION = new ResourceLocation("textures/misc/spyglass_scope.png");
 +    public static final ResourceLocation SPYGLASS_SCOPE_LOCATION = new ResourceLocation("textures/misc/spyglass_scope.png");
      private static final ResourceLocation POWDER_SNOW_OUTLINE_LOCATION = new ResourceLocation("textures/misc/powder_snow_outline.png");
-     private static final Component DEMO_EXPIRED_TEXT = new TranslatableComponent("demo.demoExpired");
-     private static final Component SAVING_TEXT = new TranslatableComponent("menu.savingLevel");
-@@ -142,7 +145,9 @@
+     private static final Component DEMO_EXPIRED_TEXT = Component.translatable("demo.demoExpired");
+     private static final Component SAVING_TEXT = Component.translatable("menu.savingLevel");
+@@ -144,7 +149,9 @@
      private float lastAutosaveIndicatorValue;
-     private final Map<ChatType, List<ChatListener>> chatListeners = Maps.newHashMap();
+     private final List<ChatListener> chatListeners;
      private float scopeScale;
 -
 +    //Vivecraft
 +    public boolean showPlayerList;
 +    
-     public Gui(Minecraft pMinecraft)
+     public Gui(Minecraft p_232355_, ItemRenderer p_232356_)
      {
-         this.minecraft = pMinecraft;
-@@ -175,6 +180,8 @@
+         this.minecraft = p_232355_;
+@@ -166,6 +173,8 @@
          this.titleFadeOutTime = 20;
      }
  
@@ -50,7 +57,7 @@
      public void render(PoseStack pPoseStack, float pPartialTick)
      {
          this.screenWidth = this.minecraft.getWindow().getGuiScaledWidth();
-@@ -182,7 +189,7 @@
+@@ -173,7 +182,7 @@
          Font font = this.getFont();
          RenderSystem.enableBlend();
  
@@ -59,7 +66,7 @@
          {
              this.renderVignette(this.minecraft.getCameraEntity());
          }
-@@ -196,7 +203,7 @@
+@@ -187,7 +196,7 @@
          float f = this.minecraft.getDeltaFrameTime();
          this.scopeScale = Mth.lerp(0.5F * f, this.scopeScale, 1.125F);
  
@@ -68,7 +75,7 @@
          {
              if (this.minecraft.player.isScoping())
              {
-@@ -214,14 +221,15 @@
+@@ -205,14 +214,15 @@
              }
          }
  
@@ -86,7 +93,7 @@
          {
              this.renderPortalOverlay(f2);
          }
-@@ -241,7 +249,7 @@
+@@ -232,7 +242,7 @@
              RenderSystem.setShader(GameRenderer::getPositionTexShader);
              RenderSystem.setShaderTexture(0, GUI_ICONS_LOCATION);
              RenderSystem.enableBlend();
@@ -95,7 +102,7 @@
              RenderSystem.setShader(GameRenderer::getPositionTexShader);
              GlStateManager.enableAlphaTest();
              RenderSystem.defaultBlendFunc();
-@@ -418,7 +426,27 @@
+@@ -409,7 +419,27 @@
              {
                  this.displayScoreboardSidebar(pPoseStack, objective1);
              }
@@ -124,7 +131,7 @@
              RenderSystem.enableBlend();
              RenderSystem.defaultBlendFunc();
              pPoseStack.pushPose();
-@@ -428,17 +456,17 @@
+@@ -419,17 +449,17 @@
              this.minecraft.getProfiler().pop();
              pPoseStack.popPose();
              objective1 = scoreboard.getDisplayObjective(0);
@@ -148,7 +155,7 @@
              this.renderSavingIndicator(pPoseStack);
          }
  
-@@ -458,6 +486,7 @@
+@@ -449,6 +479,7 @@
  
      private void renderCrosshair(PoseStack pPoseStack)
      {
@@ -156,7 +163,7 @@
          Options options = this.minecraft.options;
  
          if (options.getCameraType().isFirstPerson() && (this.minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR || this.canRenderCrosshairForSpectator(this.minecraft.hitResult)))
-@@ -670,12 +699,36 @@
+@@ -666,12 +697,36 @@
              this.setBlitOffset(-90);
              this.blit(pPoseStack, i - 91, this.screenHeight - 22, 0, 0, 182, 22);
              this.blit(pPoseStack, i - 91 - 1 + player.getInventory().selected * 20, this.screenHeight - 22 - 1, 0, 22, 24, 22);
@@ -196,7 +203,7 @@
                  }
                  else
                  {
-@@ -736,6 +789,7 @@
+@@ -732,6 +787,7 @@
              }
  
              RenderSystem.disableBlend();
@@ -204,7 +211,7 @@
          }
      }
  
-@@ -1251,6 +1305,7 @@
+@@ -1254,6 +1310,7 @@
  
      private void renderTextureOverlay(ResourceLocation pTextureLocation, float pAlpha)
      {
@@ -212,7 +219,7 @@
          RenderSystem.disableDepthTest();
          RenderSystem.depthMask(false);
          RenderSystem.defaultBlendFunc();
-@@ -1272,6 +1327,7 @@
+@@ -1275,6 +1332,7 @@
  
      private void renderSpyglassOverlay(float p_168676_)
      {
@@ -220,7 +227,7 @@
          RenderSystem.disableDepthTest();
          RenderSystem.depthMask(false);
          RenderSystem.defaultBlendFunc();
-@@ -1330,6 +1386,7 @@
+@@ -1335,6 +1393,7 @@
  
      private void renderVignette(Entity pEntity)
      {
@@ -228,7 +235,7 @@
          if (!Config.isVignetteEnabled())
          {
              RenderSystem.enableDepthTest();
-@@ -1386,6 +1443,7 @@
+@@ -1391,6 +1450,7 @@
  
      private void renderPortalOverlay(float pTimeInPortal)
      {
@@ -236,7 +243,7 @@
          if (pTimeInPortal < 1.0F)
          {
              pTimeInPortal *= pTimeInPortal;
-@@ -1719,4 +1777,101 @@
+@@ -1746,4 +1806,100 @@
              return gui$hearttype;
          }
      }
@@ -334,7 +341,6 @@
 +        bufferbuilder.vertex((double)((float)centreX + width / 2.0F), (double)((float)centreY + height / 2.0F), (double)this.getBlitOffset()).uv((float)(u + texWidth) * f, (float)(v + texHeight) * f1).endVertex();
 +        bufferbuilder.vertex((double)((float)centreX + width / 2.0F), (double)((float)centreY - height / 2.0F), (double)this.getBlitOffset()).uv((float)(u + texWidth) * f, (float)(v + 0) * f1).endVertex();
 +        bufferbuilder.vertex((double)((float)centreX - width / 2.0F), (double)((float)centreY - height / 2.0F), (double)this.getBlitOffset()).uv((float)(u + 0) * f, (float)(v + 0) * f1).endVertex();
-+        bufferbuilder.end();
-+        BufferUploader.end(bufferbuilder);
++        BufferUploader.drawWithShader(bufferbuilder.end());
 +    }
  }

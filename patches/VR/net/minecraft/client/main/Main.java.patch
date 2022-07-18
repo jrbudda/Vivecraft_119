@@ -1,9 +1,9 @@
 --- a/net/minecraft/client/main/Main.java
 +++ b/net/minecraft/client/main/Main.java
-@@ -39,12 +39,18 @@
+@@ -38,12 +38,18 @@
+ import net.minecraft.util.NativeModuleLister;
  import net.minecraft.util.profiling.jfr.Environment;
  import net.minecraft.util.profiling.jfr.JvmProfiler;
- import net.minecraft.world.entity.player.Player;
 +import net.optifine.reflect.Reflector;
 +
  import org.slf4j.Logger;
@@ -92,7 +92,15 @@
          Bootstrap.validate();
          Util.startTimerHackThread();
          String s10 = optionspec23.value(optionset);
-@@ -196,6 +240,7 @@
+@@ -189,13 +233,14 @@
+             minecraft = new Minecraft(gameconfig);
+             RenderSystem.finishInitialization();
+         }
+-        catch (SilentInitException silentinitexception)
++        catch (RuntimeException silentinitexception)
+         {
+             LOGGER.warn("Failed to create window: ", (Throwable)silentinitexception);
+             return;
          }
          catch (Throwable throwable1)
          {
@@ -112,7 +120,7 @@
          }
          finally
          {
-@@ -306,6 +351,6 @@
+@@ -305,6 +350,6 @@
  
      static
      {

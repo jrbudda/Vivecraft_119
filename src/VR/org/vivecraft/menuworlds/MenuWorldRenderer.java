@@ -37,7 +37,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tags.Tag;
 import net.minecraft.util.CubicSampler;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelReader;
@@ -1027,7 +1026,7 @@ public class MenuWorldRenderer
         this.torchFlickerX += this.torchFlickerDX - this.torchFlickerX;
         this.lightmapUpdateNeeded = true;
     }
-
+    /*
     public void updateLightmap()
     {
         if (this.lightmapUpdateNeeded)
@@ -1251,7 +1250,7 @@ public class MenuWorldRenderer
 ////            }
 //        }
 //    }
-
+*/
     public static class MenuCloudRenderer
     {
         private Minecraft mc;

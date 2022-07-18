@@ -20,7 +20,7 @@
  import net.minecraft.CrashReport;
  import net.minecraft.CrashReportCategory;
  import net.minecraft.ReportedException;
-@@ -77,6 +83,12 @@
+@@ -81,6 +87,12 @@
      private Entity renderedEntity = null;
      private EntityRendererProvider.Context context = null;
  
@@ -33,8 +33,8 @@
      public <E extends Entity> int getPackedLightCoords(E pEntity, float pPartialTicks)
      {
          int i = this.getRenderer(pEntity).getPackedLightCoords(pEntity, pPartialTicks);
-@@ -98,18 +110,66 @@
-         this.entityModels = p_174002_;
+@@ -104,18 +116,66 @@
+         this.entityModels = p_234585_;
      }
  
 +    //Vivecraft

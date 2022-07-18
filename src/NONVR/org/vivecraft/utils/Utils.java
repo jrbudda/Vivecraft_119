@@ -1,5 +1,9 @@
 package org.vivecraft.utils;
 
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -12,6 +16,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -27,12 +33,30 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
 import javax.annotation.Nullable;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.ComponentCollector;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Screenshot;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.phys.Vec3;
+import optifine.OptiFineTransformationService;
+import optifine.OptiFineTransformer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
 import org.vivecraft.render.VRShaders;
 import org.vivecraft.tweaker.LoaderUtils;
+import org.vivecraft.tweaker.VivecraftTransformationService;
+import org.vivecraft.tweaker.VivecraftTransformer;
 import org.vivecraft.utils.lwjgl.Matrix3f;
 import org.vivecraft.utils.lwjgl.Matrix4f;
 import org.vivecraft.utils.lwjgl.Vector2f;
@@ -42,62 +66,12 @@ import org.vivecraft.utils.math.Quaternion;
 import org.vivecraft.utils.math.Vector2;
 import org.vivecraft.utils.math.Vector3;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
-import com.mojang.blaze3d.pipeline.RenderTarget;
-
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.ComponentCollector;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.Screenshot;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.phys.Vec3;
-
 public class Utils
 {
     private static final char[] illegalChars = new char[] {'"', '<', '>', '|', '\u0000', '\u0001', '\u0002', '\u0003', '\u0004', '\u0005', '\u0006', '\u0007', '\b', '\t', '\n', '\u000b', '\f', '\r', '\u000e', '\u000f', '\u0010', '\u0011', '\u0012', '\u0013', '\u0014', '\u0015', '\u0016', '\u0017', '\u0018', '\u0019', '\u001a', '\u001b', '\u001c', '\u001d', '\u001e', '\u001f', ':', '*', '?', '\\', '/'};
     private static final int CONNECT_TIMEOUT = 5000;
     private static final int READ_TIMEOUT = 20000;
     private static final Random avRandomizer = new Random();
-
-    public static String sanitizeFileName(String fileName)
-    {
-        StringBuilder stringbuilder = new StringBuilder();
-
-        for (int i = 0; i < fileName.length(); ++i)
-        {
-            char c0 = fileName.charAt(i);
-
-            if (Arrays.binarySearch(illegalChars, c0) < 0)
-            {
-                stringbuilder.append(c0);
-            }
-            else
-            {
-                stringbuilder.append('_');
-            }
-        }
-
-        return stringbuilder.toString();
-    }
-
-    public static Vector3 convertToOVRVector(Vector3f vector)
-    {
-        return new Vector3(vector.x, vector.y, vector.z);
-    }
-
-    public static Vector3 convertToOVRVector(Vec3 vector)
-    {
-        return new Vector3((float)vector.x, (float)vector.y, (float)vector.z);
-    }
 
     public static Matrix4f convertOVRMatrix(org.vivecraft.utils.math.Matrix4f matrix)
     {
@@ -314,8 +288,8 @@ public class Utils
         {
             try
             {
-                Resource resource = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation("vivecraft", name));
-                inputstream = resource.getInputStream();
+                Optional<Resource> resource = Minecraft.getInstance().getResourceManager().getResource(new ResourceLocation("vivecraft", name));
+                inputstream = resource.get().open();
             }
             catch (NullPointerException | FileNotFoundException filenotfoundexception)
             {
@@ -718,30 +692,30 @@ public class Utils
         return f1;
     }
 
-//    public static void spawnParticles(ParticleOptions type, int count, Vec3 position, Vec3 size, double speed)
-//    {
-//        Minecraft minecraft = Minecraft.getInstance();
-//
-//        for (int i = 0; i < count; ++i)
-//        {
-//            double d0 = avRandomizer.nextGaussian() * size.x;
-//            double d1 = avRandomizer.nextGaussian() * size.y;
-//            double d2 = avRandomizer.nextGaussian() * size.z;
-//            double d3 = avRandomizer.nextGaussian() * speed;
-//            double d4 = avRandomizer.nextGaussian() * speed;
-//            double d5 = avRandomizer.nextGaussian() * speed;
-//
-//            try
-//            {
-//                minecraft.level.addParticle(type, position.x + d0, position.y + d1, position.z + d2, d3, d4, d5);
-//            }
-//            catch (Throwable throwable)
-//            {
-//                LogManager.getLogger().warn("Could not spawn particle effect {}", (Object)type);
-//                return;
-//            }
-//        }
-//    }
+    public static void spawnParticles(ParticleOptions type, int count, Vec3 position, Vec3 size, double speed)
+    {
+        Minecraft minecraft = Minecraft.getInstance();
+
+        for (int i = 0; i < count; ++i)
+        {
+            double d0 = avRandomizer.nextGaussian() * size.x;
+            double d1 = avRandomizer.nextGaussian() * size.y;
+            double d2 = avRandomizer.nextGaussian() * size.z;
+            double d3 = avRandomizer.nextGaussian() * speed;
+            double d4 = avRandomizer.nextGaussian() * speed;
+            double d5 = avRandomizer.nextGaussian() * speed;
+
+            try
+            {
+                minecraft.level.addParticle(type, position.x + d0, position.y + d1, position.z + d2, d3, d4, d5);
+            }
+            catch (Throwable throwable)
+            {
+                LogManager.getLogger().warn("Could not spawn particle effect {}", (Object)type);
+                return;
+            }
+        }
+    }
 
     public static int getCombinedLightWithMin(BlockAndTintGetter lightReader, BlockPos pos, int minLight)
     {
@@ -1024,4 +998,5 @@ public class Utils
     {
         Arrays.sort(illegalChars);
     }
+
 }

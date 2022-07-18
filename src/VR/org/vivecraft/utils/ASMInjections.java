@@ -6,8 +6,7 @@ import java.util.Random;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -43,8 +42,8 @@ public class ASMInjections
     {
         if (tab == CreativeModeTab.TAB_FOOD || tab == null)
         {
-            ItemStack itemstack = (new ItemStack(Items.PUMPKIN_PIE)).setHoverName(new TextComponent("EAT ME"));
-            ItemStack itemstack1 = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER).setHoverName(new TextComponent("DRINK ME"));
+            ItemStack itemstack = (new ItemStack(Items.PUMPKIN_PIE)).setHoverName(Component.literal("EAT ME"));
+            ItemStack itemstack1 = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER).setHoverName(Component.literal("DRINK ME"));
             itemstack1.getTag().putInt("HideFlags", 32);
             list.add(itemstack);
             list.add(itemstack1);
@@ -52,10 +51,10 @@ public class ASMInjections
 
         if (tab == CreativeModeTab.TAB_TOOLS || tab == null)
         {
-            ItemStack itemstack3 = (new ItemStack(Items.LEATHER_BOOTS)).setHoverName(new TranslatableComponent("vivecraft.item.jumpboots"));
+            ItemStack itemstack3 = (new ItemStack(Items.LEATHER_BOOTS)).setHoverName(Component.translatable("vivecraft.item.jumpboots"));
             itemstack3.getTag().putBoolean("Unbreakable", true);
             itemstack3.getTag().putInt("HideFlags", 4);
-            ItemStack itemstack4 = (new ItemStack(Items.SHEARS)).setHoverName(new TranslatableComponent("vivecraft.item.climbclaws"));
+            ItemStack itemstack4 = (new ItemStack(Items.SHEARS)).setHoverName(Component.translatable("vivecraft.item.climbclaws"));
             itemstack4.getTag().putBoolean("Unbreakable", true);
             itemstack4.getTag().putInt("HideFlags", 4);
             list.add(itemstack3);
@@ -127,11 +126,11 @@ public class ASMInjections
 
             if (random.nextInt(2) == 1)
             {
-                itemstack = (new ItemStack(Items.PUMPKIN_PIE)).setHoverName(new TextComponent("EAT ME"));
+                itemstack = (new ItemStack(Items.PUMPKIN_PIE)).setHoverName(Component.literal("EAT ME"));
             }
             else
             {
-                itemstack = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER).setHoverName(new TextComponent("DRINK ME"));
+                itemstack = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER).setHoverName(Component.literal("DRINK ME"));
             }
 
             itemstack.getTag().putInt("HideFlags", 32);
@@ -159,12 +158,12 @@ public class ASMInjections
     public static void injectItems(Map map) {
         //VIVECRAFT - This prolly cant stay here. Move to .json files someday.
         ItemStack is = new ItemStack(Items.LEATHER_BOOTS);
-        is.setHoverName(new TranslatableComponent("vivecraft.item.jumpboots"));
+        is.setHoverName(Component.translatable("vivecraft.item.jumpboots"));
         is.getOrCreateTag().putBoolean("Unbreakable", true);
         is.getOrCreateTag().putInt("HideFlags",4);
 
         ItemStack is2 = new ItemStack(Items.SHEARS);
-        is2.setHoverName(new TranslatableComponent("vivecraft.item.climbclaws"));
+        is2.setHoverName(Component.translatable("vivecraft.item.climbclaws"));
         is2.getOrCreateTag().putBoolean("Unbreakable", true);
         is2.getOrCreateTag().putInt("HideFlags",4);
 

@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/model/geom/ModelPart.java
 +++ b/net/minecraft/client/model/geom/ModelPart.java
-@@ -478,7 +478,7 @@
+@@ -547,7 +547,7 @@
  
      public static class Cube
      {
@@ -9,7 +9,7 @@
          public final float minX;
          public final float minY;
          public final float minZ;
-@@ -645,7 +645,7 @@
+@@ -714,7 +714,7 @@
          }
      }
  
@@ -18,7 +18,7 @@
      {
          public final ModelPart.Vertex[] vertices;
          public final Vector3f normal;
-@@ -698,7 +698,7 @@
+@@ -767,7 +767,7 @@
          }
      }
  

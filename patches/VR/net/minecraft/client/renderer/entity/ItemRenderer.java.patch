@@ -1,7 +1,7 @@
 --- a/net/minecraft/client/renderer/entity/ItemRenderer.java
 +++ b/net/minecraft/client/renderer/entity/ItemRenderer.java
-@@ -17,6 +17,11 @@
- import java.util.Random;
+@@ -16,6 +16,11 @@
+ import java.util.List;
  import java.util.Set;
  import javax.annotation.Nullable;
 +
@@ -12,7 +12,7 @@
  import net.minecraft.CrashReport;
  import net.minecraft.CrashReportCategory;
  import net.minecraft.ReportedException;
-@@ -59,11 +64,15 @@
+@@ -60,11 +65,15 @@
  import net.minecraft.world.level.block.StainedGlassPaneBlock;
  import net.minecraft.world.level.block.state.BlockState;
  import net.minecraftforge.client.RenderProperties;
@@ -28,7 +28,7 @@
  import net.optifine.render.VertexBuilderWrapper;
  import net.optifine.shaders.Shaders;
  
-@@ -83,6 +92,11 @@
+@@ -84,6 +93,11 @@
      private final BlockEntityWithoutLevelRenderer blockEntityRenderer;
      public ModelManager modelManager = null;
      private static boolean renderItemGui = false;
@@ -40,7 +40,7 @@
  
      public ItemRenderer(TextureManager p_174225_, ModelManager p_174226_, ItemColors p_174227_, BlockEntityWithoutLevelRenderer p_174228_)
      {
-@@ -165,6 +179,16 @@
+@@ -166,6 +180,16 @@
              }
  
              pMatrixStack.translate(-0.5D, -0.5D, -0.5D);
@@ -57,7 +57,7 @@
  
              if (!pModel.isCustomRenderer() && (!pItemStack.is(Items.TRIDENT) || flag))
              {
-@@ -187,6 +211,12 @@
+@@ -188,6 +212,12 @@
                  else
                  {
                      RenderType rendertype = ItemBlockRenderTypes.getRenderType(pItemStack, flag1);
@@ -69,8 +69,8 @@
 +
                      VertexConsumer vertexconsumer;
  
-                     if (pItemStack.is(Items.COMPASS) && pItemStack.hasFoil())
-@@ -358,6 +388,19 @@
+                     if (pItemStack.is(ItemTags.COMPASSES) && pItemStack.hasFoil())
+@@ -359,6 +389,19 @@
                      l = CustomColors.getColorFromItemStack(pItemStack, bakedquad.getTintIndex(), l);
                  }
              }
@@ -90,7 +90,7 @@
  
              float f = (float)(l >> 16 & 255) / 255.0F;
              float f1 = (float)(l >> 8 & 255) / 255.0F;
-@@ -369,7 +412,7 @@
+@@ -370,7 +413,7 @@
              }
              else
              {
@@ -99,7 +99,7 @@
              }
          }
      }
-@@ -430,6 +473,10 @@
+@@ -431,6 +474,10 @@
          RenderSystem.enableBlend();
          RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
          RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -110,7 +110,7 @@
          PoseStack posestack = RenderSystem.getModelViewStack();
          posestack.pushPose();
          posestack.translate((double)pX, (double)pY, (double)(100.0F + this.blitOffset));
-@@ -621,4 +668,24 @@
+@@ -617,4 +664,24 @@
      {
          return this.blockEntityRenderer;
      }

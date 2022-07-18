@@ -24,7 +24,7 @@
  
  public class Shaders
  {
-@@ -398,13 +401,13 @@
+@@ -402,13 +405,13 @@
      public static final int MaxShadowColorBuffers = 2;
      public static final int MaxShadowDepthBuffers = 2;
      static int usedColorBuffers = 0;
@@ -40,7 +40,7 @@
      static ShadersFramebuffer sfb;
      private static int[] gbuffersFormat = new int[16];
      public static boolean[] gbuffersClear = new boolean[16];
-@@ -602,6 +605,8 @@
+@@ -606,6 +609,8 @@
      private static final Pattern patternLoadEntityDataMap = Pattern.compile("\\s*([\\w:]+)\\s*=\\s*([-]?\\d+)\\s*");
      public static int[] entityData = new int[32];
      public static int entityDataIndex = 0;
@@ -49,7 +49,7 @@
  
      private Shaders()
      {
-@@ -827,9 +832,9 @@
+@@ -831,9 +836,9 @@
              shadersConfig.store(filewriter, (String)null);
              filewriter.close();
          }
@@ -61,7 +61,7 @@
          }
      }
  
-@@ -905,7 +910,7 @@
+@@ -909,7 +914,7 @@
  
      public static void loadShaderPack()
      {
@@ -70,7 +70,7 @@
          boolean flag = shaderPackLoaded;
          boolean flag1 = isOldLighting();
  
-@@ -975,6 +980,47 @@
+@@ -979,6 +984,47 @@
          loadShaderPackResources();
          loadShaderPackDimensions();
          shaderPackOptions = loadShaderPackOptions();
@@ -118,7 +118,7 @@
          loadShaderPackFixedProperties();
          loadShaderPackDynamicProperties();
          boolean flag3 = shaderPackLoaded != flag;
-@@ -1033,9 +1079,9 @@
+@@ -1037,9 +1083,9 @@
                              return file1.isFile() && name.toLowerCase().endsWith(".zip") ? new ShaderPackZip(name, file1) : null;
                          }
                      }
@@ -130,7 +130,7 @@
                          return null;
                      }
                  }
-@@ -1069,7 +1115,7 @@
+@@ -1073,7 +1119,7 @@
          if (shaderPackDimensions.size() > 0)
          {
              Integer[] ainteger = shaderPackDimensions.toArray(new Integer[shaderPackDimensions.size()]);
@@ -139,7 +139,7 @@
          }
      }
  
-@@ -1101,7 +1147,7 @@
+@@ -1105,7 +1151,7 @@
                  shaderPackProfiles = ShaderPackParser.parseProfiles(properties, shaderPackOptions);
                  shaderPackGuiScreens = ShaderPackParser.parseGuiScreens(properties, shaderPackProfiles, shaderPackOptions);
              }
@@ -148,7 +148,7 @@
              {
                  Config.warn("[Shaders] Error reading: " + s);
              }
-@@ -1203,7 +1249,7 @@
+@@ -1207,7 +1253,7 @@
                  ShaderPackParser.parseBuffersFlip(properties);
                  colorBufferSizes = ShaderPackParser.parseBufferSizes(properties, 16);
              }
@@ -157,7 +157,7 @@
              {
                  Config.warn("[Shaders] Error reading: " + s);
              }
-@@ -1886,10 +1932,10 @@
+@@ -1890,10 +1936,10 @@
          {
              saveOptionProperties(sp, properties);
          }
@@ -170,7 +170,7 @@
          }
      }
  
-@@ -1937,10 +1983,10 @@
+@@ -1941,10 +1987,10 @@
  
              return ashaderoption;
          }
@@ -183,7 +183,7 @@
              return null;
          }
      }
-@@ -2101,7 +2147,7 @@
+@@ -2105,7 +2151,7 @@
  
          if (location.equals("setDrawBuffers"))
          {
@@ -192,7 +192,7 @@
          }
  
          return stringbuilder.toString();
-@@ -2577,6 +2623,7 @@
+@@ -2581,6 +2627,7 @@
              }
  
              checkGLError("Shaders.init");
@@ -200,7 +200,7 @@
          }
      }
  
-@@ -3836,7 +3883,7 @@
+@@ -3840,7 +3887,7 @@
          }
      }
  
@@ -209,7 +209,7 @@
      {
          MemoryStack memorystack = MemoryStack.stackGet();
          int i = memorystack.getPointer();
-@@ -3863,34 +3910,31 @@
+@@ -3867,34 +3914,31 @@
              file1.getParentFile().mkdirs();
              Config.writeFile(file1, code);
          }
@@ -240,13 +240,13 @@
 -                    for (int i = 0; i < afile.length; ++i)
 -                    {
 -                        File file1 = afile[i];
--
++                    File file1 = afile[i];
+ 
 -                        if (file1.isDirectory())
 -                        {
 -                            clearDirectory(file1);
 -                        }
-+                    File file1 = afile[i];
- 
+-
 -                        file1.delete();
 +                    if (file1.isDirectory())
 +                    {
@@ -257,12 +257,12 @@
                  }
              }
          }
-@@ -4219,7 +4263,18 @@
+@@ -4223,8 +4267,16 @@
          setProgramUniform1f(uniform_viewHeight, (float)renderHeight);
          setProgramUniform1f(uniform_near, 0.05F);
-         setProgramUniform1f(uniform_far, (float)(mc.options.renderDistance * 16));
+         setProgramUniform1f(uniform_far, (float)(mc.options.renderDistance().get() * 16));
 -        setProgramUniform3f(uniform_sunPosition, sunPosition[0], sunPosition[1], sunPosition[2]);
-+
+-        setProgramUniform3f(uniform_moonPosition, moonPosition[0], moonPosition[1], moonPosition[2]);
 +        if (Minecraft.getInstance().currentPass == RenderPass.THIRD)
 +        {
 +            setProgramUniform3f(uniform_sunPosition, sunPositionT[0], sunPositionT[1], sunPositionT[2]);
@@ -273,11 +273,10 @@
 +            setProgramUniform3f(uniform_sunPosition, sunPosition[0], sunPosition[1], sunPosition[2]);
 +            setProgramUniform3f(uniform_moonPosition, moonPosition[0], moonPosition[1], moonPosition[2]);
 +        }
-+
-         setProgramUniform3f(uniform_moonPosition, moonPosition[0], moonPosition[1], moonPosition[2]);
          setProgramUniform3f(uniform_shadowLightPosition, shadowLightPosition[0], shadowLightPosition[1], shadowLightPosition[2]);
          setProgramUniform3f(uniform_upPosition, upPosition[0], upPosition[1], upPosition[2]);
-@@ -4509,7 +4564,7 @@
+         setProgramUniform3f(uniform_previousCameraPosition, (float)previousCameraPositionX, (float)previousCameraPositionY, (float)previousCameraPositionZ);
+@@ -4515,7 +4567,7 @@
                      }
                  }
              }
@@ -286,7 +285,7 @@
              {
                  SMCLog.warning("Error parsing mc_Entity_x.txt");
              }
-@@ -4652,8 +4707,9 @@
+@@ -4658,8 +4710,9 @@
      {
          renderDisplayWidth = mc.getWindow().getWidth();
          renderDisplayHeight = mc.getWindow().getHeight();
@@ -298,7 +297,7 @@
          setupFrameBuffer();
      }
  
-@@ -4770,9 +4826,10 @@
+@@ -4776,9 +4829,10 @@
              }
          }
  
@@ -310,7 +309,7 @@
          }
  
          if (needResizeShadow)
-@@ -4825,7 +4882,7 @@
+@@ -4831,7 +4885,7 @@
  
              if (entity != null)
              {
@@ -319,7 +318,7 @@
                  eyePosY = (float)activeRenderInfo.getPosition().y();
                  eyeBrightness = mc.getEntityRenderDispatcher().getPackedLightCoords(entity, partialTicks);
                  float f2 = (float)diffSystemTime * 0.01F;
-@@ -4858,7 +4915,6 @@
+@@ -4864,7 +4918,6 @@
  
                      if (livingentity.hasEffect(MobEffects.NIGHT_VISION))
                      {
@@ -327,7 +326,7 @@
                          nightVision = GameRenderer.getNightVisionScale(livingentity, partialTicks);
                      }
  
-@@ -4916,7 +4972,13 @@
+@@ -4922,7 +4975,13 @@
          setDefaultAttribColor();
          setDefaultAttribLightmap();
          setDefaultAttribNormal();
@@ -342,7 +341,7 @@
          mc.getProfiler().pop();
          dfb.setColorTextures(true);
          setRenderStage(RenderStage.NONE);
-@@ -4949,12 +5011,12 @@
+@@ -4955,12 +5014,12 @@
          bindCustomTextures(customTextures);
      }
  
@@ -358,7 +357,7 @@
  
              if (currentWorld == null)
              {
-@@ -4968,7 +5030,7 @@
+@@ -4974,7 +5033,7 @@
  
              setCameraOffset(mc.getCameraEntity());
              int i = WorldUtils.getDimensionId(level);
@@ -367,7 +366,7 @@
  
              if (j != i)
              {
-@@ -5118,7 +5180,12 @@
+@@ -5124,7 +5183,12 @@
          cameraPositionY = d1;
          cameraPositionZ = d2 - (double)cameraOffsetZ;
          updateProjectionMatrix();
@@ -380,7 +379,7 @@
          checkGLError("setCamera");
      }
  
-@@ -5263,12 +5330,25 @@
+@@ -5269,12 +5333,25 @@
          Matrix4f matrix4f1 = new Matrix4f(matrix4f);
          matrix4f1.transpose();
          matrix4f1.write(tempMat);
@@ -412,7 +411,7 @@
  
          if (customUniforms != null)
          {
-@@ -5418,7 +5498,6 @@
+@@ -5423,7 +5500,6 @@
          GlStateManager.disableAlphaTest();
          GlStateManager._disableBlend();
          GlStateManager._enableDepthTest();
@@ -420,7 +419,7 @@
          GlStateManager._depthMask(false);
          bindTextures(0, customTextures);
          framebuffer.bindColorImages(true);
-@@ -6377,9 +6456,9 @@
+@@ -6382,9 +6458,9 @@
      {
          try
          {
@@ -432,7 +431,7 @@
          {
              return;
          }
-@@ -6407,6 +6486,7 @@
+@@ -6412,6 +6488,7 @@
      private static void loadShaderPackResources()
      {
          shaderPackResources = new HashMap<>();
@@ -440,7 +439,7 @@
  
          if (shaderPackLoaded)
          {
-@@ -6440,13 +6520,14 @@
+@@ -6445,13 +6522,14 @@
                          {
                              String s6 = properties.getProperty(s5);
                              shaderPackResources.put(s5, s6);

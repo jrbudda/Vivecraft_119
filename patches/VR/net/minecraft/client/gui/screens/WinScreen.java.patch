@@ -9,15 +9,7 @@
  import com.mojang.blaze3d.systems.RenderSystem;
  import com.mojang.blaze3d.vertex.BufferBuilder;
  import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-@@ -32,6 +34,7 @@
- import net.minecraft.util.FormattedCharSequence;
- import net.minecraft.util.GsonHelper;
- import org.apache.commons.io.IOUtils;
-+import org.lwjgl.opengl.GL11;
- import org.slf4j.Logger;
- 
- public class WinScreen extends Screen
-@@ -348,7 +351,12 @@
+@@ -361,7 +363,12 @@
          RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
          RenderSystem.setShaderTexture(0, VIGNETTE_LOCATION);
          RenderSystem.enableBlend();

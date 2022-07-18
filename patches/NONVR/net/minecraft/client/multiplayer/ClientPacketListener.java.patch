@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/multiplayer/ClientPacketListener.java
 +++ b/net/minecraft/client/multiplayer/ClientPacketListener.java
-@@ -277,7 +277,11 @@
+@@ -278,7 +278,11 @@
  import net.minecraft.world.scores.Scoreboard;
  import net.minecraft.world.scores.Team;
  import net.minecraft.world.scores.criteria.ObjectiveCriteria;
@@ -12,17 +12,7 @@
  
  public class ClientPacketListener implements ClientGamePacketListener
  {
-@@ -296,7 +300,8 @@
-     private int serverChunkRadius = 3;
-     private int serverSimulationDistance = 3;
-     private final Random random = new Random();
--    private CommandDispatcher<SharedSuggestionProvider> commands = new CommandDispatcher<>();
-+    //Forge public
-+    public CommandDispatcher<SharedSuggestionProvider> commands = new CommandDispatcher<>();
-     private final RecipeManager recipeManager = new RecipeManager();
-     private final UUID id = UUID.randomUUID();
-     private Set<ResourceKey<Level>> levels;
-@@ -312,6 +317,8 @@
+@@ -313,6 +317,8 @@
          this.advancements = new ClientAdvancements(p_194193_);
          this.suggestionsProvider = new ClientSuggestionProvider(this, p_194193_);
          this.telemetryManager = p_194197_;
@@ -31,7 +21,7 @@
      }
  
      public ClientSuggestionProvider getSuggestionsProvider()
-@@ -370,6 +377,9 @@
+@@ -371,6 +377,9 @@
  
          this.minecraft.debugRenderer.clear();
          this.minecraft.player.resetPos();
@@ -41,8 +31,8 @@
          int i = pPacket.playerId();
          this.minecraft.player.setId(i);
          this.level.addPlayer(i, this.minecraft.player);
-@@ -381,10 +391,15 @@
-         this.minecraft.player.setShowDeathScreen(pPacket.showDeathScreen());
+@@ -383,10 +392,15 @@
+         this.minecraft.player.setLastDeathLocation(pPacket.lastDeathLocation());
          this.minecraft.gameMode.setLocalMode(pPacket.gameType(), pPacket.previousGameType());
          this.minecraft.options.setServerRenderDistance(pPacket.chunkRadius());
 +        //Forge
@@ -57,27 +47,7 @@
      }
  
      public void handleAddEntity(ClientboundAddEntityPacket pPacket)
-@@ -806,7 +821,18 @@
-     public void handleChat(ClientboundChatPacket pPacket)
-     {
-         PacketUtils.ensureRunningOnSameThread(pPacket, this, this.minecraft);
--        this.minecraft.gui.handleChat(pPacket.getType(), pPacket.getMessage(), pPacket.getSender());
-+        //Forge
-+        Component component = (Component)Reflector.call(Reflector.ForgeEventFactory_onClientChat, pPacket.getType(), pPacket.getMessage(), pPacket.getSender());
-+
-+        if (component == null)
-+        {
-+            this.minecraft.gui.handleChat(pPacket.getType(), pPacket.getMessage(), pPacket.getSender());
-+        }
-+        else
-+        {
-+            this.minecraft.gui.handleChat(pPacket.getType(), component, pPacket.getSender());
-+        }
-+
-     }
- 
-     public void handleAnimate(ClientboundAnimatePacket pPacket)
-@@ -1027,6 +1053,8 @@
+@@ -1077,6 +1091,8 @@
              this.level.addMapData(map);
              this.minecraft.setLevel(this.level);
              this.minecraft.setScreen(new ReceivingLevelScreen());
@@ -86,7 +56,7 @@
          }
  
          String s = localplayer.getServerBrand();
-@@ -1047,9 +1075,12 @@
+@@ -1097,9 +1113,12 @@
          {
              localplayer1.getAttributes().assignValues(localplayer.getAttributes());
          }
@@ -100,7 +70,7 @@
          this.level.addPlayer(i, localplayer1);
          localplayer1.setYRot(-180.0F);
          localplayer1.input = new KeyboardInput(this.minecraft.options);
-@@ -1182,13 +1213,18 @@
+@@ -1233,13 +1252,18 @@
          BlockPos blockpos = pPacket.getPos();
          this.minecraft.level.getBlockEntity(blockpos, pPacket.getType()).ifPresent((p_205557_) ->
          {
@@ -120,47 +90,7 @@
              if (p_205557_ instanceof CommandBlockEntity && this.minecraft.screen instanceof CommandBlockEditScreen)
              {
                  ((CommandBlockEditScreen)this.minecraft.screen).updateGui();
-@@ -1418,6 +1454,9 @@
-         clientrecipebook.setupCollections(this.recipeManager.getRecipes());
-         clientrecipebook.getCollections().forEach(mutablesearchtree::add);
-         mutablesearchtree.refresh();
-+        //Forge
-+        Reflector.call(Reflector.ForgeHooksClient_onRecipesUpdated, this.recipeManager);
-+        //
-     }
- 
-     public void handleLookAt(ClientboundPlayerLookAtPacket pPacket)
-@@ -1518,7 +1557,7 @@
- 
-         if (entity instanceof LivingEntity)
-         {
--            MobEffect mobeffect = MobEffect.byId(pPacket.getEffectId());
-+            MobEffect mobeffect = MobEffect.byId(pPacket.getEffectId() & 255);
- 
-             if (mobeffect != null)
-             {
-@@ -1899,16 +1938,16 @@
-             {
-                 throw new URISyntaxException(pUrl, "Wrong protocol");
-             }
--            else if (!flag || !pUrl.contains("..") && pUrl.endsWith("/resources.zip"))
-+            else if (flag && (pUrl.contains("..") || !pUrl.endsWith("/resources.zip")))
-             {
--                return true;
-+                throw new URISyntaxException(pUrl, "Invalid levelstorage resourcepack path");
-             }
-             else
-             {
--                throw new URISyntaxException(pUrl, "Invalid levelstorage resourcepack path");
-+                return true;
-             }
-         }
--        catch (URISyntaxException urisyntaxexception)
-+        catch (URISyntaxException urisyntaxexception1)
-         {
-             this.send(ServerboundResourcePackPacket.Action.FAILED_DOWNLOAD);
-             return false;
-@@ -1980,6 +2019,7 @@
+@@ -2041,6 +2065,7 @@
          PacketUtils.ensureRunningOnSameThread(pPacket, this, this.minecraft);
          ResourceLocation resourcelocation = pPacket.getIdentifier();
          FriendlyByteBuf friendlybytebuf = null;
@@ -168,9 +98,9 @@
  
          try
          {
-@@ -2256,14 +2296,86 @@
-                 int i5 = friendlybytebuf.readVarInt();
-                 this.minecraft.debugRenderer.gameEventListenerRenderer.trackListener(positionsource, i5);
+@@ -2286,14 +2311,86 @@
+                 int j5 = friendlybytebuf.readVarInt();
+                 this.minecraft.debugRenderer.gameEventListenerRenderer.trackListener(positionsource, j5);
              }
 +            else if (resourcelocation.getNamespace().equalsIgnoreCase("vivecraft"))
 +            {
@@ -187,7 +117,7 @@
 +                            if (!NetworkHelper.displayedChatMessage)
 +                            {
 +                                NetworkHelper.displayedChatMessage = true;
-+                                this.minecraft.gui.getChat().addMessage(new TranslatableComponent("vivecraft.messages.serverplugin", s11));
++                                this.minecraft.gui.getChat().addMessage(Component.a("vivecraft.messages.serverplugin", s11));
 +                            }
 +
 +                            break;
@@ -257,7 +187,7 @@
              {
                  friendlybytebuf.release();
              }
-@@ -2452,28 +2564,27 @@
+@@ -2482,28 +2579,27 @@
              {
                  throw new IllegalStateException("Server tried to update attributes of a non-living entity (actually: " + entity + ")");
              }
@@ -272,12 +202,12 @@
  
 -                for (ClientboundUpdateAttributesPacket.AttributeSnapshot clientboundupdateattributespacket$attributesnapshot : pPacket.getValues())
 +                if (attributeinstance == null)
-+                {
+                 {
+-                    AttributeInstance attributeinstance = attributemap.getInstance(clientboundupdateattributespacket$attributesnapshot.getAttribute());
 +                    LOGGER.warn("Entity {} does not have attribute {}", entity, Registry.ATTRIBUTE.getKey(clientboundupdateattributespacket$attributesnapshot.getAttribute()));
 +                }
 +                else
-                 {
--                    AttributeInstance attributeinstance = attributemap.getInstance(clientboundupdateattributespacket$attributesnapshot.getAttribute());
++                {
 +                    attributeinstance.setBaseValue(clientboundupdateattributespacket$attributesnapshot.getBase());
 +                    attributeinstance.removeModifiers();
  
@@ -300,7 +230,7 @@
                  }
              }
          }
-@@ -2656,4 +2767,16 @@
+@@ -2685,4 +2781,16 @@
      {
          return this.registryAccess;
      }

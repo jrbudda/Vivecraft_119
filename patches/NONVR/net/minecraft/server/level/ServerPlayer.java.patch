@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -135,6 +135,8 @@
+@@ -142,6 +142,8 @@
  import net.minecraft.world.scores.Team;
  import net.minecraft.world.scores.criteria.ObjectiveCriteria;
  import org.slf4j.Logger;
@@ -9,7 +9,7 @@
  
  public class ServerPlayer extends Player
  {
-@@ -420,6 +422,9 @@
+@@ -427,6 +429,9 @@
      public void initInventoryMenu()
      {
          this.initMenu(this.inventoryMenu);
@@ -19,7 +19,7 @@
      }
  
      public void onEnterCombat()
-@@ -501,6 +506,9 @@
+@@ -508,6 +513,9 @@
              if (!this.isSpectator() || !this.touchingUnloadedChunk())
              {
                  super.tick();
@@ -29,7 +29,7 @@
              }
  
              for (int i = 0; i < this.getInventory().getContainerSize(); ++i)
-@@ -1777,6 +1785,9 @@
+@@ -1814,6 +1822,9 @@
      {
          ItemEntity itementity = super.drop(pDroppedItem, pDropAround, pTraceItem);
  

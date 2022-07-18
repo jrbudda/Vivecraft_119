@@ -1435,7 +1435,7 @@
 			"downloads": {
 				"artifact": {
 					"path": "org/lwjgl/lwjgl-ovr/3.3.1/lwjgl-ovr-3.3.1.jar",
-					"sha1": "49f5d732e41163146c2b37928c5dacaeae3418e8",
+					"sha1": "275f9064fc5f00b7a8a3c629bd7eea1b6d1ae6fc",
 					"size": 255902,
 					"url": "https://repo1.maven.org/maven2/org/lwjgl/lwjgl-ovr/3.3.1/lwjgl-ovr-3.3.1.jar"
 				}
@@ -1447,7 +1447,7 @@
 			"downloads": {
 				"artifact": {
 						"path": "org/lwjgl/lwjgl-ovr/3.3.1/lwjgl-ovr-3.3.1.natives-windows.jar",
-						"sha1": "c9ff89063cbb07def1928fe2ffa14b17b132c0f3",
+						"sha1": "6bfd19cfc95750af294cef030000cb63d6fd7976",
 						"size": 89227,
 						"url": "https://repo1.maven.org/maven2/org/lwjgl/lwjgl-ovr/3.3.1/lwjgl-ovr-3.3.1-natives-windows.jar"
 				}

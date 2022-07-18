@@ -10,15 +10,12 @@
  import net.minecraft.client.multiplayer.ClientLevel;
  import net.minecraft.client.renderer.MultiBufferSource;
  import net.minecraft.client.renderer.RenderBuffers;
-@@ -58,11 +60,20 @@
-             Shaders.nextEntity(this.itemEntity);
-         }
+@@ -60,9 +62,17 @@
  
-+
          float f = ((float)this.life + pPartialTicks) / 3.0F;
          f *= f;
 -        double d0 = Mth.lerp((double)pPartialTicks, this.target.xOld, this.target.getX());
--        double d1 = Mth.lerp((double)pPartialTicks, this.target.yOld, this.target.getY()) + 0.5D;
+-        double d1 = Mth.lerp((double)pPartialTicks, this.target.yOld, (this.target.getY() + this.target.getEyeY()) / 2.0D);
 -        double d2 = Mth.lerp((double)pPartialTicks, this.target.zOld, this.target.getZ());
 +        Vec3 pos = this.target.position().add(0, 0.5f, 0);
 +   

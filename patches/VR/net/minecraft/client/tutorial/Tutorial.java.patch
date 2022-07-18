@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/tutorial/Tutorial.java
 +++ b/net/minecraft/client/tutorial/Tutorial.java
-@@ -95,8 +95,8 @@
+@@ -94,8 +94,8 @@
          {
              this.stop();
          }

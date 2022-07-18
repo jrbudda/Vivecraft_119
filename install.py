@@ -274,12 +274,12 @@ def download_deps( mcp_dir, download_mc, forgedep=False ):
             else:
                 group,artifact,version = lib["name"].split(":")
             
-            if "url" in lib:
-                url = lib["url"]
-                filepath = group.replace(".","/")+ "/"+artifact+"/"+version +"/"+artifact+"-"+version+".jar"
-            elif "downloads" in lib:
-                url = lib["downloads"]["artifact"]["url"]
+            if "downloads" in lib:
                 filepath = lib["downloads"]["artifact"]["path"]
+                url = lib["downloads"]["artifact"]["url"]
+            elif "url" in lib:
+                filepath = group.replace(".","/")+ "/"+artifact+"/"+version +"/"+artifact+"-"+version+".jar"
+                url = lib["url"] + filepath
             else:
                 url = "unknown"     
                 

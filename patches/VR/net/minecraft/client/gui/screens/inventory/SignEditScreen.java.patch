@@ -10,7 +10,7 @@
  import net.minecraft.client.gui.components.Button;
  import net.minecraft.client.gui.font.TextFieldHelper;
  import net.minecraft.client.gui.screens.Screen;
-@@ -63,6 +66,9 @@
+@@ -61,6 +64,9 @@
              this.onDone();
          }));
          this.sign.setEditable(false);
@@ -20,7 +20,7 @@
          this.signField = new TextFieldHelper(() ->
          {
              return this.messages[this.line];
-@@ -90,6 +96,7 @@
+@@ -88,6 +94,7 @@
          }
  
          this.sign.setEditable(true);

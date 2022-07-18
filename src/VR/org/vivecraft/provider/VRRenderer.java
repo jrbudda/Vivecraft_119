@@ -52,7 +52,6 @@ public abstract class VRRenderer
     public RenderTarget fsaaFirstPassResultFBO;
     public RenderTarget fsaaLastPassResultFBO;
     protected float[][] hiddenMesheVertecies = new float[2][];
-    public ResourceKey<DimensionType> lastDimensionId = DimensionType.OVERWORLD_LOCATION;
     public int lastDisplayFBHeight = 0;
     public int lastDisplayFBWidth = 0;
     public boolean lastEnableVsync = true;
@@ -426,10 +425,10 @@ public abstract class VRRenderer
             this.reinitFrameBuffers("Window Handle Changed");
         }
 
-        if (this.lastEnableVsync != minecraft.options.enableVsync)
+        if (this.lastEnableVsync != minecraft.options.enableVsync().get())
         {
             this.reinitFrameBuffers("VSync Changed");
-            this.lastEnableVsync = minecraft.options.enableVsync;
+            this.lastEnableVsync = minecraft.options.enableVsync().get();
         }
 
         if (this.lastMirror != minecraft.vrSettings.displayMirrorMode)

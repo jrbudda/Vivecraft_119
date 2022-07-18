@@ -64,7 +64,7 @@ public class CameraTracker extends Tracker
             this.visible = false;
         }
 
-        if (this.mc.vrPlayer.vrdata_world_render.getEye(RenderPass.CENTER).getPosition().distanceTo(this.position) > (double)(this.mc.options.renderDistance * 12))
+        if (this.mc.vrPlayer.vrdata_world_render.getEye(RenderPass.CENTER).getPosition().distanceTo(this.position) > (double)(this.mc.options.renderDistance().get() * 12))
         {
             this.visible = false;
         }

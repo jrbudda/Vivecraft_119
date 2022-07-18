@@ -1,13 +1,13 @@
 --- a/net/minecraft/world/entity/monster/EnderMan.java
 +++ b/net/minecraft/world/entity/monster/EnderMan.java
-@@ -20,6 +20,7 @@
+@@ -19,6 +19,7 @@
  import net.minecraft.sounds.SoundEvents;
  import net.minecraft.tags.BlockTags;
  import net.minecraft.tags.FluidTags;
 +import net.minecraft.tags.TagKey;
  import net.minecraft.util.Mth;
+ import net.minecraft.util.RandomSource;
  import net.minecraft.util.TimeUtil;
- import net.minecraft.util.valueproviders.UniformInt;
 @@ -62,7 +63,11 @@
  import net.minecraft.world.level.pathfinder.BlockPathTypes;
  import net.minecraft.world.phys.AABB;
@@ -60,12 +60,11 @@
      private boolean teleport(double pX, double p_32545_, double pY)
      {
          BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(pX, p_32545_, pY);
-@@ -327,6 +339,19 @@
+@@ -327,6 +339,18 @@
  
          if (flag && !flag1)
          {
-+            Object object = Reflector.call(Reflector.ForgeEventFactory_onEnderTeleport, this, pX, p_32545_, pY);
-+
++        	Object object = Reflector.call(Reflector.ForgeEventFactory_onEnderTeleport, this, pX, p_32545_, pY);
 +            if (object != null)
 +            {
 +                if (Reflector.callBoolean(object, Reflector.Event_isCanceled))
@@ -77,10 +76,10 @@
 +                p_32545_ = Reflector.callDouble(object, Reflector.EnderTeleportEvent_getTargetY);
 +                pY = Reflector.callDouble(object, Reflector.EnderTeleportEvent_getTargetZ);
 +            }
+             Vec3 vec3 = this.position();
              boolean flag2 = this.randomTeleport(pX, p_32545_, pY, true);
  
-             if (flag2 && !this.isSilent())
-@@ -501,11 +526,18 @@
+@@ -507,11 +531,18 @@
  
          public boolean canUse()
          {
@@ -100,7 +99,7 @@
              {
                  return false;
              }
-@@ -527,8 +559,10 @@
+@@ -533,8 +564,10 @@
              BlockPos blockpos1 = blockpos.below();
              BlockState blockstate1 = level.getBlockState(blockpos1);
              BlockState blockstate2 = this.enderman.getCarriedBlock();
@@ -112,7 +111,7 @@
              {
                  blockstate2 = Block.updateFromNeighbourShapes(blockstate2, this.enderman.level, blockpos);
  
-@@ -543,7 +577,12 @@
+@@ -549,7 +582,12 @@
  
          private boolean canPlaceBlock(Level p_32559_, BlockPos p_32560_, BlockState p_32561_, BlockState p_32562_, BlockState p_32563_, BlockPos p_32564_)
          {
@@ -126,7 +125,7 @@
          }
      }
  
-@@ -657,11 +696,18 @@
+@@ -663,11 +701,18 @@
  
          public boolean canUse()
          {

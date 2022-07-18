@@ -13,38 +13,10 @@
  
  public class FishingHook extends Projectile
  {
-@@ -80,26 +85,52 @@
- 
-     public FishingHook(Player p_37106_, Level p_37107_, int p_37108_, int p_37109_)
-     {
--        this(EntityType.FISHING_BOBBER, p_37107_, p_37108_, p_37109_);
--        this.setOwner(p_37106_);
--        float f = p_37106_.getXRot();
--        float f1 = p_37106_.getYRot();
--        float f2 = Mth.cos(-f1 * ((float)Math.PI / 180F) - (float)Math.PI);
--        float f3 = Mth.sin(-f1 * ((float)Math.PI / 180F) - (float)Math.PI);
--        float f4 = -Mth.cos(-f * ((float)Math.PI / 180F));
--        float f5 = Mth.sin(-f * ((float)Math.PI / 180F));
--        double d0 = p_37106_.getX() - (double)f3 * 0.3D;
--        double d1 = p_37106_.getEyeY();
--        double d2 = p_37106_.getZ() - (double)f2 * 0.3D;
--        this.moveTo(d0, d1, d2, f1, f);
--        Vec3 vec3 = new Vec3((double)(-f3), (double)Mth.clamp(-(f5 / f4), -5.0F, 5.0F), (double)(-f2));
--        double d3 = vec3.length();
--        vec3 = vec3.multiply(0.6D / d3 + 0.5D + this.random.nextGaussian() * 0.0045D, 0.6D / d3 + 0.5D + this.random.nextGaussian() * 0.0045D, 0.6D / d3 + 0.5D + this.random.nextGaussian() * 0.0045D);
--        this.setDeltaMovement(vec3);
--        this.setYRot((float)(Mth.atan2(vec3.x, vec3.z) * (double)(180F / (float)Math.PI)));
--        this.setXRot((float)(Mth.atan2(vec3.y, vec3.horizontalDistance()) * (double)(180F / (float)Math.PI)));
--        this.yRotO = this.getYRot();
--        this.xRotO = this.getXRot();
-+    	this(EntityType.FISHING_BOBBER, p_37107_, p_37108_, p_37109_);
-+    	this.setOwner(p_37106_);
-+    	float f = p_37106_.getXRot();
-+    	float f1 = p_37106_.getYRot();
-+    	float f2 = Mth.cos(-f1 * ((float)Math.PI / 180F) - (float)Math.PI);
-+    	float f3 = Mth.sin(-f1 * ((float)Math.PI / 180F) - (float)Math.PI);
-+    	float f4 = -Mth.cos(-f * ((float)Math.PI / 180F));
-+    	float f5 = Mth.sin(-f * ((float)Math.PI / 180F));
+@@ -88,10 +93,30 @@
+         float f3 = Mth.sin(-f1 * ((float)Math.PI / 180F) - (float)Math.PI);
+         float f4 = -Mth.cos(-f * ((float)Math.PI / 180F));
+         float f5 = Mth.sin(-f * ((float)Math.PI / 180F));
 +    	//Vivecraft
 +    	ServerVivePlayer serverviveplayer = NetworkHelper.vivePlayers.get(p_37106_.getUUID());
 +
@@ -64,29 +36,15 @@
 +    	}
 +    	else
 +    	{
-+    		double d0 = p_37106_.getX() - (double)f3 * 0.3D;
-+    		double d1 = p_37106_.getEyeY();
-+    		double d2 = p_37106_.getZ() - (double)f2 * 0.3D;
-+    		this.moveTo(d0, d1, d2, f1, f);
+         double d0 = p_37106_.getX() - (double)f3 * 0.3D;
+         double d1 = p_37106_.getEyeY();
+         double d2 = p_37106_.getZ() - (double)f2 * 0.3D;
+         this.moveTo(d0, d1, d2, f1, f);
 +    	}
-+
-+    	double d4 = p_37106_.getX() - (double)f3 * 0.3D;
-+    	double d5 = p_37106_.getEyeY();
-+    	double d6 = p_37106_.getZ() - (double)f2 * 0.3D;
-+    	this.moveTo(d4, d5, d6, f1, f);
-+    	Vec3 vec31 = new Vec3((double)(-f3), (double)Mth.clamp(-(f5 / f4), -5.0F, 5.0F), (double)(-f2));
-+    	double d3 = vec31.length();
-+    	vec31 = vec31.multiply(0.6D / d3 + 0.5D + this.random.nextGaussian() * 0.0045D, 0.6D / d3 + 0.5D + this.random.nextGaussian() * 0.0045D, 0.6D / d3 + 0.5D + this.random.nextGaussian() * 0.0045D);
-+    	this.setDeltaMovement(vec31);
-+    	this.setYRot((float)(Mth.atan2(vec31.x, vec31.z) * (double)(180F / (float)Math.PI)));
-+    	this.setXRot((float)(Mth.atan2(vec31.y, vec31.horizontalDistance()) * (double)(180F / (float)Math.PI)));
-+    	//
-+    	this.yRotO = this.getYRot();
-+    	this.xRotO = this.getXRot();
-     }
- 
-     protected void defineSynchedData()
-@@ -274,6 +305,16 @@
+         Vec3 vec3 = new Vec3((double)(-f3), (double)Mth.clamp(-(f5 / f4), -5.0F, 5.0F), (double)(-f2));
+         double d3 = vec3.length();
+         vec3 = vec3.multiply(0.6D / d3 + this.random.triangle(0.5D, 0.0103365D), 0.6D / d3 + this.random.triangle(0.5D, 0.0103365D), 0.6D / d3 + this.random.triangle(0.5D, 0.0103365D));
+@@ -274,6 +299,16 @@
              this.setDeltaMovement(this.getDeltaMovement().scale(0.92D));
              this.reapplyPosition();
          }
@@ -103,7 +61,7 @@
      }
  
      private boolean shouldStopFishing(Player p_37137_)
-@@ -474,9 +515,9 @@
+@@ -474,9 +509,9 @@
  
      private FishingHook.OpenWaterType getOpenWaterTypeForArea(BlockPos p_37148_, BlockPos p_37149_)
      {
@@ -115,7 +73,7 @@
          }).orElse(FishingHook.OpenWaterType.INVALID);
      }
  
-@@ -515,6 +556,7 @@
+@@ -515,6 +550,7 @@
          if (!this.level.isClientSide && player != null && !this.shouldStopFishing(player))
          {
              int i = 0;
@@ -123,7 +81,7 @@
  
              if (this.hookedIn != null)
              {
-@@ -528,6 +570,15 @@
+@@ -528,6 +564,15 @@
                  LootContext.Builder lootcontext$builder = (new LootContext.Builder((ServerLevel)this.level)).withParameter(LootContextParams.ORIGIN, this.position()).withParameter(LootContextParams.TOOL, p_37157_).withParameter(LootContextParams.THIS_ENTITY, this).withRandom(this.random).withLuck((float)this.luck + player.getLuck());
                  LootTable loottable = this.level.getServer().getLootTables().get(BuiltInLootTables.FISHING);
                  List<ItemStack> list = loottable.getRandomItems(lootcontext$builder.create(LootContextParamSets.FISHING));
@@ -139,7 +97,7 @@
                  CriteriaTriggers.FISHING_ROD_HOOKED.trigger((ServerPlayer)player, p_37157_, this, list);
  
                  for (ItemStack itemstack : list)
-@@ -556,7 +607,7 @@
+@@ -556,7 +601,7 @@
              }
  
              this.discard();
@@ -148,7 +106,7 @@
          }
          else
          {
-@@ -617,6 +668,16 @@
+@@ -617,6 +662,16 @@
          }
      }
  

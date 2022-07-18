@@ -9,12 +9,14 @@
  import net.minecraft.server.packs.PackResources;
  import net.minecraft.server.packs.PackType;
  
-@@ -26,15 +28,25 @@
+@@ -25,18 +27,31 @@
+ 
      public PackRepository(Pack.PackConstructor p_10502_, RepositorySource... p_10503_)
      {
-         this.constructor = p_10502_;
+-        this.constructor = p_10502_;
 -        this.sources = ImmutableSet.copyOf(p_10503_);
-+      this.sources = new java.util.HashSet<>(java.util.Arrays.asList(p_10503_));
++    	this.constructor = p_10502_;
++    	this.sources = new java.util.HashSet<>(java.util.Arrays.asList(p_10503_));
      }
  
 -    public PackRepository(PackType p_143890_, RepositorySource... p_143891_)
@@ -22,6 +24,7 @@
 -        this((p_143894_, p_143895_, p_143896_, p_143897_, p_143898_, p_143899_, p_143900_) ->
 -        {
 -            return new Pack(p_143894_, p_143895_, p_143896_, p_143897_, p_143898_, p_143890_, p_143899_, p_143900_);
+-        }, p_143891_);
 +    //vanilla
 +//    public PackRepository(PackType p_143890_, RepositorySource... p_143891_)
 +//    {
@@ -36,18 +39,14 @@
 +    public PackRepository(PackType p_143890_, RepositorySource... p_143891_) {
 +        this((p_143894_, p_143895_, p_143896_, p_143897_, p_143898_, p_143899_, p_143900_, hidden) -> {
 +           return new Pack(p_143894_, p_143895_, p_143896_, p_143897_, p_143898_, p_143890_, p_143899_, p_143900_, hidden);
-         }, p_143891_);
-+      //net.minecraftforge.fml.ModLoader.get().postEvent(new net.minecraftforge.event.AddPackFindersEvent(p_143890_, sources::add));
++        }, p_143891_);      //net.minecraftforge.fml.ModLoader.get().postEvent(new net.minecraftforge.event.AddPackFindersEvent(p_143890_, sources::add));
      }
- 
+-
++    public synchronized void addPackFinder(RepositorySource packFinder) {
++    	this.sources.add(packFinder);
++    }
++    //
++    
      public void reload()
-@@ -111,6 +123,9 @@
-         return this.available.get(pName);
-     }
- 
-+   public synchronized void addPackFinder(RepositorySource packFinder) {
-+      this.sources.add(packFinder);
-+   }
-     public void close()
      {
-         this.available.values().forEach(Pack::close);
+         List<String> list = this.selected.stream().map(Pack::getId).collect(ImmutableList.toImmutableList());

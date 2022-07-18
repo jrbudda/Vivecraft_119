@@ -68,7 +68,7 @@ public class VehicleTracker extends Tracker
             {
                 Mob mob = (Mob)entity;
 
-                if (mob.canBeControlledByRider())
+                if (mob.isControlledByLocalInstance())
                 {
                     int i = player.getMainHandItem().getItem() instanceof FoodOnAStickItem ? 0 : 1;
                     VRData.VRDevicePose vrdata$vrdevicepose = minecraft.vrPlayer.vrdata_world_pre.getController(i);
@@ -114,7 +114,7 @@ public class VehicleTracker extends Tracker
                 {
                     AbstractHorse abstracthorse = (AbstractHorse)entity;
 
-                    if (abstracthorse.canBeControlledByRider() && abstracthorse.isSaddled())
+                    if (abstracthorse.isControlledByLocalInstance())
                     {
                         return;
                     }
@@ -125,7 +125,7 @@ public class VehicleTracker extends Tracker
                 {
                     Mob mob = (Mob)entity;
 
-                    if (mob.canBeControlledByRider())
+                    if (mob.isControlledByLocalInstance())
                     {
                         return;
                     }

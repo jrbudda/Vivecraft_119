@@ -1,7 +1,7 @@
 {
 	"inheritsFrom": "$MCVERSION",
 	"id": "$MCVERSION-Vivecraft-$VERSION",
-	"time": "1979-06-01T00:00:00-05:00", 
+	"time": "1979-06-01T00:00:00-05:00",
 	"releaseTime": "1979-06-02T00:00:00-05:00",
 	"type": "release",
 	"fileId": "$FILE",
@@ -10,69 +10,46 @@
 	"mcVersion": "$MCVERSION",
 	"mainClass": "net.minecraft.launchwrapper.Launch",
 	"arguments": {
-    "game": [
-      "--tweakClass",
-      "optifine.OptiFineTweaker",
-	  "--tweakClass",
-	  "org.vivecraft.tweaker.MinecriftVanillaTweaker"
-    ]
-  },
+		"game": [
+			"--tweakClass",
+			"optifine.OptiFineTweaker",
+			"--tweakClass",
+			"org.vivecraft.tweaker.MinecriftVanillaTweaker"
+		]
+	},
 	"order": 6,
 	"libraries": [
-	{
-		"url": "http://vivecraft.org/jar/", 
-		"name": "optifine:OptiFine:$OFVERSION"
-	},
-	{
-		"name": "net.minecraft:launchwrapper:2.3",
-		"url": "http://vivecraft.org/jar/"
-	},		
 		{
-			"downloads": {
-				"artifact": {
-					"path": "org/lwjgl/lwjgl-ovr/3.2.2/lwjgl-ovr-3.2.2.jar",
-					"sha1": "2445b0d65d20bf75c7252edc9297eb0ba8aeead6",
-					"size": 244701,
-					"url": "https://repo1.maven.org/maven2/org/lwjgl/lwjgl-ovr/3.2.2/lwjgl-ovr-3.2.2.jar"
-				}
-			},
-			"name": "org.lwjgl:lwjgl-ovr:3.2.2",
-			"url": "https://repo1.maven.org/maven2/",
-			"rules": [
-				{
-					"action": "allow"
-				},
-				{
-					"action": "disallow",
-					"os": {
-						"name": "linux",
-						"name": "osx"
-					}
-				}
-			]
+			"url": "http://vivecraft.org/jar/",
+			"name": "optifine:OptiFine:$OFVERSION"
+		},
+		{
+			"name": "net.minecraft:launchwrapper:2.3",
+			"url": "http://vivecraft.org/jar/"
 		},
 		{
 			"downloads": {
 				"artifact": {
-					"path": "org/lwjgl/lwjgl-ovr/3.2.2/lwjgl-ovr-3.2.2.jar",
-					"sha1": "2445b0d65d20bf75c7252edc9297eb0ba8aeead6",
-					"size": 244701,
-					"url": "https://repo1.maven.org/maven2/org/lwjgl/lwjgl-ovr/3.2.2/lwjgl-ovr-3.2.2.jar"
-				},
-				"classifiers": {
-					"natives-windows": {
-						"path": "org/lwjgl/lwjgl-ovr/3.2.2/lwjgl-ovr-3.2.2-natives-windows.jar",
-						"sha1": "5f069603dd0a2791e43382a275bf567e0ac84c3d",
-						"size": 155216,
-						"url": "https://repo1.maven.org/maven2/org/lwjgl/lwjgl-ovr/3.2.2/lwjgl-ovr-3.2.2-natives-windows.jar"
-					}
+					"path": "org/lwjgl/lwjgl-ovr/3.3.1/lwjgl-ovr-3.3.1.jar",
+					"sha1": "275f9064fc5f00b7a8a3c629bd7eea1b6d1ae6fc",
+					"size": 255902,
+					"url": "https://repo1.maven.org/maven2/org/lwjgl/lwjgl-ovr/3.3.1/lwjgl-ovr-3.3.1.jar"
 				}
 			},
-			"name": "org.lwjgl:lwjgl-ovr:3.2.2",
-			"url": "https://repo1.maven.org/maven2/",
-			"natives": {
-				"windows": "natives-windows"
+			"name": "org.lwjgl:lwjgl-ovr:3.3.1",
+			"url": "https://repo1.maven.org/maven2/"
+		},
+		{
+			"downloads": {
+				"artifact": {
+					"path": "org/lwjgl/lwjgl-ovr/3.3.1/lwjgl-ovr-3.3.1.natives-windows.jar",
+					"sha1": "6bfd19cfc95750af294cef030000cb63d6fd7976",
+					"size": 89227,
+					"url": "https://repo1.maven.org/maven2/org/lwjgl/lwjgl-ovr/3.3.1/lwjgl-ovr-3.3.1-natives-windows.jar"
+				}
 			},
+			"name": "org.lwjgl:lwjgl-ovr:3.3.1:natives-windows",
+			"url": "https://repo1.maven.org/maven2/",
 			"rules": [
 				{
 					"action": "allow"

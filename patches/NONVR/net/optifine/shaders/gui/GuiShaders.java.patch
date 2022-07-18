@@ -1,0 +1,247 @@
+--- a/net/optifine/shaders/gui/GuiShaders.java
++++ b/net/optifine/shaders/gui/GuiShaders.java
+@@ -1,6 +1,12 @@
+ package net.optifine.shaders.gui;
+ 
++import java.io.File;
++import java.io.IOException;
++import java.net.URI;
++
+ import com.mojang.blaze3d.vertex.PoseStack;
++
++import net.minecraft.Util;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.Options;
+ import net.minecraft.client.gui.components.AbstractWidget;
+@@ -14,6 +20,7 @@
+ import net.optifine.gui.TooltipManager;
+ import net.optifine.gui.TooltipProviderEnumShaderOptions;
+ import net.optifine.shaders.Shaders;
++import net.optifine.shaders.ShadersTex;
+ import net.optifine.shaders.config.EnumShaderOption;
+ 
+ public class GuiShaders extends GuiScreenOF
+@@ -101,10 +108,222 @@
+         this.actionPerformed(button, true);
+     }
+ 
+-    private void actionPerformed(AbstractWidget var1, boolean var2)
++    //Vivecraft this gets eaten in decomp.
++    private void actionPerformed(AbstractWidget guiElement, boolean rightClick)
+     {
++        if (guiElement.active)
++        {
++            if (guiElement instanceof GuiButtonEnumShaderOption)
++            {
++                GuiButtonEnumShaderOption guibuttonenumshaderoption = (GuiButtonEnumShaderOption)guiElement;
++
++                switch (guibuttonenumshaderoption.getEnumShaderOption())
++                {
++                    case ANTIALIASING:
++                        Shaders.nextAntialiasingLevel(!rightClick);
++
++                        if (hasShiftDown())
++                        {
++                            Shaders.configAntialiasingLevel = 0;
++                        }
++
++                        Shaders.uninit();
++                        break;
++
++                    case NORMAL_MAP:
++                        Shaders.configNormalMap = !Shaders.configNormalMap;
++
++                        if (hasShiftDown())
++                        {
++                            Shaders.configNormalMap = true;
++                        }
++
++                        Shaders.uninit();
++                        this.minecraft.delayTextureReload();
++                        break;
++
++                    case SPECULAR_MAP:
++                        Shaders.configSpecularMap = !Shaders.configSpecularMap;
++
++                        if (hasShiftDown())
++                        {
++                            Shaders.configSpecularMap = true;
++                        }
++
++                        Shaders.uninit();
++                        this.minecraft.delayTextureReload();
++                        break;
++
++                    case RENDER_RES_MUL:
++                        Shaders.configRenderResMul = this.getNextValue(Shaders.configRenderResMul, QUALITY_MULTIPLIERS, QUALITY_MULTIPLIER_DEFAULT, !rightClick, hasShiftDown());
++                        Shaders.uninit();
++                        Shaders.scheduleResize();
++                        break;
++
++                    case SHADOW_RES_MUL:
++                        Shaders.configShadowResMul = this.getNextValue(Shaders.configShadowResMul, QUALITY_MULTIPLIERS, QUALITY_MULTIPLIER_DEFAULT, !rightClick, hasShiftDown());
++                        Shaders.uninit();
++                        Shaders.scheduleResizeShadow();
++                        break;
++
++                    case HAND_DEPTH_MUL:
++                        Shaders.configHandDepthMul = this.getNextValue(Shaders.configHandDepthMul, HAND_DEPTH_VALUES, HAND_DEPTH_DEFAULT, !rightClick, hasShiftDown());
++                        Shaders.uninit();
++                        break;
++
++                    case OLD_HAND_LIGHT:
++                        Shaders.configOldHandLight.nextValue(!rightClick);
++
++                        if (hasShiftDown())
++                        {
++                            Shaders.configOldHandLight.resetValue();
++                        }
++
++                        Shaders.uninit();
++                        break;
++
++                    case OLD_LIGHTING:
++                        Shaders.configOldLighting.nextValue(!rightClick);
++
++                        if (hasShiftDown())
++                        {
++                            Shaders.configOldLighting.resetValue();
++                        }
++
++                        Shaders.updateBlockLightLevel();
++                        Shaders.uninit();
++                        this.minecraft.delayTextureReload();
++                        break;
++
++                    case TWEAK_BLOCK_DAMAGE:
++                        Shaders.configTweakBlockDamage = !Shaders.configTweakBlockDamage;
++                        break;
++
++                    case CLOUD_SHADOW:
++                        Shaders.configCloudShadow = !Shaders.configCloudShadow;
++                        break;
++
++                    case TEX_MIN_FIL_B:
++                        Shaders.configTexMinFilB = (Shaders.configTexMinFilB + 1) % 3;
++                        Shaders.configTexMinFilN = Shaders.configTexMinFilS = Shaders.configTexMinFilB;
++                        guibuttonenumshaderoption.setMessage("Tex Min: " + Shaders.texMinFilDesc[Shaders.configTexMinFilB]);
++                        ShadersTex.updateTextureMinMagFilter();
++                        break;
++
++                    case TEX_MAG_FIL_N:
++                        Shaders.configTexMagFilN = (Shaders.configTexMagFilN + 1) % 2;
++                        guibuttonenumshaderoption.setMessage("Tex_n Mag: " + Shaders.texMagFilDesc[Shaders.configTexMagFilN]);
++                        ShadersTex.updateTextureMinMagFilter();
++                        break;
++
++                    case TEX_MAG_FIL_S:
++                        Shaders.configTexMagFilS = (Shaders.configTexMagFilS + 1) % 2;
++                        guibuttonenumshaderoption.setMessage("Tex_s Mag: " + Shaders.texMagFilDesc[Shaders.configTexMagFilS]);
++                        ShadersTex.updateTextureMinMagFilter();
++                        break;
++
++                    case SHADOW_CLIP_FRUSTRUM:
++                        Shaders.configShadowClipFrustrum = !Shaders.configShadowClipFrustrum;
++                        guibuttonenumshaderoption.setMessage("ShadowClipFrustrum: " + toStringOnOff(Shaders.configShadowClipFrustrum));
++                        ShadersTex.updateTextureMinMagFilter();
++                }
++
++                guibuttonenumshaderoption.updateButtonText();
++            }
++            else if (!rightClick)
++            {
++                if (guiElement instanceof GuiButtonOF)
++                {
++                    GuiButtonOF guibuttonof = (GuiButtonOF)guiElement;
++
++                    switch (guibuttonof.id)
++                    {
++                        case 201:
++                            switch (getOSType())
++                            {
++                                case 1:
++                                    String s = String.format("cmd.exe /C start \"Open file\" \"%s\"", Shaders.shaderPacksDir.getAbsolutePath());
++
++                                    try
++                                    {
++                                        Runtime.getRuntime().exec(s);
++                                        return;
++                                    }
++                                    catch (IOException ioexception)
++                                    {
++                                        ioexception.printStackTrace();
++                                        break;
++                                    }
++
++                                case 2:
++                                    try
++                                    {
++                                        Runtime.getRuntime().exec(new String[] {"/usr/bin/open", Shaders.shaderPacksDir.getAbsolutePath()});
++                                        return;
++                                    }
++                                    catch (IOException ioexception1)
++                                    {
++                                        ioexception1.printStackTrace();
++                                    }
++                            }
++
++                            boolean flag = false;
++
++                            try
++                            {
++                                URI uri1 = (new File(this.minecraft.gameDirectory, "shaderpacks")).toURI();
++                                Util.getPlatform().openUri(uri1);
++                            }
++                            catch (Throwable throwable1)
++                            {
++                                throwable1.printStackTrace();
++                                flag = true;
++                            }
++
++                            if (flag)
++                            {
++                                Config.dbg("Opening via system class!");
++                                Util.getPlatform().openUri("file://" + Shaders.shaderPacksDir.getAbsolutePath());
++                            }
++
++                            break;
++
++                        case 202:
++                            Shaders.storeConfig();
++                            this.saved = true;
++                            this.minecraft.setScreen(this.parentGui);
++                            break;
++
++                        case 203:
++                            GuiShaderOptions guishaderoptions = new GuiShaderOptions(this, Config.getGameSettings());
++                            Config.getMinecraft().setScreen(guishaderoptions);
++
++                        case 204:
++                        case 205:
++                        case 206:
++                        case 207:
++                        case 208:
++                        case 209:
++                        default:
++                            break;
++
++                        case 210:
++                            try
++                            {
++                                URI uri = new URI("http://optifine.net/shaderPacks");
++                                Util.getPlatform().openUri(uri);
++                            }
++                            catch (Throwable throwable1)
++                            {
++                                throwable1.printStackTrace();
++                            }
++                    }
++                }
++            }
++        }
+     }
+ 
++
+     public void removed()
+     {
+         if (!this.saved)

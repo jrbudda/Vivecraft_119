@@ -1,7 +1,8 @@
 package org.vivecraft.settings;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
+
 import org.vivecraft.utils.LangHelper;
 
 public class AutoCalibration
@@ -13,7 +14,7 @@ public class AutoCalibration
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.vrSettings.manualCalibration = (float)minecraft.vr.hmdPivotHistory.averagePosition(0.5D).y;
         int i = (int)((float)((double)Math.round(100.0D * (double)getPlayerHeight() / (double)1.52F)));
-        minecraft.gui.getChat().addMessage(new TextComponent(LangHelper.get("vivecraft.messages.heightset", i)));
+        minecraft.gui.getChat().addMessage(Component.literal(LangHelper.get("vivecraft.messages.heightset", i)));
         minecraft.vrSettings.saveOptions();
     }
 

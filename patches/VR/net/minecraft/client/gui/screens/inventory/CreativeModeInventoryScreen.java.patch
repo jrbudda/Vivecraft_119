@@ -10,7 +10,7 @@
  import net.minecraft.ChatFormatting;
  import net.minecraft.client.HotbarManager;
  import net.minecraft.client.Minecraft;
-@@ -452,6 +455,7 @@
+@@ -451,6 +454,7 @@
              (this.menu).items.addAll(searchtree.search(s.toLowerCase(Locale.ROOT)));
          }
  

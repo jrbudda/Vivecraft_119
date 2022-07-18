@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/player/AbstractClientPlayer.java
 +++ b/net/minecraft/client/player/AbstractClientPlayer.java
-@@ -26,6 +26,7 @@
+@@ -29,6 +29,7 @@
  import net.optifine.player.PlayerConfiguration;
  import net.optifine.player.PlayerConfigurations;
  import net.optifine.reflect.Reflector;
@@ -8,7 +8,7 @@
  
  public abstract class AbstractClientPlayer extends Player
  {
-@@ -70,6 +71,7 @@
+@@ -74,6 +75,7 @@
  
          CapeUtils.downloadCape(this);
          PlayerConfigurations.getPlayerConfiguration(this);
@@ -16,7 +16,7 @@
      }
  
      public boolean isSpectator()
-@@ -230,9 +232,9 @@
+@@ -234,9 +236,9 @@
          return this.locationOfCape;
      }
  
@@ -28,7 +28,7 @@
      }
  
      public boolean hasElytraCape()
-@@ -249,9 +251,9 @@
+@@ -253,9 +255,9 @@
          }
      }
  
@@ -40,7 +40,7 @@
      }
  
      public boolean isElytraOfCape()
-@@ -264,8 +266,8 @@
+@@ -268,9 +270,9 @@
          return this.reloadCapeTimeMs;
      }
  
@@ -50,4 +50,5 @@
 -        this.reloadCapeTimeMs = reloadCapeTimeMs;
 +        this.reloadCapeTimeMs = p_setReloadCapeTimeMs_1_;
      }
- }
+ 
+     public void tick()

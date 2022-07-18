@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.TerrainParticle;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
@@ -277,7 +278,7 @@ public class VRPlayer
         }
     }
 
-    public void tick(LocalPlayer player, Minecraft mc, Random rand)
+    public void tick(LocalPlayer player, Minecraft mc, RandomSource rand)
     {
         if (player.initFromServer)
         {
@@ -320,8 +321,7 @@ public class VRPlayer
                 if (entity instanceof AbstractHorse)
                 {
                     AbstractHorse abstracthorse = (AbstractHorse)entity;
-
-                    if (abstracthorse.canBeControlledByRider() && abstracthorse.isSaddled() && !mc.horseTracker.isActive(mc.player))
+                    if (abstracthorse.isControlledByLocalInstance() && !mc.horseTracker.isActive(mc.player))
                     {
                         abstracthorse.yBodyRot = this.vrdata_world_pre.getBodyYaw();
                         mc.vehicleTracker.rotationCooldown = 10;
@@ -331,7 +331,7 @@ public class VRPlayer
                 {
                     Mob mob = (Mob)entity;
 
-                    if (mob.canBeControlledByRider())
+                    if (mob.isControlledByLocalInstance())
                     {
                         mob.yBodyRot = this.vrdata_world_pre.getBodyYaw();
                         mc.vehicleTracker.rotationCooldown = 10;

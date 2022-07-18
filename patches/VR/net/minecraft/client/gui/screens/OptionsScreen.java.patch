@@ -8,25 +8,36 @@
  
  public class OptionsScreen extends Screen
  {
-@@ -42,7 +43,20 @@
+@@ -39,10 +40,14 @@
+ 
+         for (OptionInstance<?> optioninstance : new OptionInstance[] {this.options.fov()})
          {
-             int j = this.width / 2 - 155 + i % 2 * 160;
-             int k = this.height / 6 - 12 + 24 * (i >> 1);
--            this.addRenderableWidget(option.createButton(this.minecraft.options, j, k, 150));
-+             
-+            if (option == Option.FOV)
-+            {
-+            	this.addRenderableWidget(new Button(j, k, 150, 20, new TranslatableComponent("vivecraft.options.screen.main.button"), (p) ->
-+            	{
-+            		this.minecraft.options.save();
-+            		this.minecraft.setScreen(new GuiMainVRSettings(this));
-+            	}));
-+            }
-+            else
-+            {
-+            	this.addRenderableWidget(option.createButton(this.minecraft.options, j, k, 150));
-+            }
-+
-             ++i;
+-            int j = this.width / 2 - 155 + i % 2 * 160;
+-            int k = this.height / 6 - 12 + 24 * (i >> 1);
+-            this.addRenderableWidget(optioninstance.createButton(this.minecraft.options, j, k, 150));
+-            ++i;
++        	int j = this.width / 2 - 155 + i % 2 * 160;
++        	int k = this.height / 6 - 12 + 24 * (i >> 1);
++        	this.addRenderableWidget(new Button(j, k, 150, 20, Component.translatable("vivecraft.options.screen.main.button"), (p) ->
++        	{
++        		this.minecraft.options.save();
++        		this.minecraft.setScreen(new GuiMainVRSettings(this));
++        	}));
++        	++i;
          }
  
+         if (this.minecraft.level != null && this.minecraft.hasSingleplayerServer())
+@@ -171,4 +176,13 @@
+         drawCenteredString(pPoseStack, this.font, this.title, this.width / 2, 15, 16777215);
+         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+     }
++    //Forge
++    @Override
++    public void onClose() {
++        // We need to consider 2 potential parent screens here:
++        // 1. From the main menu, in which case display the main menu
++        // 2. From the pause menu, in which case exit back to game
++        this.minecraft.setScreen(this.lastScreen instanceof PauseScreen ? null : this.lastScreen);
++    }
++    //
+ }

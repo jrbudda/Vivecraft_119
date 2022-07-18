@@ -10,7 +10,7 @@
  import net.minecraft.SharedConstants;
  import net.minecraft.Util;
  import net.minecraft.core.BlockPos;
-@@ -151,7 +154,8 @@
+@@ -150,7 +153,8 @@
          {
              ItemStack itemstack = pPlayer.getItemInHand(pUsedHand);
  
@@ -20,7 +20,7 @@
              {
                  pPlayer.startUsingItem(pUsedHand);
                  return InteractionResultHolder.consume(itemstack);
-@@ -366,6 +370,14 @@
+@@ -365,6 +369,14 @@
          float f = pPlayer.getXRot();
          float f1 = pPlayer.getYRot();
          Vec3 vec3 = pPlayer.getEyePosition();

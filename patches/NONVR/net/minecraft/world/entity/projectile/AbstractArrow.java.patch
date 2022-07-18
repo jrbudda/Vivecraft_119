@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/projectile/AbstractArrow.java
 +++ b/net/minecraft/world/entity/projectile/AbstractArrow.java
-@@ -41,6 +41,9 @@
+@@ -42,6 +42,9 @@
  import net.minecraft.world.phys.HitResult;
  import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.phys.shapes.VoxelShape;
@@ -10,7 +10,7 @@
  
  public abstract class AbstractArrow extends Projectile
  {
-@@ -83,6 +86,22 @@
+@@ -84,6 +87,22 @@
  
          if (p_36718_ instanceof Player)
          {
@@ -33,7 +33,7 @@
              this.pickup = AbstractArrow.Pickup.ALLOWED;
          }
      }
-@@ -222,7 +241,14 @@
+@@ -223,7 +242,14 @@
                      }
                  }
  

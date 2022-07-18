@@ -3,7 +3,7 @@ package org.vivecraft.gui.framework;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.vivecraft.settings.VRSettings;
 
@@ -23,7 +23,7 @@ public class GuiVROptionSlider extends GuiVROptionButton
         this.maxValue = max;
         Minecraft minecraft = Minecraft.getInstance();
         this.sliderValue = this.enumOptions.normalizeValue(minecraft.vrSettings.getOptionFloatValue(this.enumOptions));
-        this.setMessage(new TextComponent(minecraft.vrSettings.getButtonDisplayString(this.enumOptions)));
+        this.setMessage(Component.literal(minecraft.vrSettings.getButtonDisplayString(this.enumOptions)));
     }
 
     public GuiVROptionSlider(int id, int x, int y, VRSettings.VrOptions option, double min, double max)
@@ -50,7 +50,7 @@ public class GuiVROptionSlider extends GuiVROptionButton
         double d0 = this.enumOptions.denormalizeValue((float)this.sliderValue);
         minecraft.vrSettings.setOptionFloatValue(this.enumOptions, (float)d0);
         this.sliderValue = this.enumOptions.normalizeValue((float)d0);
-        this.setMessage(new TextComponent(minecraft.vrSettings.getButtonDisplayString(this.enumOptions)));
+        this.setMessage(Component.literal(minecraft.vrSettings.getButtonDisplayString(this.enumOptions)));
     }
 
     protected void renderBg(PoseStack pMatrixStack, Minecraft pMinecraft, int pMouseX, int pMouseY)
@@ -71,7 +71,7 @@ public class GuiVROptionSlider extends GuiVROptionButton
         this.sliderValue = Mth.clamp(this.sliderValue, 0.0D, 1.0D);
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.vrSettings.setOptionFloatValue(this.enumOptions, (float)this.enumOptions.denormalizeValue((float)this.sliderValue));
-        this.setMessage(new TextComponent(minecraft.vrSettings.getButtonDisplayString(this.enumOptions)));
+        this.setMessage(Component.literal(minecraft.vrSettings.getButtonDisplayString(this.enumOptions)));
         this.dragging = true;
     }
 

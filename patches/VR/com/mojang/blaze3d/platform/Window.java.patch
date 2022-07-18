@@ -1,6 +1,6 @@
 --- a/com/mojang/blaze3d/platform/Window.java
 +++ b/com/mojang/blaze3d/platform/Window.java
-@@ -98,8 +98,10 @@
+@@ -97,8 +97,10 @@
          GLFW.glfwWindowHint(139275, 221185);
          GLFW.glfwWindowHint(139266, 3);
          GLFW.glfwWindowHint(139267, 2);
@@ -13,7 +13,7 @@
          long i = 0L;
  
          if (Reflector.EarlyProgressVisualization_handOffWindow.exists())
-@@ -154,7 +156,6 @@
+@@ -153,7 +155,6 @@
          GL.createCapabilities();
          this.setMode();
          this.refreshFramebufferSize();
@@ -21,7 +21,7 @@
          GLFW.glfwSetWindowPosCallback(this.window, this::onMove);
          GLFW.glfwSetWindowSizeCallback(this.window, this::onResize);
          GLFW.glfwSetWindowFocusCallback(this.window, this::onFocus);
-@@ -285,9 +286,9 @@
+@@ -284,9 +285,9 @@
                  memorystack.close();
              }
          }
@@ -33,7 +33,7 @@
          }
      }
  
-@@ -364,7 +365,8 @@
+@@ -363,7 +364,8 @@
      {
          RenderSystem.assertOnRenderThreadOrInit();
          this.vsync = pVsync;
@@ -43,7 +43,7 @@
      }
  
      public void close()
-@@ -387,15 +389,16 @@
+@@ -386,15 +388,16 @@
      {
          if (p_85416_ == this.window)
          {
@@ -63,7 +63,7 @@
                  {
                      this.eventHandler.resizeDisplay();
                  }
-@@ -423,11 +426,15 @@
+@@ -422,11 +425,15 @@
              });
          }
      }
@@ -83,7 +83,7 @@
      }
  
      private void onFocus(long p_85393_, boolean p_85394_)
-@@ -575,13 +582,12 @@
+@@ -581,13 +588,12 @@
      {
          int i;
  
@@ -98,7 +98,7 @@
          }
  
          return i;
-@@ -590,10 +596,10 @@
+@@ -596,10 +602,10 @@
      public void setGuiScale(double pScaleFactor)
      {
          this.guiScale = pScaleFactor;
@@ -113,7 +113,7 @@
      }
  
      public void setTitle(String pTitle)
-@@ -613,12 +619,12 @@
+@@ -619,12 +625,12 @@
  
      public int getWidth()
      {
@@ -128,7 +128,7 @@
      }
  
      public void setWidth(int pFramebufferWidth)
-@@ -677,9 +683,9 @@
+@@ -683,9 +689,9 @@
          InputConstants.updateRawMouseInput(this.window, pEnableRawMouseMotion);
      }
  

@@ -269,18 +269,21 @@ public class MCOpenVR extends MCVR
         }
     }
 
+    private long lastInit = 0;
+    
     public boolean init()
     {
         if (this.initialized)
         {
             return true;
         }
-        else if (this.tried)
+        else if (System.currentTimeMillis() - lastInit < 20000)
         {
             return this.initialized;
         }
         else
         {
+        	lastInit = System.currentTimeMillis();
             this.tried = true;
             this.mc = Minecraft.getInstance();
             this.unpackPlatformNatives();

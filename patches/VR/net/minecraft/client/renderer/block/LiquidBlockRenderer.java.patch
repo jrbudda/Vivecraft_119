@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/block/LiquidBlockRenderer.java
 +++ b/net/minecraft/client/renderer/block/LiquidBlockRenderer.java
-@@ -36,7 +36,7 @@
+@@ -37,7 +37,7 @@
      private final TextureAtlasSprite[] lavaIcons = new TextureAtlasSprite[2];
      private final TextureAtlasSprite[] waterIcons = new TextureAtlasSprite[2];
      private TextureAtlasSprite waterOverlay;

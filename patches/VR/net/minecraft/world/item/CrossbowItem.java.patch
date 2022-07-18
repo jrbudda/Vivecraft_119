@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/CrossbowItem.java
 +++ b/net/minecraft/world/item/CrossbowItem.java
-@@ -31,6 +31,9 @@
+@@ -29,6 +29,9 @@
  import net.minecraft.world.item.enchantment.Enchantments;
  import net.minecraft.world.level.Level;
  import net.minecraft.world.phys.Vec3;
@@ -10,7 +10,7 @@
  
  public class CrossbowItem extends ProjectileWeaponItem implements Vanishable
  {
-@@ -270,6 +273,15 @@
+@@ -268,6 +271,15 @@
                  Vec3 vec31 = pShooter.getUpVector(1.0F);
                  Quaternion quaternion = new Quaternion(new Vector3f(vec31), pProjectileAngle, true);
                  Vec3 vec3 = pShooter.getViewVector(1.0F);
@@ -26,7 +26,7 @@
                  Vector3f vector3f = new Vector3f(vec3);
                  vector3f.transform(quaternion);
                  projectile.shoot((double)vector3f.x(), (double)vector3f.y(), (double)vector3f.z(), pVelocity, pInaccuracy);
-@@ -428,7 +440,7 @@
+@@ -424,7 +436,7 @@
          }
      }
  

@@ -157,7 +157,7 @@
  
              if (pDisableBlend)
              {
-@@ -363,36 +403,92 @@
+@@ -363,35 +403,92 @@
              }
  
              Minecraft minecraft = Minecraft.getInstance();
@@ -188,8 +188,7 @@
 -            bufferbuilder.vertex((double)f, (double)f1, 0.0D).uv(f2, 0.0F).color(255, 255, 255, 255).endVertex();
 -            bufferbuilder.vertex((double)f, 0.0D, 0.0D).uv(f2, f3).color(255, 255, 255, 255).endVertex();
 -            bufferbuilder.vertex(0.0D, 0.0D, 0.0D).uv(0.0F, f3).color(255, 255, 255, 255).endVertex();
--            bufferbuilder.end();
--            BufferUploader._endInternal(bufferbuilder);
+-            BufferUploader.draw(bufferbuilder.end());
 -            shaderinstance.clear();
 +                       
 +            float f = (float)width / (float)height;
@@ -225,7 +224,7 @@
 +            float f9 = (float)this.viewHeight / (float)this.height;
 +            
 +            if(!blitLegacy) {
-+                ShaderInstance shaderinstance = minecraft.gameRenderer.blitShader;
++            	ShaderInstance shaderinstance = minecraft.gameRenderer.blitShader;
 +            	shaderinstance.setSampler("DiffuseSampler", this.colorTextureId);
 +            	Matrix4f matrix4f = Matrix4f.orthographic((float)width, (float)(-height), 1000.0F, 3000.0F);
 +            	RenderSystem.setProjectionMatrix(matrix4f);
@@ -241,17 +240,17 @@
 +            	}
 +
 +            	shaderinstance.apply();
++
++            	Tesselator tesselator = RenderSystem.renderThreadTesselator();
++            	BufferBuilder bufferbuilder = tesselator.getBuilder();
++            	bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 +            	
-+                Tesselator tesselator = RenderSystem.renderThreadTesselator();
-+                BufferBuilder bufferbuilder = tesselator.getBuilder();
-+        		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-+        		bufferbuilder.vertex((double)f4, (double)f3, 0.0D).uv(xCropFactor, yCropFactor).color(255, 255, 255, 255).endVertex();
-+        		bufferbuilder.vertex((double)f2, (double)f3, 0.0D).uv(f8 - xCropFactor, yCropFactor).color(255, 255, 255, 255).endVertex();
-+        		bufferbuilder.vertex((double)f2, (double)f5, 0.0D).uv(f8 - xCropFactor, f9 - yCropFactor).color(255, 255, 255, 255).endVertex();
-+        		bufferbuilder.vertex((double)f4, (double)f5, 0.0D).uv(xCropFactor, f9 - yCropFactor).color(255, 255, 255, 255).endVertex();
-+                bufferbuilder.end();
-+                BufferUploader._endInternal(bufferbuilder);
-+              	shaderinstance.clear();
++            	bufferbuilder.vertex((double)f4, (double)f3, 0.0D).uv(xCropFactor, yCropFactor).color(255, 255, 255, 255).endVertex();
++            	bufferbuilder.vertex((double)f2, (double)f3, 0.0D).uv(f8 - xCropFactor, yCropFactor).color(255, 255, 255, 255).endVertex();
++            	bufferbuilder.vertex((double)f2, (double)f5, 0.0D).uv(f8 - xCropFactor, f9 - yCropFactor).color(255, 255, 255, 255).endVertex();
++            	bufferbuilder.vertex((double)f4, (double)f5, 0.0D).uv(xCropFactor, f9 - yCropFactor).color(255, 255, 255, 255).endVertex();
++                BufferUploader.draw(bufferbuilder.end());
++            	shaderinstance.clear();
 +            } else {
 +            	this.bindRead();
 +                GlStateManager.disableAlphaTest();
@@ -280,7 +279,7 @@
              GlStateManager._depthMask(true);
              GlStateManager._colorMask(true, true, true, true);
          }
-@@ -425,17 +521,52 @@
+@@ -424,17 +521,52 @@
          return this.depthBufferId;
      }
  

@@ -1,10 +1,6 @@
 --- a/net/minecraft/client/gui/components/Button.java
 +++ b/net/minecraft/client/gui/components/Button.java
-@@ -5,10 +5,11 @@
- import net.minecraft.client.gui.narration.NarratedElementType;
- import net.minecraft.client.gui.narration.NarrationElementOutput;
- import net.minecraft.network.chat.Component;
-+import net.minecraft.network.chat.TextComponent;
+@@ -8,7 +8,7 @@
  
  public class Button extends AbstractButton
  {
@@ -13,13 +9,13 @@
      {
      };
      protected final Button.OnPress onPress;
-@@ -55,6 +56,11 @@
+@@ -55,6 +55,11 @@
          });
      }
  
 +    public Button(int p_i1309_1_, int p_i1309_2_, int p_i1309_3_, int p_i1309_4_, String p_i1309_5_, Button.OnPress p_i1309_6_)
 +    {
-+        this(p_i1309_1_, p_i1309_2_, p_i1309_3_, p_i1309_4_, new TextComponent(p_i1309_5_), p_i1309_6_, NO_TOOLTIP);
++        this(p_i1309_1_, p_i1309_2_, p_i1309_3_, p_i1309_4_, Component.literal(p_i1309_5_), p_i1309_6_, NO_TOOLTIP);
 +    }
 +
      public interface OnPress

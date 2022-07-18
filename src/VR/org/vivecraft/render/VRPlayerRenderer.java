@@ -30,7 +30,6 @@ import net.minecraft.client.renderer.entity.layers.PlayerItemInHandLayer;
 import net.minecraft.client.renderer.entity.layers.SpinAttackEffectLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -63,11 +62,11 @@ public class VRPlayerRenderer extends LivingEntityRenderer<AbstractClientPlayer,
 									new VRPlayerModel_WithArms<>(VRLayerDef_arms_slim.bakeRoot(), p_174558_))
 					, 0.5F);        
 		this.addLayer(new HumanoidArmorLayer<>(this, new HumanoidModel(p_174557_.bakeLayer(p_174558_ ? ModelLayers.PLAYER_SLIM_INNER_ARMOR : ModelLayers.PLAYER_INNER_ARMOR)), new HumanoidModel(p_174557_.bakeLayer(p_174558_ ? ModelLayers.PLAYER_SLIM_OUTER_ARMOR : ModelLayers.PLAYER_OUTER_ARMOR))));
-		this.addLayer(new PlayerItemInHandLayer<>(this));
+        this.addLayer(new PlayerItemInHandLayer<>(this, p_174557_.getItemInHandRenderer()));
 		this.addLayer(new ArrowLayer<>(p_174557_, this));
 		this.addLayer(new Deadmau5EarsLayer(this));
 		this.addLayer(new CapeLayer(this));
-		this.addLayer(new CustomHeadLayer<>(this, p_174557_.getModelSet()));
+        this.addLayer(new CustomHeadLayer<>(this, p_174557_.getModelSet(), p_174557_.getItemInHandRenderer()));
 		this.addLayer(new ElytraLayer<>(this, p_174557_.getModelSet()));
 		this.addLayer(new ParrotOnShoulderLayer<>(this, p_174557_.getModelSet()));
 		this.addLayer(new SpinAttackEffectLayer<>(this, p_174557_.getModelSet()));
@@ -218,7 +217,7 @@ public class VRPlayerRenderer extends LivingEntityRenderer<AbstractClientPlayer,
             if (objective != null)
             {
                 Score score = scoreboard.getOrCreatePlayerScore(pEntity.getScoreboardName(), objective);
-                super.renderNameTag(pEntity, (new TextComponent(Integer.toString(score.getScore()))).append(" ").append(objective.getDisplayName()), pMatrixStack, pBuffer, pPackedLight);
+                super.renderNameTag(pEntity, (Component.literal(Integer.toString(score.getScore()))).append(" ").append(objective.getDisplayName()), pMatrixStack, pBuffer, pPackedLight);
                 pMatrixStack.translate(0.0D, (double)(9.0F * 1.15F * 0.025F), 0.0D);
             }
         }

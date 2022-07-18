@@ -1,31 +1,30 @@
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -28,6 +28,7 @@
+@@ -35,6 +35,7 @@
  import net.minecraft.Util;
  import net.minecraft.advancements.Advancement;
  import net.minecraft.advancements.CriteriaTriggers;
 +import net.minecraft.client.Minecraft;
  import net.minecraft.commands.CommandSourceStack;
+ import net.minecraft.commands.arguments.PreviewedArgument;
  import net.minecraft.core.BlockPos;
- import net.minecraft.core.Direction;
-@@ -35,6 +36,7 @@
+@@ -44,6 +45,7 @@
  import net.minecraft.nbt.ListTag;
  import net.minecraft.nbt.StringTag;
  import net.minecraft.network.Connection;
 +import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.ChatDecorator;
+ import net.minecraft.network.chat.ChatPreviewThrottler;
  import net.minecraft.network.chat.ChatType;
- import net.minecraft.network.chat.Component;
- import net.minecraft.network.chat.TextComponent;
-@@ -111,6 +113,8 @@
- import net.minecraft.world.entity.ExperienceOrb;
+@@ -129,6 +131,7 @@
+ import net.minecraft.world.entity.HasCustomInventoryScreen;
  import net.minecraft.world.entity.MoverType;
  import net.minecraft.world.entity.PlayerRideableJumping;
 +import net.minecraft.world.entity.Pose;
-+import net.minecraft.world.entity.ai.attributes.Attribute;
- import net.minecraft.world.entity.animal.horse.AbstractHorse;
  import net.minecraft.world.entity.item.ItemEntity;
  import net.minecraft.world.entity.player.ChatVisiblity;
-@@ -149,8 +153,19 @@
+ import net.minecraft.world.entity.player.Inventory;
+@@ -165,8 +168,19 @@
  import net.minecraft.world.phys.shapes.BooleanOp;
  import net.minecraft.world.phys.shapes.Shapes;
  import net.minecraft.world.phys.shapes.VoxelShape;
@@ -45,7 +44,7 @@
  
  public class ServerGamePacketListenerImpl implements ServerPlayerConnection, ServerGamePacketListener
  {
-@@ -198,6 +213,20 @@
+@@ -219,6 +233,20 @@
          this.player = p_9772_;
          p_9772_.connection = this;
          this.keepAliveTime = Util.getMillis();
@@ -66,25 +65,7 @@
          p_9772_.getTextFilter().join();
      }
  
-@@ -294,6 +323,8 @@
-         {
-             this.disconnect(new TranslatableComponent("multiplayer.disconnect.idling"));
-         }
-+
-+        NetworkHelper.sendPosData(this.player);
-     }
- 
-     public void resetPosition()
-@@ -318,7 +349,7 @@
- 
-     public void disconnect(Component pTextComponent)
-     {
--        this.connection.send(new ClientboundDisconnectPacket(pTextComponent), (p_9828_) ->
-+        this.connection.send(new ClientboundDisconnectPacket(pTextComponent), (p_210161_2_) ->
-         {
-             this.connection.disconnect(pTextComponent);
-         });
-@@ -441,11 +472,17 @@
+@@ -470,11 +498,17 @@
                  }
  
                  entity.absMoveTo(d3, d4, d5, f, f1);
@@ -102,7 +83,13 @@
                      this.connection.send(new ClientboundMoveVehiclePacket(entity));
                      return;
                  }
-@@ -462,7 +499,10 @@
+@@ -487,11 +521,16 @@
+                 this.vehicleLastGoodZ = entity.getZ();
+             }
+         }
++
++        NetworkHelper.sendPosData(this.player);
+     }
  
      private boolean noBlocksAround(Entity p_9794_)
      {
@@ -114,26 +101,31 @@
      }
  
      public void handleAcceptTeleportPacket(ServerboundAcceptTeleportationPacket pPacket)
-@@ -1226,7 +1266,17 @@
- 
+@@ -1248,8 +1287,8 @@
+         Vec3 vec3 = blockhitresult.getLocation();
+         BlockPos blockpos = blockhitresult.getBlockPos();
+         Vec3 vec31 = Vec3.atCenterOf(blockpos);
+-
+-        if (!(this.player.getEyePosition().distanceToSqr(vec31) > MAX_INTERACTION_DISTANCE))
++        boolean flag = Reflector.IForgePlayer_canInteractWith.exists() || !(this.player.getEyePosition().distanceToSqr(vec31) > MAX_INTERACTION_DISTANCE);
++        if (flag)
+         {
+             Vec3 vec32 = vec3.subtract(vec31);
+             double d0 = 1.0000001D;
+@@ -1259,10 +1298,10 @@
+                 Direction direction = blockhitresult.getDirection();
+                 this.player.resetLastActionTime();
+                 int i = this.player.level.getMaxBuildHeight();
+-
                  if (blockpos.getY() < i)
                  {
 -                    if (this.awaitingPositionFromClient == null && this.player.distanceToSqr((double)blockpos.getX() + 0.5D, (double)blockpos.getY() + 0.5D, (double)blockpos.getZ() + 0.5D) < 64.0D && serverlevel.mayInteract(this.player, blockpos))
-+	            //Forge
-+	            Object object = Reflector.call(Reflector.getFieldValue(Reflector.ForgeMod_REACH_DISTANCE), Reflector.RegistryObject_get);
-+	            double dist = 64.0;
-+	            if (object != null)
-+	            {
-+	            	dist = this.player.getAttribute((Attribute)object).getValue() + 3.0D;
-+	            }
-+	
-+	            dist = dist * dist;
-+	            //
-+                    if (this.awaitingPositionFromClient == null && this.player.distanceToSqr((double)blockpos.getX() + 0.5D, (double)blockpos.getY() + 0.5D, (double)blockpos.getZ() + 0.5D) < dist && serverlevel.mayInteract(this.player, blockpos))
++                	boolean flag1 = !Reflector.IForgePlayer_canInteractWith.exists() && this.player.distanceToSqr((double)blockpos.getX() + 0.5D, (double)blockpos.getY() + 0.5D, (double)blockpos.getZ() + 0.5D) < 64.0;
++                    if (this.awaitingPositionFromClient == null && (flag1 || Reflector.callBoolean(player,Reflector.IForgePlayer_canInteractWith,blockpos,3)) && serverlevel.mayInteract(this.player, blockpos))
                      {
                          InteractionResult interactionresult = this.player.gameMode.useItemOn(this.player, serverlevel, itemstack, interactionhand, blockhitresult);
  
-@@ -1352,9 +1402,9 @@
+@@ -1397,9 +1436,9 @@
          {
              this.connection.send(pPacket, pFutureListeners);
          }
@@ -145,37 +137,21 @@
              CrashReportCategory crashreportcategory = crashreport.addCategory("Packet being sent");
              crashreportcategory.setDetail("Packet class", () ->
              {
-@@ -1386,8 +1436,10 @@
- 
-     public void handleChat(ServerboundChatPacket pPacket)
-     {
--        String s = StringUtils.normalizeSpace(pPacket.getMessage());
--
-+        //String s = StringUtils.normalizeSpace(pPacket.getMessage());
-+        //Forge -why?
-+    	String s = org.apache.commons.lang3.StringUtils.normalizeSpace(pPacket.getMessage());
-+        //
-         for (int i = 0; i < s.length(); ++i)
-         {
-             if (!SharedConstants.isAllowedChatCharacter(s.charAt(i)))
-@@ -1428,9 +1480,14 @@
-                 String s1 = pPacket.getFiltered();
-                 Component component = s1.isEmpty() ? null : new TranslatableComponent("chat.type.text", this.player.getDisplayName(), s1);
-                 Component component1 = new TranslatableComponent("chat.type.text", this.player.getDisplayName(), s);
-+    			//Forge
-+                if(Reflector.ForgeHooks_onServerChatEvent.exists())
-+                	component1 = (Component) Reflector.call(Reflector.ForgeHooks_onServerChatEvent, this, s, component1);
-+                Component finalComponent = component1;
-+                //
-                 this.server.getPlayerList().broadcastMessage(component1, (p_184197_) ->
-                 {
--                    return this.player.shouldFilterMessageTo(p_184197_) ? component : component1;
-+                    return this.player.shouldFilterMessageTo(p_184197_) ? component : finalComponent;
-                 }, ChatType.CHAT, this.player.getUUID());
+@@ -1759,16 +1798,21 @@
+             {
+                 return;
              }
++            boolean flag = Reflector.IForgePlayer_canInteractWith.exists() || entity.distanceToSqr(this.player.getEyePosition()) < MAX_INTERACTION_DISTANCE;
  
-@@ -1556,7 +1613,9 @@
+-            if (entity.distanceToSqr(this.player.getEyePosition()) < MAX_INTERACTION_DISTANCE)
++            if (flag)
+             {
+                 pPacket.dispatch(new ServerboundInteractPacket.Handler()
+                 {
+                     private void performInteraction(InteractionHand p_143679_, ServerGamePacketListenerImpl.EntityInteraction p_143680_)
                      {
++                    	//Forge: If the entity cannot be reached, do nothing. Original check was dist < 6, range is 4.5, so vanilla used padding=1.5
++                        if(Reflector.IForgePlayer_canInteractWith.exists() && !Reflector.callBoolean(player,Reflector.IForgePlayer_canInteractWith, entity, 1.5D)) return; 
                          ItemStack itemstack = ServerGamePacketListenerImpl.this.player.getItemInHand(p_143679_).copy();
                          InteractionResult interactionresult = p_143680_.run(ServerGamePacketListenerImpl.this.player, entity, p_143679_);
 -
@@ -185,7 +161,17 @@
                          if (interactionresult.consumesAction())
                          {
                              CriteriaTriggers.PLAYER_INTERACTED_WITH_ENTITY.trigger(ServerGamePacketListenerImpl.this.player, itemstack, entity);
-@@ -1832,6 +1891,130 @@
+@@ -1794,7 +1838,8 @@
+                     {
+                         if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrb) && !(entity instanceof AbstractArrow) && entity != ServerGamePacketListenerImpl.this.player)
+                         {
+-                            ServerGamePacketListenerImpl.this.player.attack(entity);
++                            if(!Reflector.IForgePlayer_canHit.exists() || Reflector.callBoolean(player, Reflector.IForgePlayer_canHit,entity,3))
++                            	ServerGamePacketListenerImpl.this.player.attack(entity); //Forge: Perform attack range check. Original check was dist < 6, range is 3, so vanilla used padding=3
+                         }
+                         else
+                         {
+@@ -2044,6 +2089,130 @@
  
      public void handleCustomPayload(ServerboundCustomPayloadPacket pPacket)
      {
@@ -230,12 +216,12 @@
 +
 +                        if (s3.contains("NONVR"))
 +                        {
-+                            this.player.sendMessage(new TextComponent("NONVR: " + this.player.getDisplayName().getString()), this.player.getUUID());
++                            this.player.sendSystemMessage(Component.literal("NONVR: " + this.player.getDisplayName().getString()));
 +                            serverviveplayer.setVR(false);
 +                        }
 +                        else
 +                        {
-+                            this.player.sendMessage(new TextComponent("VR: " + this.player.getDisplayName().getString()), this.player.getUUID());
++                            this.player.sendSystemMessage(Component.literal("VR: " + this.player.getDisplayName().getString()));
 +                            serverviveplayer.setVR(true);
 +                        }
 +                    }

@@ -8,15 +8,15 @@
  import net.minecraft.client.gui.screens.Screen;
  import net.minecraft.client.renderer.GameRenderer;
  import net.minecraft.network.chat.Component;
-@@ -28,6 +29,7 @@
- import net.minecraft.network.chat.TranslatableComponent;
+@@ -27,6 +28,7 @@
+ import net.minecraft.network.chat.Style;
  import net.minecraft.util.FormattedCharSequence;
  import net.minecraft.util.Mth;
 +import org.vivecraft.gameplay.screenhandlers.KeyboardHandler;
  
  public class EditBox extends AbstractWidget implements Widget, GuiEventListener
  {
-@@ -58,9 +60,9 @@
+@@ -57,9 +59,9 @@
      @Nullable
      private Consumer<String> responder;
      private Predicate<String> filter = Objects::nonNull;
@@ -28,7 +28,7 @@
      };
  
      public EditBox(Font pFont, int pX, int pY, int pWidth, int pHeight, Component p_94119_)
-@@ -458,11 +460,19 @@
+@@ -457,11 +459,19 @@
          {
              boolean flag = pMouseX >= (double)this.x && pMouseX < (double)(this.x + this.width) && p_94126_ >= (double)this.y && p_94126_ < (double)(this.y + this.height);
  
@@ -49,7 +49,7 @@
              if (this.isFocused() && flag && pMouseY == 0)
              {
                  int i = Mth.floor(pMouseX) - this.x;
-@@ -519,6 +529,12 @@
+@@ -518,6 +528,12 @@
                  String s1 = flag ? s.substring(0, j) : s;
                  j1 = this.font.drawShadow(pPoseStack, this.formatter.apply(s1, this.displayPos), (float)l, (float)i1, i2);
              }
@@ -62,7 +62,7 @@
  
              boolean flag2 = this.cursorPos < this.value.length() || this.value.length() >= this.getMaxLength();
              int k1 = j1;
-@@ -663,6 +679,17 @@
+@@ -662,6 +678,17 @@
          if (pFocused)
          {
              this.frame = 0;
@@ -80,7 +80,7 @@
          }
      }
  
-@@ -717,7 +744,8 @@
+@@ -716,7 +743,8 @@
  
      public void setCanLoseFocus(boolean pCanLoseFocus)
      {

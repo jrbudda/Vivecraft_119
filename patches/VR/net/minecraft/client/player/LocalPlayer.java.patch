@@ -1,20 +1,24 @@
 --- a/net/minecraft/client/player/LocalPlayer.java
 +++ b/net/minecraft/client/player/LocalPlayer.java
-@@ -1,12 +1,24 @@
+@@ -1,15 +1,31 @@
  package net.minecraft.client.player;
  
- import com.google.common.collect.Lists;
-+import io.netty.buffer.ByteBuf;
-+import io.netty.buffer.Unpooled;
+-import com.google.common.collect.ImmutableMap;
+-import com.google.common.collect.Lists;
+-import com.mojang.brigadier.ParseResults;
+-import com.mojang.logging.LogUtils;
 +import java.util.HashMap;
  import java.util.Iterator;
  import java.util.List;
+ import java.util.Map;
  import java.util.Objects;
- import java.util.UUID;
++import java.util.function.BiPredicate;
  import java.util.stream.StreamSupport;
++
  import javax.annotation.Nullable;
 +
 +import org.apache.commons.lang3.tuple.Pair;
++import org.slf4j.Logger;
 +import org.vivecraft.api.NetworkHelper;
 +import org.vivecraft.gameplay.VRPlayer;
 +import org.vivecraft.physicalinventory.TransactionMutex;
@@ -22,10 +26,17 @@
 +import org.vivecraft.utils.external.jinfinadeck;
 +import org.vivecraft.utils.external.jkatvr;
 +
++import com.google.common.collect.ImmutableMap;
++import com.google.common.collect.Lists;
++import com.mojang.brigadier.ParseResults;
++import com.mojang.logging.LogUtils;
++
++import io.netty.buffer.ByteBuf;
++import io.netty.buffer.Unpooled;
  import net.minecraft.client.ClientRecipeBook;
  import net.minecraft.client.Minecraft;
  import net.minecraft.client.gui.screens.DeathScreen;
-@@ -19,6 +31,7 @@
+@@ -22,6 +38,7 @@
  import net.minecraft.client.gui.screens.inventory.MinecartCommandBlockEditScreen;
  import net.minecraft.client.gui.screens.inventory.SignEditScreen;
  import net.minecraft.client.gui.screens.inventory.StructureBlockEditScreen;
@@ -33,13 +44,15 @@
  import net.minecraft.client.multiplayer.ClientLevel;
  import net.minecraft.client.multiplayer.ClientPacketListener;
  import net.minecraft.client.resources.sounds.AmbientSoundHandler;
-@@ -31,11 +44,13 @@
- import net.minecraft.client.resources.sounds.UnderwaterAmbientSoundInstances;
+@@ -36,6 +53,7 @@
+ import net.minecraft.commands.arguments.ArgumentSignatures;
  import net.minecraft.core.BlockPos;
  import net.minecraft.core.Direction;
 +import net.minecraft.core.particles.ItemParticleOption;
  import net.minecraft.core.particles.ParticleTypes;
  import net.minecraft.network.chat.Component;
+ import net.minecraft.network.chat.MessageSignature;
+@@ -44,6 +62,7 @@
  import net.minecraft.network.protocol.game.ServerboundChatPacket;
  import net.minecraft.network.protocol.game.ServerboundClientCommandPacket;
  import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
@@ -47,12 +60,13 @@
  import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
  import net.minecraft.network.protocol.game.ServerboundMoveVehiclePacket;
  import net.minecraft.network.protocol.game.ServerboundPlayerAbilitiesPacket;
-@@ -68,8 +83,13 @@
+@@ -78,9 +97,14 @@
  import net.minecraft.world.item.ElytraItem;
  import net.minecraft.world.item.ItemStack;
  import net.minecraft.world.item.Items;
 +import net.minecraft.world.item.UseAnim;
  import net.minecraft.world.item.crafting.Recipe;
+ import net.minecraft.world.item.enchantment.EnchantmentHelper;
  import net.minecraft.world.level.BaseCommandBlock;
 +import net.minecraft.world.level.Level;
 +import net.minecraft.world.level.block.Block;
@@ -61,15 +75,17 @@
  import net.minecraft.world.level.block.entity.CommandBlockEntity;
  import net.minecraft.world.level.block.entity.JigsawBlockEntity;
  import net.minecraft.world.level.block.entity.SignBlockEntity;
-@@ -80,6 +100,7 @@
+@@ -91,8 +115,7 @@
  import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.phys.shapes.CollisionContext;
  import net.minecraft.world.phys.shapes.VoxelShape;
+-import org.slf4j.Logger;
+-
 +import net.optifine.reflect.Reflector;
- 
  public class LocalPlayer extends AbstractClientPlayer
  {
-@@ -110,6 +131,13 @@
+     public static final Logger LOGGER = LogUtils.getLogger();
+@@ -124,6 +147,13 @@
      public Input input;
      protected final Minecraft minecraft;
      protected int sprintTriggerTime;
@@ -83,7 +99,7 @@
      public int sprintTime;
      public float yBob;
      public float xBob;
-@@ -128,6 +156,10 @@
+@@ -142,6 +172,10 @@
      private boolean wasFallFlying;
      private int waterVisionTime;
      private boolean showDeathScreen = true;
@@ -94,7 +110,7 @@
  
      public LocalPlayer(Minecraft pMinecraft, ClientLevel pClientLevel, ClientPacketListener pConnection, StatsCounter pStats, ClientRecipeBook pRecipeBook, boolean pWasShiftKeyDown, boolean pWasSprinting)
      {
-@@ -143,6 +175,102 @@
+@@ -157,6 +191,102 @@
          this.ambientSoundHandlers.add(new BiomeAmbientSoundsHandler(this, pMinecraft.getSoundManager(), pClientLevel.getBiomeManager()));
      }
  
@@ -197,7 +213,7 @@
      public boolean hurt(DamageSource pSource, float pAmount)
      {
          return false;
-@@ -166,6 +294,8 @@
+@@ -180,6 +310,8 @@
                  this.minecraft.getSoundManager().play(new RidingMinecartSoundInstance(this, (AbstractMinecart)pEntity, false));
              }
  
@@ -206,7 +222,7 @@
              return true;
          }
      }
-@@ -174,6 +304,7 @@
+@@ -188,6 +320,7 @@
      {
          super.removeVehicle();
          this.handsBusy = false;
@@ -214,7 +230,7 @@
      }
  
      public float getViewXRot(float pPartialTick)
-@@ -191,6 +322,8 @@
+@@ -205,6 +338,8 @@
          if (this.level.hasChunkAt(this.getBlockX(), this.getBlockZ()))
          {
              super.tick();
@@ -223,7 +239,7 @@
  
              if (this.isPassenger())
              {
-@@ -259,7 +392,20 @@
+@@ -273,7 +408,20 @@
              boolean flag1 = Mth.lengthSquared(d4, d0, d1) > Mth.square(2.0E-4D) || this.positionReminder >= 20;
              boolean flag2 = d2 != 0.0D || d3 != 0.0D;
  
@@ -245,50 +261,50 @@
              {
                  Vec3 vec3 = this.getDeltaMovement();
                  this.connection.send(new ServerboundMovePlayerPacket.PosRot(vec3.x, -999.0D, vec3.z, this.getYRot(), this.getXRot(), this.onGround));
-@@ -297,6 +443,12 @@
+@@ -311,6 +459,10 @@
              }
  
              this.lastOnGround = this.onGround;
-+
 +            if (this.minecraft.vrSettings.walkUpBlocks)
 +            {
-+                this.minecraft.options.autoJump = false;
++                this.minecraft.options.autoJump().set(false);
 +            }
-+
-             this.autoJumpEnabled = this.minecraft.options.autoJump;
+             this.autoJumpEnabled = this.minecraft.options.autoJump().get();
          }
      }
-@@ -312,10 +464,29 @@
-     public void chat(String pMessage)
-     {
-         this.connection.send(new ServerboundChatPacket(pMessage));
-+        this.lastMsg = pMessage;
-+    }
-+
+@@ -333,7 +485,11 @@
+         MessageSigner messagesigner = MessageSigner.create(this.getUUID());
+         this.sendChat(messagesigner, p_234126_, p_234127_);
+     }
+-
 +    public void swingArm(InteractionHand hand, VRFirstPersonArmSwing animation)
 +    {
-+        this.minecraft.getItemInHandRenderer().swingType = animation;
++        this.minecraft.getEntityRenderDispatcher().getItemInHandRenderer().swingType = animation;
 +        this.swing(hand);
-     }
++    }
+     public void command(String p_234157_)
+     {
+         this.command(p_234157_, (Component)null);
+@@ -425,6 +581,18 @@
  
      public void swing(InteractionHand pHand)
      {
-+        if (!this.swinging)
++    	if (!this.swinging)
 +        {
 +            if (this.minecraft.hitResult != null && this.minecraft.hitResult.getType() != net.minecraft.world.phys.HitResult.Type.MISS)
 +            {
-+                this.minecraft.getItemInHandRenderer().xdist = (float)this.minecraft.hitResult.getLocation().subtract(this.minecraft.vrPlayer.vrdata_world_pre.getController(pHand.ordinal()).getPosition()).length();
++                this.minecraft.getEntityRenderDispatcher().getItemInHandRenderer().xdist = (float)this.minecraft.hitResult.getLocation().subtract(this.minecraft.vrPlayer.vrdata_world_pre.getController(pHand.ordinal()).getPosition()).length();
 +            }
 +            else
 +            {
-+                this.minecraft.getItemInHandRenderer().xdist = 0.0F;
++                this.minecraft.getEntityRenderDispatcher().getItemInHandRenderer().xdist = 0.0F;
 +            }
 +        }
 +
          super.swing(pHand);
          this.connection.send(new ServerboundSwingPacket(pHand));
      }
-@@ -552,7 +723,23 @@
+@@ -661,7 +829,24 @@
  
      public void playSound(SoundEvent pSound, float pVolume, float pPitch)
      {
@@ -297,31 +313,72 @@
 +
 +        if (Reflector.ForgeEventFactory_onPlaySoundAtEntity.exists())
 +        {
-+            Object object = Reflector.ForgeEventFactory_onPlaySoundAtEntity.call(this, pSound, this.getSoundSource(), pVolume, pPitch);
++        	Object object = Reflector.ForgeEventFactory_onPlaySoundAtEntity.call(this, pSound, this.getSoundSource(), pVolume, pPitch);
 +
-+            if (Reflector.callBoolean(object, Reflector.Event_isCanceled) || Reflector.call(object, Reflector.PlaySoundAtEntityEvent_getSound) == null)
-+            {
-+                return;
-+            }
++        	if (Reflector.callBoolean(object, Reflector.Event_isCanceled) || Reflector.call(object, Reflector.ForgeEventFactory_onPlaySoundAtEntity) == null)
++        	{
++        		return;
++        	}
 +
-+            pSound = (SoundEvent)Reflector.call(object, Reflector.PlaySoundAtEntityEvent_getSound);
-+            soundsource = (SoundSource)Reflector.call(object, Reflector.PlaySoundAtEntityEvent_getCategory);
-+            pVolume = Reflector.callFloat(object, Reflector.PlaySoundAtEntityEvent_getVolume);
++        	pSound = (SoundEvent)Reflector.call(object, Reflector.PlayLevelSoundEvent_getSound);
++        	soundsource = (SoundSource)Reflector.call(object, Reflector.PlayLevelSoundEvent_getSource);
++        	pVolume = Reflector.callFloat(object, Reflector.PlayLevelSoundEvent_getNewVolume);
++        	pPitch = Reflector.callFloat(object, Reflector.PlayLevelSoundEvent_getNewPitch);
 +        }
 +
 +        this.level.playLocalSound(this.getX(), this.getY(), this.getZ(), pSound, soundsource, pVolume, pPitch, false);
      }
  
      public void playNotifySound(SoundEvent p_108655_, SoundSource p_108656_, float p_108657_, float p_108658_)
-@@ -747,6 +934,7 @@
-         boolean flag2 = this.hasEnoughImpulseToStartSprinting();
+@@ -857,6 +1042,9 @@
          this.crouching = !this.getAbilities().flying && !this.isSwimming() && this.canEnterPose(Pose.CROUCHING) && (this.isShiftKeyDown() || !this.isSleeping() && !this.canEnterPose(Pose.STANDING));
-         this.input.tick(this.isMovingSlowly());
+         float f = Mth.clamp(0.3F + EnchantmentHelper.getSneakingSpeedBonus(this), 0.0F, 1.0F);
+         this.input.tick(this.isMovingSlowly(), f);
++        //Forge
 +        Reflector.call(Reflector.ForgeHooksClient_onInputUpdate, this, this.input);
++        //
          this.minecraft.getTutorial().onInput(this.input);
  
          if (this.isUsingItem() && !this.isPassenger())
-@@ -815,7 +1003,7 @@
+@@ -890,7 +1078,13 @@
+ 
+         boolean flag4 = (float)this.getFoodData().getFoodLevel() > 6.0F || this.getAbilities().mayfly;
+ 
+-        if ((this.onGround || this.isUnderWater()) && !flag1 && !flag2 && this.hasEnoughImpulseToStartSprinting() && !this.isSprinting() && flag4 && !this.isUsingItem() && !this.hasEffect(MobEffects.BLINDNESS))
++        //Forge add this nonsense
++        boolean canStartSwimming = Reflector.callBoolean(this, Reflector.IForgeEntity_canStartSwimming);
++        BiPredicate<Object, Double> param = (fluidType, height) -> {return Reflector.callBoolean(this, Reflector.IForgeEntity_canSwimInFluidType, fluidType);};    
++        boolean isInFluid = Reflector.callBoolean(this, Reflector.IForgeEntity_isInFluidType, param);
++        //
++        
++        if ((this.onGround || this.isUnderWater() || canStartSwimming) && !flag1 && !flag2 && this.hasEnoughImpulseToStartSprinting() && !this.isSprinting() && flag4 && !this.isUsingItem() && !this.hasEffect(MobEffects.BLINDNESS))
+         {
+             if (this.sprintTriggerTime <= 0 && !this.minecraft.options.keySprint.isDown())
+             {
+@@ -902,7 +1096,7 @@
+             }
+         }
+ 
+-        if (!this.isSprinting() && (!this.isInWater() || this.isUnderWater()) && this.hasEnoughImpulseToStartSprinting() && flag4 && !this.isUsingItem() && !this.hasEffect(MobEffects.BLINDNESS) && this.minecraft.options.keySprint.isDown())
++        if (!this.isSprinting() && (!(this.isInWater() || isInFluid) || (this.isUnderWater() || canStartSwimming)) && this.hasEnoughImpulseToStartSprinting() && flag4 && !this.isUsingItem() && !this.hasEffect(MobEffects.BLINDNESS) && this.minecraft.options.keySprint.isDown())
+         {
+             this.setSprinting(true);
+         }
+@@ -910,11 +1104,11 @@
+         if (this.isSprinting())
+         {
+             boolean flag5 = !this.input.hasForwardImpulse() || !flag4;
+-            boolean flag6 = flag5 || this.horizontalCollision && !this.minorHorizontalCollision || this.isInWater() && !this.isUnderWater();
++            boolean flag6 = flag5 || this.horizontalCollision && !this.minorHorizontalCollision || (this.isInWater() && !this.isUnderWater()) || isInFluid && !canStartSwimming;
+ 
+             if (this.isSwimming())
+             {
+-                if (!this.onGround && !this.input.shiftKeyDown && flag5 || !this.isInWater())
++                if (!this.onGround && !this.input.shiftKeyDown && flag5 || !(this.isInWater() || isInFluid))
+                 {
+                     this.setSprinting(false);
+                 }
+@@ -925,7 +1119,7 @@
              }
          }
  
@@ -330,7 +387,7 @@
  
          if (this.getAbilities().mayfly)
          {
-@@ -824,7 +1012,7 @@
+@@ -934,7 +1128,7 @@
                  if (!this.getAbilities().flying)
                  {
                      this.getAbilities().flying = true;
@@ -339,7 +396,7 @@
                      this.onUpdateAbilities();
                  }
              }
-@@ -837,21 +1025,28 @@
+@@ -947,28 +1141,43 @@
                  else if (!this.isSwimming())
                  {
                      this.getAbilities().flying = !this.getAbilities().flying;
@@ -373,7 +430,25 @@
          }
  
          this.wasFallFlying = this.isFallFlying();
-@@ -937,6 +1132,7 @@
+ 
+-        if (this.isInWater() && this.input.shiftKeyDown && this.isAffectedByFluids())
+-        {
+-            this.goDownInWater();
++        //Forge
++        Object fluidType = Reflector.call(this,Reflector.IForgeEntity_getMaxHeightFluidType);
++        boolean isAir = Reflector.callBoolean(fluidType, Reflector.FluidType_isAir);
++        boolean canswim = Reflector.callBoolean(this, Reflector.IForgeEntity_canSwimInFluidType, fluidType);
++        //
++        if ((this.isInWater() || (!isAir && canswim)) && this.input.shiftKeyDown && this.isAffectedByFluids())
++        {
++        	if(Reflector.IForgeEntity_sinkInFluid.exists())
++        		Reflector.call(this, Reflector.IForgeEntity_sinkInFluid, this.isInWater() ? Reflector.call(Reflector.getFieldValue(Reflector.ForgeMod_WATER_TYPE), Reflector.RegistryObject_get) : fluidType);
++        	else
++        	     this.goDownInWater();
+         }
+ 
+         if (this.isEyeInFluid(FluidTags.WATER))
+@@ -1047,6 +1256,7 @@
          }
  
          super.aiStep();
@@ -381,7 +456,17 @@
  
          if (this.onGround && this.getAbilities().flying && !this.minecraft.gameMode.isAlwaysFlying())
          {
-@@ -1042,10 +1238,67 @@
+@@ -1123,6 +1333,9 @@
+     public void rideTick()
+     {
+         super.rideTick();
++        //Forge
++        if (this.wantsToStopRiding() && this.isPassenger()) this.input.shiftKeyDown = false;
++        //
+         this.handsBusy = false;
+ 
+         if (this.getVehicle() instanceof Boat)
+@@ -1152,10 +1365,67 @@
  
      public void move(MoverType pType, Vec3 pPos)
      {
@@ -453,7 +538,7 @@
      }
  
      public boolean isAutoJumpEnabled()
-@@ -1062,14 +1315,18 @@
+@@ -1172,14 +1442,18 @@
              Vec3 vec32 = new Vec3((double)pMovementX, 0.0D, (double)pMovementZ);
              float f = this.getSpeed();
              float f1 = (float)vec32.lengthSqr();
@@ -475,7 +560,7 @@
                  vec32 = new Vec3((double)(f2 * f5 - f3 * f4), vec32.y, (double)(f3 * f5 + f2 * f4));
                  f1 = (float)vec32.lengthSqr();
  
-@@ -1079,12 +1336,12 @@
+@@ -1189,12 +1463,12 @@
                  }
              }
  
@@ -492,7 +577,7 @@
              {
                  CollisionContext collisioncontext = CollisionContext.of(this);
                  BlockPos blockpos = new BlockPos(this.getX(), this.getBoundingBox().maxY, this.getZ());
-@@ -1105,7 +1362,7 @@
+@@ -1215,7 +1489,7 @@
                              f7 += (float)(this.getEffect(MobEffects.JUMP).getAmplifier() + 1) * 0.75F;
                          }
  
@@ -501,7 +586,7 @@
                          Vec3 vec34 = vec31.add(vec312.scale((double)f8));
                          float f9 = this.getBbWidth();
                          float f10 = this.getBbHeight();
-@@ -1131,11 +1388,11 @@
+@@ -1241,11 +1515,11 @@
  
                              if (aabb1.intersects(vec37, vec38) || aabb1.intersects(vec39, vec310))
                              {
@@ -515,7 +600,7 @@
                                  {
                                      BlockPos blockpos2 = blockpos1.above(i);
                                      BlockState blockstate2 = this.level.getBlockState(blockpos2);
-@@ -1143,9 +1400,9 @@
+@@ -1253,9 +1527,9 @@
  
                                      if (!(voxelshape = blockstate2.getCollisionShape(this.level, blockpos2, collisioncontext)).isEmpty())
                                      {
@@ -527,7 +612,7 @@
                                          {
                                              return;
                                          }
-@@ -1169,9 +1426,9 @@
+@@ -1279,9 +1553,9 @@
  
                          if (f11 != Float.MIN_VALUE)
                          {
@@ -539,11 +624,13 @@
                              {
                                  this.autoJumpTime = 1;
                              }
-@@ -1296,4 +1553,359 @@
+@@ -1411,4 +1685,369 @@
      {
-         this.minecraft.getTutorial().onInventoryAction(p_172532_, p_172533_, p_172534_);
+         return this.getYRot();
      }
-+
++    
++    //Vivecraft additions and overrides
++    @Override
 +    public void moveTo(double pX, double p_20109_, double pY, float p_20111_, float pZ)
 +    {
 +        super.moveTo(pX, p_20109_, pY, p_20111_, pZ);
@@ -553,7 +640,7 @@
 +            this.minecraft.vrPlayer.snapRoomOriginToPlayerEntity(this, false, false);
 +        }
 +    }
-+
++    @Override
 +    public void absMoveTo(double pX, double p_19892_, double pY, float p_19894_, float pZ)
 +    {
 +        super.absMoveTo(pX, p_19892_, pY, p_19894_, pZ);
@@ -565,7 +652,7 @@
 +            this.initFromServer = true;
 +        }
 +    }
-+
++    @Override
 +    public void setPos(double pX, double p_20211_, double pY)
 +    {
 +        double d0 = this.getX();
@@ -593,7 +680,7 @@
 +        }
 +    }
 +
-+    public void doDrag()
++    private void doDrag()
 +    {
 +        float f = 0.91F;
 +
@@ -616,12 +703,13 @@
 +        d1 = d1 * d8;
 +        this.setDeltaMovement(this.getDeltaMovement().x * d0, this.getDeltaMovement().y, this.getDeltaMovement().z * d1);
 +    }
-+
-+    public double getBoundedAddition(double orig)
++    
++    private double getBoundedAddition(double orig)
 +    {
 +        return orig >= -1.0E-6D && orig <= 1.0E-6D ? 1.0E-6D : orig;
 +    }
-+
++    
++    @Override
 +    public void moveRelative(float pAmount, Vec3 pRelative)
 +    {
 +        double d0 = pRelative.y;
@@ -770,7 +858,8 @@
 +    {
 +        return this == Minecraft.getInstance().player;
 +    }
-+
++    
++    @Override
 +    protected void triggerItemUseEffects(ItemStack pStack, int pCount)
 +    {
 +        if (!pStack.isEmpty() && this.isUsingItem())
@@ -787,7 +876,7 @@
 +            }
 +        }
 +    }
-+
++    
 +    private void addItemParticles(ItemStack stack, int count)
 +    {
 +        for (int i = 0; i < count; ++i)
@@ -829,14 +918,15 @@
 +            return this.getOffhandItem() != null && this.minecraft.climbTracker.isClaws(this.getOffhandItem());
 +        }
 +    }
-+
++    
++    @Override
 +    public void die(DamageSource pCause)
 +    {
 +        super.die(pCause);
 +        this.minecraft.vr.triggerHapticPulse(0, 2000);
 +        this.minecraft.vr.triggerHapticPulse(1, 2000);
 +    }
-+
++    
 +    public void stepSound(BlockPos blockforNoise, Vec3 soundPos)
 +    {
 +        BlockState blockstate = this.level.getBlockState(blockforNoise);
@@ -859,19 +949,7 @@
 +        }
 +    }
 +
-+    public void updateSyncFields(LocalPlayer old)
-+    {
-+        this.xLast = old.xLast;
-+        this.yLast1 = old.yLast1;
-+        this.zLast = old.zLast;
-+        this.yRotLast = old.yRotLast;
-+        this.xRotLast = old.xRotLast;
-+        this.lastOnGround = old.lastOnGround;
-+        this.wasShiftKeyDown = old.wasShiftKeyDown;
-+        this.wasSprinting = old.wasSprinting;
-+        this.positionReminder = old.positionReminder;
-+    }
-+
++    @Override
 +    public ItemStack eat(Level p_36185_, ItemStack p_36186_)
 +    {
 +        if (p_36186_.isEdible() && this == Minecraft.getInstance().player && p_36186_.getHoverName().getString().equals("EAT ME"))
@@ -892,10 +970,27 @@
 +    {
 +        return this.moveMulIn.lengthSqr() > 0.0D ? (float)((double)this.getBlockSpeedFactor() * (this.moveMulIn.x + this.moveMulIn.z) / 2.0D) : this.getBlockSpeedFactor();
 +    }
-+
++    
++    @Override
 +    public void releaseUsingItem()
 +    {
 +        NetworkHelper.sendActiveHand((byte)this.getUsedItemHand().ordinal());
 +        super.releaseUsingItem();
 +    }
++    //
++    
++    //Forge
++    public void updateSyncFields(LocalPlayer old)
++    {
++        this.xLast = old.xLast;
++        this.yLast1 = old.yLast1;
++        this.zLast = old.zLast;
++        this.yRotLast = old.yRotLast;
++        this.xRotLast = old.xRotLast;
++        this.lastOnGround = old.lastOnGround;
++        this.wasShiftKeyDown = old.wasShiftKeyDown;
++        this.wasSprinting = old.wasSprinting;
++        this.positionReminder = old.positionReminder;
++    }
++    //
  }

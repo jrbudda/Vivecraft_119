@@ -16,6 +16,6 @@
 +        //Vivecraft vanilla only - forge use ASM
 +        ASMInjections.injectItems(map);
 +        
-         this.recipes = map.entrySet().stream().collect(ImmutableMap.toImmutableMap(Entry::getKey, (p_44033_) ->
+         this.recipes = map.entrySet().stream().collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, (p_44033_) ->
          {
              return p_44033_.getValue().build();
