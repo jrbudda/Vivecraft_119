@@ -1,0 +1,28 @@
+--- a/net/minecraft/client/GuiMessage.java
++++ b/net/minecraft/client/GuiMessage.java
+@@ -4,12 +4,8 @@
+ import net.minecraft.network.chat.MessageSignature;
+ import net.minecraft.util.FormattedCharSequence;
+ 
+-public record GuiMessage(int updateCounterCreated, Component content, MessageSignature headerSignature, GuiMessageTag tag)
++public record GuiMessage(int addedTime, Component content, MessageSignature headerSignature, GuiMessageTag tag)
+ {
+-    private final int addedTime;
+-    private final Component content;
+-    private final MessageSignature headerSignature;
+-    private final GuiMessageTag tag;
+     public int addedTime()
+     {
+         return this.addedTime;
+@@ -28,10 +24,7 @@
+     }
+     public static record Line(int addedTime, FormattedCharSequence content, GuiMessageTag tag, boolean endOfEntry)
+     {
+-        private final int addedTime;
+-        private final FormattedCharSequence content;
+-        private final GuiMessageTag tag;
+-        private final boolean endOfEntry;
++
+         public int addedTime()
+         {
+             return this.addedTime;

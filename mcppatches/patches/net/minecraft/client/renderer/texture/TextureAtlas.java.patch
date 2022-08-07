@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/texture/TextureAtlas.java
 +++ b/net/minecraft/client/renderer/texture/TextureAtlas.java
-@@ -180,7 +180,7 @@
+@@ -181,7 +181,7 @@
              {
                  GlStateManager._bindTexture(this.getMultiTexID().norm);
  
@@ -9,7 +9,7 @@
                  {
                      TextureAtlasSprite textureatlassprite4 = textureatlassprite2.spriteNormal;
  
-@@ -195,7 +195,7 @@
+@@ -196,7 +196,7 @@
              {
                  GlStateManager._bindTexture(this.getMultiTexID().spec);
  
@@ -18,7 +18,7 @@
                  {
                      TextureAtlasSprite textureatlassprite5 = textureatlassprite3.spriteSpecular;
  
-@@ -952,7 +952,7 @@
+@@ -953,7 +953,7 @@
                              }
                              else
                              {
@@ -27,7 +27,7 @@
                                  map.put(j, k + 1);
                              }
                          }
-@@ -968,9 +968,9 @@
+@@ -969,9 +969,9 @@
          Set set = map.keySet();
          Set set1 = new TreeSet(set);
  
@@ -39,7 +39,7 @@
              l += l1;
          }
  
-@@ -978,9 +978,9 @@
+@@ -979,9 +979,9 @@
          int k1 = 0;
          int i2 = l * percentScale / 100;
  

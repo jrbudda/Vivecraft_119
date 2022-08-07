@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\server\level\ChunkMap.java minecraft_patched\net\minecraft\server\level\ChunkMap.java
 --- minecraft\net\minecraft\server\level\ChunkMap.java
 +++ minecraft_patched\net\minecraft\server\level\ChunkMap.java
-@@ -554,7 +554,7 @@
+@@ -555,7 +555,7 @@
  
              return flag;
           });

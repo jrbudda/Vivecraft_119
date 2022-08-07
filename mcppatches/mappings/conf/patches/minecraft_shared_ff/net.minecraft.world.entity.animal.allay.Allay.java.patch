@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\world\entity\animal\allay\Allay.java minecraft_patched\net\minecraft\world\entity\animal\allay\Allay.java
 --- minecraft\net\minecraft\world\entity\animal\allay\Allay.java
 +++ minecraft_patched\net\minecraft\world\entity\animal\allay\Allay.java
-@@ -89,7 +89,7 @@
+@@ -115,7 +115,7 @@
     }
  
     public Brain<Allay> m_6274_() {

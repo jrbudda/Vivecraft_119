@@ -1,101 +1,50 @@
 --- a/net/minecraft/client/Minecraft.java
 +++ b/net/minecraft/client/Minecraft.java
-@@ -15,8 +15,10 @@
- import com.mojang.blaze3d.pipeline.TextureTarget;
- import com.mojang.blaze3d.platform.DisplayData;
- import com.mojang.blaze3d.platform.GlDebug;
-+import com.mojang.blaze3d.platform.GlStateManager;
- import com.mojang.blaze3d.platform.GlUtil;
- import com.mojang.blaze3d.platform.MacosUtil;
-+import com.mojang.blaze3d.platform.MemoryTracker;
- import com.mojang.blaze3d.platform.Window;
- import com.mojang.blaze3d.platform.WindowEventHandler;
- import com.mojang.blaze3d.systems.RenderSystem;
-@@ -34,20 +36,33 @@
- import java.io.IOException;
- import java.io.InputStream;
- import java.io.UncheckedIOException;
+@@ -1,5 +1,88 @@
+ package net.minecraft.client;
+ 
++import java.io.File;
++import java.io.IOException;
++import java.io.InputStream;
++import java.io.UncheckedIOException;
 +import java.lang.reflect.Field;
 +import java.lang.reflect.Method;
- import java.net.Proxy;
- import java.net.SocketAddress;
++import java.net.Proxy;
++import java.net.SocketAddress;
 +import java.net.URL;
 +import java.net.URLClassLoader;
 +import java.nio.Buffer;
- import java.nio.ByteBuffer;
-+import java.nio.ByteOrder;
++import java.nio.ByteBuffer;
 +import java.nio.FloatBuffer;
- import java.nio.file.Path;
- import java.nio.file.Paths;
- import java.text.DecimalFormat;
- import java.text.DecimalFormatSymbols;
- import java.text.SimpleDateFormat;
++import java.nio.file.Path;
++import java.nio.file.Paths;
++import java.text.DecimalFormat;
++import java.text.DecimalFormatSymbols;
 +import java.util.ArrayDeque;
 +import java.util.ArrayList;
 +import java.util.Arrays;
- import java.util.Collections;
- import java.util.Date;
++import java.util.Collections;
 +import java.util.Deque;
 +import java.util.Iterator;
- import java.util.List;
- import java.util.Locale;
- import java.util.MissingResourceException;
- import java.util.Queue;
-+import java.util.Set;
- import java.util.UUID;
- import java.util.concurrent.CompletableFuture;
- import java.util.concurrent.atomic.AtomicReference;
-@@ -96,6 +111,7 @@
- import net.minecraft.client.gui.screens.social.SocialInteractionsScreen;
- import net.minecraft.client.gui.screens.worldselection.WorldOpenFlows;
- import net.minecraft.client.main.GameConfig;
-+import net.minecraft.client.main.Main;
- import net.minecraft.client.model.geom.EntityModelSet;
- import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
- import net.minecraft.client.multiplayer.ClientLevel;
-@@ -143,6 +159,7 @@
- import net.minecraft.client.searchtree.SearchTree;
- import net.minecraft.client.server.IntegratedServer;
- import net.minecraft.client.sounds.MusicManager;
-+import net.minecraft.client.sounds.SoundEngine;
- import net.minecraft.client.sounds.SoundManager;
- import net.minecraft.client.tutorial.Tutorial;
- import net.minecraft.core.BlockPos;
-@@ -152,7 +169,9 @@
- import net.minecraft.core.Registry;
- import net.minecraft.nbt.CompoundTag;
- import net.minecraft.nbt.ListTag;
-+import net.minecraft.nbt.NbtOps;
- import net.minecraft.nbt.StringTag;
-+import net.minecraft.nbt.Tag;
- import net.minecraft.network.Connection;
- import net.minecraft.network.ConnectionProtocol;
- import net.minecraft.network.chat.ClickEvent;
-@@ -221,6 +240,7 @@
- import net.minecraft.world.level.Level;
- import net.minecraft.world.level.biome.Biome;
- import net.minecraft.world.level.block.Block;
-+import net.minecraft.world.level.block.Blocks;
- import net.minecraft.world.level.block.RenderShape;
- import net.minecraft.world.level.block.entity.BlockEntity;
- import net.minecraft.world.level.block.entity.SkullBlockEntity;
-@@ -229,14 +249,118 @@
- import net.minecraft.world.phys.BlockHitResult;
- import net.minecraft.world.phys.EntityHitResult;
- import net.minecraft.world.phys.HitResult;
-+import net.minecraft.world.phys.Vec3;
-+import net.optifine.Config;
-+import net.optifine.reflect.Reflector;
-+import net.optifine.reflect.ReflectorForge;
-+import net.optifine.shaders.Shaders;
++import java.util.List;
++import java.util.Locale;
++import java.util.MissingResourceException;
++import java.util.Optional;
++import java.util.Queue;
++import java.util.UUID;
++import java.util.concurrent.CompletableFuture;
++import java.util.concurrent.atomic.AtomicReference;
++import java.util.function.Consumer;
++import java.util.function.Function;
++import java.util.function.Supplier;
++import java.util.stream.Stream;
 +
-+import org.apache.commons.io.Charsets;
- import org.apache.commons.io.FileUtils;
++import javax.annotation.Nullable;
++
++import org.apache.commons.io.FileUtils;
 +import org.lwjgl.opengl.ARBShaderObjects;
-+import org.lwjgl.opengl.GL11;
-+import org.lwjgl.opengl.GL30;
- import org.lwjgl.util.tinyfd.TinyFileDialogs;
- import org.slf4j.Logger;
++import org.lwjgl.util.tinyfd.TinyFileDialogs;
++import org.slf4j.Logger;
 +import org.vivecraft.api.ErrorHelper;
 +import org.vivecraft.api.NetworkHelper;
 +import org.vivecraft.gameplay.VRPlayer;
@@ -126,7 +75,6 @@
 +import org.vivecraft.provider.openvr_jna.VRInputAction;
 +import org.vivecraft.provider.ovr_lwjgl.MC_OVR;
 +import org.vivecraft.provider.ovr_lwjgl.OVR_StereoRenderer;
-+import org.vivecraft.render.OpenGLdebugging;
 +import org.vivecraft.render.PlayerModelController;
 +import org.vivecraft.render.RenderConfigException;
 +import org.vivecraft.render.RenderPass;
@@ -137,6 +85,90 @@
 +import org.vivecraft.utils.LangHelper;
 +import org.vivecraft.utils.Utils;
 +import org.vivecraft.utils.math.Vector3;
++
+ import com.google.common.collect.ImmutableList;
+ import com.google.common.collect.ImmutableMap;
+ import com.google.common.collect.Queues;
+@@ -16,8 +99,10 @@
+ import com.mojang.blaze3d.pipeline.TextureTarget;
+ import com.mojang.blaze3d.platform.DisplayData;
+ import com.mojang.blaze3d.platform.GlDebug;
++import com.mojang.blaze3d.platform.GlStateManager;
+ import com.mojang.blaze3d.platform.GlUtil;
+ import com.mojang.blaze3d.platform.MacosUtil;
++import com.mojang.blaze3d.platform.MemoryTracker;
+ import com.mojang.blaze3d.platform.Window;
+ import com.mojang.blaze3d.platform.WindowEventHandler;
+ import com.mojang.blaze3d.systems.RenderSystem;
+@@ -34,31 +119,7 @@
+ import com.mojang.realmsclient.client.RealmsClient;
+ import com.mojang.realmsclient.dto.RealmsServer;
+ import com.mojang.realmsclient.gui.RealmsDataFetcher;
+-import java.io.File;
+-import java.io.IOException;
+-import java.io.InputStream;
+-import java.io.UncheckedIOException;
+-import java.net.Proxy;
+-import java.net.SocketAddress;
+-import java.nio.ByteBuffer;
+-import java.nio.file.Path;
+-import java.nio.file.Paths;
+-import java.text.DecimalFormat;
+-import java.text.DecimalFormatSymbols;
+-import java.util.Collections;
+-import java.util.List;
+-import java.util.Locale;
+-import java.util.MissingResourceException;
+-import java.util.Optional;
+-import java.util.Queue;
+-import java.util.UUID;
+-import java.util.concurrent.CompletableFuture;
+-import java.util.concurrent.atomic.AtomicReference;
+-import java.util.function.Consumer;
+-import java.util.function.Function;
+-import java.util.function.Supplier;
+-import java.util.stream.Stream;
+-import javax.annotation.Nullable;
++
+ import net.minecraft.ChatFormatting;
+ import net.minecraft.CrashReport;
+ import net.minecraft.CrashReportCategory;
+@@ -99,6 +160,7 @@
+ import net.minecraft.client.gui.screens.social.SocialInteractionsScreen;
+ import net.minecraft.client.gui.screens.worldselection.WorldOpenFlows;
+ import net.minecraft.client.main.GameConfig;
++import net.minecraft.client.main.Main;
+ import net.minecraft.client.model.geom.EntityModelSet;
+ import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
+ import net.minecraft.client.multiplayer.ClientLevel;
+@@ -149,6 +211,7 @@
+ import net.minecraft.client.searchtree.SearchTree;
+ import net.minecraft.client.server.IntegratedServer;
+ import net.minecraft.client.sounds.MusicManager;
++import net.minecraft.client.sounds.SoundEngine;
+ import net.minecraft.client.sounds.SoundManager;
+ import net.minecraft.client.tutorial.Tutorial;
+ import net.minecraft.core.BlockPos;
+@@ -229,6 +292,7 @@
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.biome.Biome;
+ import net.minecraft.world.level.block.Block;
++import net.minecraft.world.level.block.Blocks;
+ import net.minecraft.world.level.block.RenderShape;
+ import net.minecraft.world.level.block.entity.BlockEntity;
+ import net.minecraft.world.level.block.entity.SkullBlockEntity;
+@@ -237,14 +301,69 @@
+ import net.minecraft.world.phys.BlockHitResult;
+ import net.minecraft.world.phys.EntityHitResult;
+ import net.minecraft.world.phys.HitResult;
+-import org.apache.commons.io.FileUtils;
+-import org.lwjgl.util.tinyfd.TinyFileDialogs;
+-import org.slf4j.Logger;
++import net.minecraft.world.phys.Vec3;
++import net.optifine.Config;
++import net.optifine.reflect.Reflector;
++import net.optifine.reflect.ReflectorForge;
++import net.optifine.shaders.Shaders;
  
 -public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements WindowEventHandler
 +public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements WindowEventHandler, net.minecraftforge.client.extensions.IForgeMinecraft
@@ -195,11 +227,11 @@
 +    private boolean lastClick;
 +    public boolean resourcePacksChanged;
 +    public int tickCounter;
-+    public final String minecriftVerString = "Vivecraft 1.19  jrbudda-VR-1-a3";
++    public final String minecriftVerString = "Vivecraft 1.19.2  jrbudda-VR-2-b1";
      public static final boolean ON_OSX = Util.getPlatform() == Util.OS.OSX;
      private static final int MAX_TICKS_PER_UPDATE = 10;
      public static final ResourceLocation DEFAULT_FONT = new ResourceLocation("default");
-@@ -265,7 +389,7 @@
+@@ -274,7 +393,7 @@
      public final DebugRenderer debugRenderer;
      private final AtomicReference<StoringChunkProgressListener> progressListener = new AtomicReference<>();
      public final Gui gui;
@@ -208,7 +240,7 @@
      private final HotbarManager hotbarManager;
      public final MouseHandler mouseHandler;
      public final KeyboardHandler keyboardHandler;
-@@ -285,7 +409,7 @@
+@@ -294,7 +413,7 @@
      private final LanguageManager languageManager;
      private final BlockColors blockColors;
      private final ItemColors itemColors;
@@ -217,9 +249,9 @@
      private final SoundManager soundManager;
      private final MusicManager musicManager;
      private final FontManager fontManager;
-@@ -373,6 +497,14 @@
-     private TimerQuery.FrameProfile currentFrameProfile;
-     private final Realms32BitWarningStatus realms32BitWarningStatus;
+@@ -386,6 +505,14 @@
+     private final ChatListener chatListener;
+     private ReportingContext reportingContext;
      private String debugPath = "root";
 +    private float fov = 1.0F;
 +    public float watereffect;
@@ -232,7 +264,7 @@
  
      public Minecraft(GameConfig pGameConfig)
      {
-@@ -392,8 +524,6 @@
+@@ -405,8 +532,6 @@
          this.userApiService = this.createUserApiService(this.authenticationService, pGameConfig);
          this.serviceSignatureValidator = SignatureValidator.from(this.authenticationService.getServicesKey());
          this.user = pGameConfig.user.user;
@@ -241,7 +273,7 @@
          this.demo = pGameConfig.game.demo;
          this.allowsMultiplayer = !pGameConfig.game.disableMultiplayer;
          this.allowsChat = !pGameConfig.game.disableChat;
-@@ -416,6 +546,23 @@
+@@ -429,6 +554,23 @@
          KeybindResolver.setKeyResolver(KeyMapping::createNameSupplier);
          this.fixerUpper = DataFixers.getDataFixer();
          this.toast = new ToastComponent(this);
@@ -265,17 +297,7 @@
          this.gameThread = Thread.currentThread();
          this.options = new Options(this, this.gameDirectory);
          this.running = true;
-@@ -434,6 +581,9 @@
-         }
- 
-         Util.timeSource = RenderSystem.initBackendSystem();
-+        if(ReflectorForge.getConfigClientBoolean(Reflector.ForgeConfig_Client_forceSystemNanoTime, false))
-+        	Util.timeSource = System::nanoTime;
-+
-         this.virtualScreen = new VirtualScreen(this);
-         this.window = this.virtualScreen.newWindow(displaydata, this.options.fullscreenVideoModeString, this.createTitle());
-         this.setWindowActive(true);
-@@ -459,14 +609,19 @@
+@@ -472,14 +614,19 @@
  
          this.window.setFramerateLimit(this.options.framerateLimit().get());
          this.mouseHandler = new MouseHandler(this);
@@ -297,8 +319,8 @@
          this.resourcePackRepository.reload();
          this.options.loadSelectedResourcePacks(this.resourcePackRepository);
          this.languageManager = new LanguageManager(this.options.languageCode);
-@@ -484,6 +639,16 @@
-         this.font = this.fontManager.createFont();
+@@ -498,6 +645,16 @@
+         this.fontFilterFishy = this.fontManager.createFontFilterFishy();
          this.resourceManager.registerReloadListener(this.fontManager.getReloadListener());
          this.selectMainFont(this.isEnforceUnicode());
 +        /** MINECRIFT */
@@ -314,7 +336,7 @@
          this.resourceManager.registerReloadListener(new GrassColorReloadListener());
          this.resourceManager.registerReloadListener(new FoliageColorReloadListener());
          this.window.setErrorSection("Startup");
-@@ -510,10 +675,18 @@
+@@ -524,10 +681,18 @@
          this.gameRenderer = new GameRenderer(this, this.entityRenderDispatcher.getItemInHandRenderer(), this.resourceManager, this.renderBuffers);
          this.resourceManager.registerReloadListener(this.gameRenderer);
          this.levelRenderer = new LevelRenderer(this, this.entityRenderDispatcher, this.blockEntityRenderDispatcher, this.renderBuffers);
@@ -333,7 +355,7 @@
          this.resourceManager.registerReloadListener(this.particleEngine);
          this.paintingTextures = new PaintingTextureManager(this.textureManager);
          this.resourceManager.registerReloadListener(this.paintingTextures);
-@@ -522,7 +695,15 @@
+@@ -536,7 +701,15 @@
          this.gpuWarnlistManager = new GpuWarnlistManager();
          this.resourceManager.registerReloadListener(this.gpuWarnlistManager);
          this.resourceManager.registerReloadListener(this.regionalCompliancies);
@@ -348,9 +370,9 @@
 +        }
 +        this.mouseHandler.setup(this.window.getWindow()); //Forge: Moved below ingameGUI setting to prevent NPEs in handeler.
          this.debugRenderer = new DebugRenderer(this);
+         this.realmsDataFetcher = new RealmsDataFetcher(RealmsClient.create(this));
          RenderSystem.setErrorCallback(this::onFullscreenError);
- 
-@@ -547,10 +728,43 @@
+@@ -562,10 +735,43 @@
              TinyFileDialogs.tinyfd_messageBox("Minecraft", stringbuilder.toString(), "ok", "error", false);
          }
  
@@ -394,9 +416,9 @@
          this.gameRenderer.preloadUiShader(this.getClientPackSource().getVanillaPack().asProvider());
          this.profileKeyPairManager = new ProfileKeyPairManager(this.userApiService, this.user.getGameProfile().getId(), this.gameDirectory.toPath());
          this.realms32BitWarningStatus = new Realms32BitWarningStatus(this);
-@@ -559,6 +773,11 @@
-         this.reloadStateTracker.startReload(ResourceLoadStateTracker.ReloadReason.INITIAL, list);
-         this.setOverlay(new LoadingOverlay(this, this.resourceManager.createReload(Util.backgroundExecutor(), this, RESOURCE_RELOAD_INITIAL_TASK, list), (p_210745_) ->
+@@ -579,6 +785,11 @@
+         ReloadInstance reloadinstance = this.resourceManager.createReload(Util.backgroundExecutor(), this, RESOURCE_RELOAD_INITIAL_TASK, list);
+         this.setOverlay(new LoadingOverlay(this, reloadinstance, (p_210745_) ->
          {
 +            if (this.vrRenderer.isInitialized())
 +            {
@@ -406,29 +428,59 @@
              Util.ifElse(p_210745_, this::rollbackResourcePacks, () -> {
                  if (SharedConstants.IS_RUNNING_IN_IDE)
                  {
-@@ -566,17 +785,21 @@
+@@ -586,32 +797,36 @@
                  }
  
                  this.reloadStateTracker.finishReload();
-+                //Forge
-+                if (!Reflector.callBoolean(Reflector.ClientModLoader_completeModLoading))
-+                {
-+                    if (s != null)
-+                    {
-+                        ConnectScreen.startConnecting(new TitleScreen(), this, new ServerAddress(s, i), (ServerData)null);
-+                    }
-+                    else
-+                    {
-+                        this.setScreen(new TitleScreen(true));
-+                    }
-+                }
-+                //
++                 //Forge
++                 if (!Reflector.callBoolean(Reflector.ClientModLoader_completeModLoading))
++                 {
++                     if (s != null)
++                     {
++                         reloadinstance.done().thenRunAsync(() ->
++                         {
++                             ConnectScreen.startConnecting(new TitleScreen(), this, new ServerAddress(s, i), (ServerData)null);
++                         }, this);
++                     }
++                     else if (this.shouldShowBanNotice())
++                     {
++                         this.setScreen(BanNoticeScreen.create((p_238185_) ->
++                         {
++                             if (p_238185_)
++                             {
++                                 Util.getPlatform().openUri("https://aka.ms/mcjavamoderation");
++                             }
++
++                             this.setScreen(new TitleScreen(true));
++                         }, this.multiplayerBan()));
++                     }
++                     else
++                     {
++                         this.setScreen(new TitleScreen(true));
++                     }
++                 }
++                 //
              });
          }, false));
 -
 -        if (s != null)
 -        {
--            ConnectScreen.startConnecting(new TitleScreen(), this, new ServerAddress(s, i), (ServerData)null);
+-            reloadinstance.done().thenRunAsync(() ->
+-            {
+-                ConnectScreen.startConnecting(new TitleScreen(), this, new ServerAddress(s, i), (ServerData)null);
+-            }, this);
+-        }
+-        else if (this.shouldShowBanNotice())
+-        {
+-            this.setScreen(BanNoticeScreen.create((p_238185_) ->
+-            {
+-                if (p_238185_)
+-                {
+-                    Util.getPlatform().openUri("https://aka.ms/mcjavamoderation");
+-                }
+-
+-                this.setScreen(new TitleScreen(true));
+-            }, this.multiplayerBan()));
 -        }
 -        else
 -        {
@@ -437,7 +489,7 @@
      }
  
      private static boolean countryEqualsISO3(Object p_210783_)
-@@ -598,7 +821,7 @@
+@@ -633,7 +848,7 @@
  
      private String createTitle()
      {
@@ -446,7 +498,7 @@
  
          if (checkModStatus().shouldReportAsModified())
          {
-@@ -652,17 +875,14 @@
+@@ -687,17 +902,14 @@
          return ModCheck.identify("vanilla", ClientBrandRetriever::getClientModName, "Client", Minecraft.class);
      }
  
@@ -455,23 +507,23 @@
 -        if (this.resourcePackRepository.getSelectedIds().size() > 1)
 -        {
 -            this.clearResourcePacksOnError(p_91240_, (Component)null);
+-        }
+-        else
+-        {
+-            Util.throwAsRuntime(p_91240_);
 +    private void rollbackResourcePacks(Throwable p_91240_) {
 +        if (this.resourcePackRepository.getSelectedPacks().stream().anyMatch(e -> !e.isRequired())) { //Forge: This caused infinite loop if any resource packs are forced. Such as mod resources. So check if we can disable any.
 +           this.clearResourcePacksOnError(p_91240_, (Component)null);
 +        } else {
 +           Util.throwAsRuntime(p_91240_);
          }
--        else
--        {
--            Util.throwAsRuntime(p_91240_);
--        }
 -    }
 +
 +     }
  
      public void clearResourcePacksOnError(Throwable pThrowable, @Nullable Component pErrorMessage)
      {
-@@ -785,7 +1005,7 @@
+@@ -820,7 +1032,7 @@
              }, p_231389_);
          });
      }
@@ -480,7 +532,7 @@
      private void onFullscreenError(int p_91114_, long p_91115_)
      {
          this.options.enableVsync().set(false);
-@@ -849,17 +1069,43 @@
+@@ -884,17 +1096,43 @@
          if (pReport.getSaveFile() != null)
          {
              Bootstrap.realStdoutPrintln("#@!@# Game crashed! Crash report saved to: #@!@# " + pReport.getSaveFile());
@@ -527,7 +579,7 @@
          }
      }
  
-@@ -900,6 +1146,22 @@
+@@ -935,6 +1173,22 @@
  
                  this.setOverlay(new LoadingOverlay(this, this.resourceManager.createReload(Util.backgroundExecutor(), this, RESOURCE_RELOAD_INITIAL_TASK, list), (p_231394_) ->
                  {
@@ -550,7 +602,7 @@
                      Util.ifElse(p_231394_, this::rollbackResourcePacks, () -> {
                          this.levelRenderer.allChanged();
                          this.reloadStateTracker.finishReload();
-@@ -1023,10 +1285,12 @@
+@@ -1058,10 +1312,12 @@
              LOGGER.error("setScreen called from non-game thread");
          }
  
@@ -567,26 +619,27 @@
  
          if (pGuiScreen == null && this.level == null)
          {
-@@ -1044,6 +1308,28 @@
+@@ -1079,6 +1335,29 @@
              }
          }
  
 +        //Forge
-+        Reflector.call(Reflector.ForgeHooksClient_clearGuiLayers, this);
-+        Screen screen = this.screen;
-+        Object object = Reflector.newInstance(Reflector.ScreenOpenEvent_Constructor, pGuiScreen);
-+        if (object != null)
-+        {
-+            if (Reflector.postForgeBusEvent(object))
-+            {
-+                return;
-+            }
++        Reflector.call(Reflector.ForgeHooksClient_clearGuiLayers, this);      
++        Screen old = this.screen;
++        if(pGuiScreen != null) {
++        	Object object = Reflector.newInstance(Reflector.ScreenOpenEvent_Constructor, pGuiScreen);
++        	if (object != null)
++        	{
++        		if (Reflector.postForgeBusEvent(object))
++        		{
++        			return;
++        		}
 +
-+            pGuiScreen = (Screen)Reflector.call(object, Reflector.ScreenOpenEvent_getScreen);
-+        }
-+        
-+        if (screen != null && pGuiScreen != screen)
-+        	screen.removed();
++        		pGuiScreen = (Screen)Reflector.call(object, Reflector.ScreenOpenEvent_getScreen);
++        	}
++        }     
++        if (old != null && pGuiScreen != old)
++        	old.removed();
 +        //
 +        
 +		// VIVECRAFT
@@ -596,7 +649,7 @@
          this.screen = pGuiScreen;
          BufferUploader.reset();
  
-@@ -1106,6 +1392,14 @@
+@@ -1141,6 +1420,14 @@
          {
              Util.timeSource = System::nanoTime;
  
@@ -611,7 +664,7 @@
              if (this.delayedCrash == null)
              {
                  System.exit(0);
-@@ -1146,11 +1440,11 @@
+@@ -1181,11 +1468,11 @@
              this.window.close();
          }
      }
@@ -625,7 +678,7 @@
  
          if (this.window.shouldClose())
          {
-@@ -1176,105 +1470,255 @@
+@@ -1211,105 +1498,255 @@
  
          if (pRenderLevel)
          {
@@ -941,7 +994,7 @@
          {
              if (this.pause)
              {
-@@ -1285,26 +1729,14 @@
+@@ -1320,26 +1757,14 @@
                  this.timer.partialTick = this.pausePartialTick;
              }
  
@@ -971,20 +1024,15 @@
          while (Util.getMillis() >= this.lastTime + 1000L)
          {
              String s;
-@@ -1319,11 +1751,10 @@
+@@ -1354,6 +1779,7 @@
              }
  
              fps = this.frames;
--            this.fpsString = String.format("%d fps T: %s%s%s%s B: %d%s", fps, l == 260 ? "inf" : l, this.options.enableVsync().get() ? " vsync" : "", this.options.graphicsMode().get(), this.options.cloudStatus().get() == CloudStatus.OFF ? "" : (this.options.cloudStatus().get() == CloudStatus.FAST ? " fast-clouds" : " fancy-clouds"), this.options.biomeBlendRadius().get(), s);
-+            this.fpsString = String.format("%d fps T: %s%s%s%s B: %d%s", fps, this.getFramerateLimit() == 260 ? "inf" : this.getFramerateLimit(), this.options.enableVsync().get() ? " vsync" : "", this.options.graphicsMode().get(), this.options.cloudStatus().get() == CloudStatus.OFF ? "" : (this.options.cloudStatus().get() == CloudStatus.FAST ? " fast-clouds" : " fancy-clouds"), this.options.biomeBlendRadius().get(), s);
++            int l = this.getFramerateLimit();
+             this.fpsString = String.format(Locale.ROOT, "%d fps T: %s%s%s%s B: %d%s", fps, l == 260 ? "inf" : l, this.options.enableVsync().get() ? " vsync" : "", this.options.graphicsMode().get(), this.options.cloudStatus().get() == CloudStatus.OFF ? "" : (this.options.cloudStatus().get() == CloudStatus.FAST ? " fast-clouds" : " fancy-clouds"), this.options.biomeBlendRadius().get(), s);
              this.lastTime += 1000L;
              this.frames = 0;
-         }
--
-         this.profiler.pop();
-     }
- 
-@@ -1394,14 +1825,19 @@
+@@ -1429,14 +1855,19 @@
          int i = this.window.calculateScale(this.options.guiScale().get(), this.isEnforceUnicode());
          this.window.setGuiScale((double)i);
  
@@ -1007,7 +1055,7 @@
          this.mouseHandler.setIgnoreFirstMove();
      }
  
-@@ -1412,7 +1848,7 @@
+@@ -1447,7 +1878,7 @@
  
      private int getFramerateLimit()
      {
@@ -1016,7 +1064,7 @@
      }
  
      public void emergencySave()
-@@ -1643,6 +2079,17 @@
+@@ -1678,6 +2109,17 @@
          }
      }
  
@@ -1034,7 +1082,7 @@
      private void renderFpsMeter(PoseStack pPoseStack, ProfileResults pProfilerResult)
      {
          List<ResultField> list = pProfilerResult.getTimes(this.debugPath);
-@@ -1760,6 +2207,10 @@
+@@ -1795,6 +2237,10 @@
  
      public void stop()
      {
@@ -1045,7 +1093,7 @@
          this.running = false;
      }
  
-@@ -1799,19 +2250,47 @@
+@@ -1834,19 +2280,47 @@
              {
                  BlockHitResult blockhitresult = (BlockHitResult)this.hitResult;
                  BlockPos blockpos = blockhitresult.getBlockPos();
@@ -1098,7 +1146,7 @@
              {
                  this.gameMode.stopDestroyBlock();
              }
-@@ -1842,7 +2321,8 @@
+@@ -1877,7 +2351,8 @@
          else
          {
              boolean flag = false;
@@ -1108,7 +1156,7 @@
              switch (this.hitResult.getType())
              {
                  case ENTITY:
-@@ -1872,18 +2352,32 @@
+@@ -1907,18 +2382,32 @@
                      }
  
                      this.player.resetAttackStrengthTicker();
@@ -1144,38 +1192,46 @@
  
              if (!this.player.isHandsBusy())
              {
-@@ -1894,13 +2388,30 @@
+@@ -1929,15 +2418,32 @@
  
                  for (InteractionHand interactionhand : InteractionHand.values())
                  {
+-                    ItemStack itemstack = this.player.getItemInHand(interactionhand);
 +                    Object object = Reflector.call(Reflector.ForgeHooksClient_OnClickInput, 1, this.options.keyUse, interactionhand);
-+
+ 
+-                    if (this.hitResult != null)
 +                    if (object != null && Reflector.callBoolean(object, Reflector.Event_isCanceled))
-+                    {
+                     {
+-                        switch (this.hitResult.getType())
 +                        if (Reflector.callBoolean(object, Reflector.ClickInputEvent_shouldSwingHand))
-+                        {
+                         {
+-                            case ENTITY:
+-                                EntityHitResult entityhitresult = (EntityHitResult)this.hitResult;
+-                                Entity entity = entityhitresult.getEntity();
 +                            this.player.swing(interactionhand);
 +                        }
 +
 +                        return;
 +                    }
 +
-                     ItemStack itemstack = this.player.getItemInHand(interactionhand);
- 
++                    ItemStack itemstack = this.player.getItemInHand(interactionhand);
++
 +                    if (vrSettings.seated || !TelescopeTracker.isTelescope(itemstack))
 +                    {
 +                        NetworkHelper.sendActiveHand((byte)interactionhand.ordinal());
 +
-                     if (this.hitResult != null)
-                     {
-                         switch (this.hitResult.getType())
-                         {
-                             case ENTITY:
++                    if (this.hitResult != null)
++                    {
++                        switch (this.hitResult.getType())
++                        {
++                            case ENTITY:
 +                                    //this.physicalGuiManager.preClickAction();
-                                 EntityHitResult entityhitresult = (EntityHitResult)this.hitResult;
-                                 Entity entity = entityhitresult.getEntity();
++                                EntityHitResult entityhitresult = (EntityHitResult)this.hitResult;
++                                Entity entity = entityhitresult.getEntity();
  
-@@ -1918,9 +2429,9 @@
+                                 if (!this.level.getWorldBorder().isWithinBounds(entity.blockPosition()))
+                                 {
+@@ -1953,9 +2459,9 @@
  
                                  if (interactionresult.consumesAction())
                                  {
@@ -1187,7 +1243,7 @@
                                      }
  
                                      return;
-@@ -1931,13 +2442,16 @@
+@@ -1966,13 +2472,16 @@
                              case BLOCK:
                                  BlockHitResult blockhitresult = (BlockHitResult)this.hitResult;
                                  int i = itemstack.getCount();
@@ -1206,7 +1262,7 @@
  
                                          if (!itemstack.isEmpty() && (itemstack.getCount() != i || this.gameMode.hasInfiniteItems()))
                                          {
-@@ -1955,15 +2469,22 @@
+@@ -1990,15 +2499,22 @@
                          }
                      }
  
@@ -1231,7 +1287,7 @@
                              }
  
                              this.gameRenderer.itemInHandRenderer.itemUsed(interactionhand);
-@@ -1974,6 +2495,7 @@
+@@ -2009,6 +2525,7 @@
              }
          }
      }
@@ -1239,28 +1295,27 @@
  
      public MusicManager getMusicManager()
      {
-@@ -1982,15 +2504,18 @@
+@@ -2017,11 +2534,17 @@
  
      public void tick()
      {
-+        ++this.tickCounter;
+-        if (this.rightClickDelay > 0)
++    	++this.tickCounter;
 +
-         if (this.rightClickDelay > 0)
++    	if (this.rightClickDelay > 0)
          {
              --this.rightClickDelay;
          }
 -
-+        //Forge
-+        Reflector.call(Reflector.BasicEventHooks_onPreClientTick);
-+        //
++    	
++    	//Forge
++    	Reflector.call(Reflector.BasicEventHooks_onPreClientTick);
++    	//
++    	
          this.profiler.push("gui");
+         this.chatListener.tick();
          this.gui.tick(this.pause);
-         this.profiler.pop();
--        this.gameRenderer.pick(1.0F);
-         this.tutorial.onLookAt(this.level, this.hitResult);
-         this.profiler.push("gameMode");
- 
-@@ -2000,11 +2525,7 @@
+@@ -2036,11 +2559,7 @@
          }
  
          this.profiler.popPush("textures");
@@ -1273,7 +1328,7 @@
  
          if (this.screen == null && this.player != null)
          {
-@@ -2050,6 +2571,10 @@
+@@ -2086,6 +2605,10 @@
              this.gui.clearCache();
          }
  
@@ -1284,7 +1339,7 @@
          if (this.overlay == null && (this.screen == null || this.screen.passEvents))
          {
              this.profiler.popPush("Keybindings");
-@@ -2061,8 +2586,30 @@
+@@ -2097,8 +2620,30 @@
              }
          }
  
@@ -1315,7 +1370,7 @@
              this.profiler.popPush("gameRenderer");
  
              if (!this.pause)
-@@ -2094,6 +2641,13 @@
+@@ -2130,6 +2675,13 @@
              this.gameRenderer.shutdownEffect();
          }
  
@@ -1329,7 +1384,7 @@
          if (!this.pause)
          {
              this.musicManager.tick();
-@@ -2165,24 +2719,23 @@
+@@ -2201,24 +2753,23 @@
          this.profiler.popPush("keyboard");
          this.keyboardHandler.tick();
          this.profiler.pop();
@@ -1362,7 +1417,7 @@
          }
  
          while (this.options.keySmoothCamera.consumeClick())
-@@ -2261,7 +2814,7 @@
+@@ -2297,7 +2848,7 @@
          {
              if (!this.player.isSpectator() && this.player.drop(Screen.hasControlDown()))
              {
@@ -1371,7 +1426,7 @@
              }
          }
  
-@@ -2279,8 +2832,9 @@
+@@ -2315,8 +2866,9 @@
  
          if (this.player.isUsingItem())
          {
@@ -1382,7 +1437,7 @@
                  this.gameMode.releaseUsingItem(this.player);
              }
  
-@@ -2418,6 +2972,15 @@
+@@ -2456,6 +3008,15 @@
  
      public void setLevel(ClientLevel pLevelClient)
      {
@@ -1398,7 +1453,7 @@
          ProgressScreen progressscreen = new ProgressScreen(true);
          progressscreen.progressStartNoAbort(Component.translatable("connect.joining"));
          this.updateScreenAndTick(progressscreen);
-@@ -2458,12 +3021,18 @@
+@@ -2496,29 +3057,38 @@
          IntegratedServer integratedserver = this.singleplayerServer;
          this.singleplayerServer = null;
          this.gameRenderer.resetData();
@@ -1406,28 +1461,55 @@
 +        Reflector.call(Reflector.ClientHooks_firePlayerLogout, this.gameMode, this.player);
 +        //
          this.gameMode = null;
-         NarratorChatListener.INSTANCE.clear();
+         this.narrator.clear();
          this.updateScreenAndTick(pScreen);
  
          if (this.level != null)
          {
+-            if (integratedserver != null)
+-            {
+-                this.profiler.push("waitForServer");
+-
+-                while (!integratedserver.isShutdown())
+-                {
+-                    this.runTick(false);
+-                }
+-
+-                this.profiler.pop();
+-            }
+-
+-            this.clientPackSource.clearServerPack();
+-            this.gui.onDisconnected();
+-            this.currentServer = null;
+-            this.isLocalServer = false;
+-            this.game.onLeaveGameSession();
 +        	//Forge
-+            Reflector.postForgeBusEvent(Reflector.newInstance(Reflector.WorldEvent_Unload_Constructor, this.level));
-+            //
-             if (integratedserver != null)
-             {
-                 this.profiler.push("waitForServer");
-@@ -2480,6 +3049,9 @@
-             this.gui.onDisconnected();
-             this.currentServer = null;
-             this.isLocalServer = false;
-+            //Forge
-+            Reflector.call(Reflector.ClientHooks_handleClientWorldClosing, this.level);
-+            //
-             this.game.onLeaveGameSession();
++        	Reflector.postForgeBusEvent(Reflector.newInstance(Reflector.WorldEvent_Unload_Constructor, this.level));
++        	//
++        	if (integratedserver != null)
++        	{
++        		this.profiler.push("waitForServer");
++
++        		while (!integratedserver.isShutdown())
++        		{
++        			this.runTick(false);
++        		}
++
++        		this.profiler.pop();
++        	}
++
++        	this.clientPackSource.clearServerPack();
++        	this.gui.onDisconnected();
++        	this.currentServer = null;
++        	this.isLocalServer = false;
++        	//Forge
++        	Reflector.call(Reflector.ClientHooks_handleClientWorldClosing, this.level);
++        	//
++        	this.game.onLeaveGameSession();
          }
  
-@@ -2589,6 +3161,19 @@
+         this.level = null;
+@@ -2638,6 +3208,19 @@
      {
          if (this.hitResult != null && this.hitResult.getType() != HitResult.Type.MISS)
          {
@@ -1447,7 +1529,7 @@
              boolean flag = this.player.getAbilities().instabuild;
              BlockEntity blockentity = null;
              HitResult.Type hitresult$type = this.hitResult.getType();
-@@ -3294,23 +3879,37 @@
+@@ -3359,23 +3942,37 @@
          return this.renderBuffers;
      }
  
@@ -1494,7 +1576,7 @@
  
      private static Supplier<PackResources> adaptV3(Supplier<PackResources> pResourcePackSupplier)
      {
-@@ -3405,4 +4004,577 @@
+@@ -3490,4 +4087,581 @@
  
          public abstract boolean isChatAllowed(boolean p_168035_);
      }
@@ -1558,6 +1640,10 @@
 +            else if (this.vrSettings.displayMirrorMode == VRSettings.MirrorMode.THIRD_PERSON)
 +            {
 +                source = this.vrRenderer.framebufferMR;
++            }
++            else if (this.vrSettings.displayMirrorMode == VRSettings.MirrorMode.GUI)
++            {
++            	source = GuiHandler.guiFramebuffer;
 +            }
 +            else if (this.vrSettings.displayMirrorMode == VRSettings.MirrorMode.SINGLE || this.vrSettings.displayMirrorMode == VRSettings.MirrorMode.OFF)
 +            {

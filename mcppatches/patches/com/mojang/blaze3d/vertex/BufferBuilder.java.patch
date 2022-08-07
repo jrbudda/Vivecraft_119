@@ -1,6 +1,6 @@
 --- a/com/mojang/blaze3d/vertex/BufferBuilder.java
 +++ b/com/mojang/blaze3d/vertex/BufferBuilder.java
-@@ -893,15 +893,8 @@
+@@ -894,15 +894,8 @@
          return MemoryUtil.memSlice(this.buffer, p_231170_, p_231171_ - p_231170_);
      }
  

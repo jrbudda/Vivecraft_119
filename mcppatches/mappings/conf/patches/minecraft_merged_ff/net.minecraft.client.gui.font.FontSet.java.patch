@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\client\gui\font\FontSet.java minecraft_patched\net\minecraft\client\gui\font\FontSet.java
 --- minecraft\net\minecraft\client\gui\font\FontSet.java
 +++ minecraft_patched\net\minecraft\client\gui\font\FontSet.java
-@@ -55,7 +55,7 @@
+@@ -56,7 +56,7 @@
        }
  
        Set<GlyphProvider> set = Sets.newHashSet();

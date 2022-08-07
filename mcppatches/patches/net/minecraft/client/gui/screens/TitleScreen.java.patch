@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/screens/TitleScreen.java
 +++ b/net/minecraft/client/gui/screens/TitleScreen.java
-@@ -544,10 +544,6 @@
+@@ -566,10 +566,6 @@
  
      static record WarningLabel(Font font, MultiLineLabel label, int x, int y)
      {

@@ -12,23 +12,15 @@
  import net.minecraft.CrashReport;
  import net.minecraft.CrashReportCategory;
  import net.minecraft.ReportedException;
-@@ -60,11 +65,15 @@
- import net.minecraft.world.level.block.StainedGlassPaneBlock;
- import net.minecraft.world.level.block.state.BlockState;
- import net.minecraftforge.client.RenderProperties;
-+import net.minecraftforge.resource.IResourceType;
-+import net.minecraftforge.resource.VanillaResourceType;
- import net.optifine.Config;
- import net.optifine.CustomColors;
+@@ -65,6 +70,7 @@
  import net.optifine.CustomItems;
  import net.optifine.EmissiveTextures;
  import net.optifine.reflect.Reflector;
-+import net.optifine.reflect.ReflectorForge;
 +import net.optifine.render.GlAlphaState;
  import net.optifine.render.VertexBuilderWrapper;
  import net.optifine.shaders.Shaders;
- 
-@@ -84,6 +93,11 @@
+ import net.optifine.util.SingleIterable;
+@@ -85,6 +91,11 @@
      private final BlockEntityWithoutLevelRenderer blockEntityRenderer;
      public ModelManager modelManager = null;
      private static boolean renderItemGui = false;
@@ -40,7 +32,7 @@
  
      public ItemRenderer(TextureManager p_174225_, ModelManager p_174226_, ItemColors p_174227_, BlockEntityWithoutLevelRenderer p_174228_)
      {
-@@ -166,6 +180,16 @@
+@@ -167,6 +178,19 @@
              }
  
              pMatrixStack.translate(-0.5D, -0.5D, -0.5D);
@@ -49,6 +41,9 @@
 +            if (localplayer != null && isfphand)
 +            {
 +                this.fade = SwingTracker.getItemFade(localplayer, pItemStack);
++                if(pItemStack.is(Items.SHIELD) && !localplayer.isBlocking())
++                	if(fade > 0.5f)
++                		fade = 0.5f;
 +            }
 +            else
 +            {
@@ -57,20 +52,21 @@
  
              if (!pModel.isCustomRenderer() && (!pItemStack.is(Items.TRIDENT) || flag))
              {
-@@ -188,6 +212,12 @@
-                 else
-                 {
-                     RenderType rendertype = ItemBlockRenderTypes.getRenderType(pItemStack, flag1);
-+
-+                    if (isfphand && this.fade < 1.0F)
-+                    {
-+                        rendertype = Sheets.translucentCullBlockSheet();
-+                    }
-+
-                     VertexConsumer vertexconsumer;
+@@ -186,6 +210,13 @@
+                 Iterable<BakedModel> iterable = (Iterable<BakedModel>)(flag2 ? pModel.getRenderPasses(pItemStack, flag1) : new SingleIterable<>(pModel));
+                 Iterable<RenderType> iterable1 = (Iterable<RenderType>)(flag2 ? pModel.getRenderTypes(pItemStack, flag1) : new SingleIterable<>(ItemBlockRenderTypes.getRenderType(pItemStack, flag1)));
  
-                     if (pItemStack.is(ItemTags.COMPASSES) && pItemStack.hasFoil())
-@@ -359,6 +389,19 @@
++                //Vivecraft - check
++                if (isfphand && this.fade < 1.0F)
++                {
++                	iterable1 = new SingleIterable<>(Sheets.translucentCullBlockSheet());
++                }
++                //
++
+                 for (BakedModel bakedmodel : iterable)
+                 {
+                     pModel = bakedmodel;
+@@ -364,6 +395,19 @@
                      l = CustomColors.getColorFromItemStack(pItemStack, bakedquad.getTintIndex(), l);
                  }
              }
@@ -90,7 +86,7 @@
  
              float f = (float)(l >> 16 & 255) / 255.0F;
              float f1 = (float)(l >> 8 & 255) / 255.0F;
-@@ -370,7 +413,7 @@
+@@ -375,7 +419,7 @@
              }
              else
              {
@@ -99,7 +95,7 @@
              }
          }
      }
-@@ -431,6 +474,10 @@
+@@ -436,6 +480,10 @@
          RenderSystem.enableBlend();
          RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
          RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -110,7 +106,7 @@
          PoseStack posestack = RenderSystem.getModelViewStack();
          posestack.pushPose();
          posestack.translate((double)pX, (double)pY, (double)(100.0F + this.blitOffset));
-@@ -617,4 +664,24 @@
+@@ -622,4 +670,24 @@
      {
          return this.blockEntityRenderer;
      }

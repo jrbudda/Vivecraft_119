@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\util\datafix\fixes\EntityRenameFix.java minecraft_patched\net\minecraft\util\datafix\fixes\EntityRenameFix.java
 --- minecraft\net\minecraft\util\datafix\fixes\EntityRenameFix.java
 +++ minecraft_patched\net\minecraft\util\datafix\fixes\EntityRenameFix.java
-@@ -18,8 +18,8 @@
+@@ -19,8 +19,8 @@
     }
  
     public TypeRewriteRule makeRule() {

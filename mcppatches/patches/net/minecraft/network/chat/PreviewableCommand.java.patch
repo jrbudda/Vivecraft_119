@@ -1,0 +1,11 @@
+--- a/net/minecraft/network/chat/PreviewableCommand.java
++++ b/net/minecraft/network/chat/PreviewableCommand.java
+@@ -42,7 +42,7 @@
+         {
+             CommandNode<S> $$5 = parsedcommandnode.getNode();
+ 
+-            if ($$5 instanceof ArgumentCommandNode < S, ? > argumentcommandnode)
++            if ($$5 instanceof ArgumentCommandNode argumentcommandnode)
+             {
+                 ArgumentType argumenttype = argumentcommandnode.getType();
+ 

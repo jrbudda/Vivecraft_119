@@ -36,7 +36,11 @@ public class GuiQuickCommandsInGame extends Screen
             this.addRenderableWidget(new Button(this.width / 2 - 125 + 127 * i, 36 + (j - 6 * i) * 24, 125, 20, s.toString(), (p) ->
             {
                 this.minecraft.setScreen((Screen)null);
-                this.minecraft.player.chat(p.getMessage().getString());
+                String msg = p.getMessage().getString();
+                if(msg.startsWith("/"))
+                    this.minecraft.player.commandUnsigned(msg.substring(1));
+                else
+                	this.minecraft.player.chatSigned(msg, Component.literal(msg));
             }));
         }
 

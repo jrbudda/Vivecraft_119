@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/Options.java
 +++ b/net/minecraft/client/Options.java
-@@ -2718,7 +2718,7 @@
+@@ -2749,7 +2749,7 @@
          }
          else if (par1EnumOptions.isProgressOption())
          {

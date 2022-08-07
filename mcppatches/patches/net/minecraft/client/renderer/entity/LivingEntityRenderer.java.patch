@@ -9,7 +9,7 @@
      public float renderLimbSwing;
      public float renderLimbSwingAmount;
      public float renderAgeInTicks;
-@@ -441,7 +441,7 @@
+@@ -439,7 +439,7 @@
              }
          }
  

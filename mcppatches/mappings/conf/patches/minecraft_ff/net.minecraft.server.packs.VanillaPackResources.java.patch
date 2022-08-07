@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\server\packs\VanillaPackResources.java minecraft_patched\net\minecraft\server\packs\VanillaPackResources.java
 --- minecraft\net\minecraft\server\packs\VanillaPackResources.java
 +++ minecraft_patched\net\minecraft\server\packs\VanillaPackResources.java
-@@ -166,7 +166,7 @@
+@@ -167,7 +167,7 @@
        try {
           stream.filter((p_215351_) -> {
              return !p_215351_.endsWith(".mcmeta") && Files.isRegularFile(p_215351_);

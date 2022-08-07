@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/Minecraft.java
 +++ b/net/minecraft/client/Minecraft.java
-@@ -232,11 +232,13 @@
+@@ -240,11 +240,13 @@
  import org.apache.commons.io.FileUtils;
  import org.lwjgl.util.tinyfd.TinyFileDialogs;
  import org.slf4j.Logger;
@@ -10,11 +10,11 @@
  {
      static Minecraft instance;
      private static final Logger LOGGER = LogUtils.getLogger();
-+    public final String minecriftVerString = "Vivecraft 1.19  jrbudda-NONVR-1-a3";
++    public final String minecriftVerString = "Vivecraft 1.19.2  jrbudda-NONVR-2-b1";
      public static final boolean ON_OSX = Util.getPlatform() == Util.OS.OSX;
      private static final int MAX_TICKS_PER_UPDATE = 10;
      public static final ResourceLocation DEFAULT_FONT = new ResourceLocation("default");
-@@ -598,7 +600,7 @@
+@@ -633,7 +635,7 @@
  
      private String createTitle()
      {
@@ -23,7 +23,7 @@
  
          if (checkModStatus().shouldReportAsModified())
          {
-@@ -2094,6 +2096,8 @@
+@@ -2130,6 +2132,8 @@
              this.gameRenderer.shutdownEffect();
          }
  

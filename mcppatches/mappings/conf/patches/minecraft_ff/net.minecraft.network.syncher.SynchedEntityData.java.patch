@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\network\syncher\SynchedEntityData.java minecraft_patched\net\minecraft\network\syncher\SynchedEntityData.java
 --- minecraft\net\minecraft\network\syncher\SynchedEntityData.java
 +++ minecraft_patched\net\minecraft\network\syncher\SynchedEntityData.java
-@@ -99,7 +99,7 @@
+@@ -100,7 +100,7 @@
  
        SynchedEntityData.DataItem<T> dataitem;
        try {

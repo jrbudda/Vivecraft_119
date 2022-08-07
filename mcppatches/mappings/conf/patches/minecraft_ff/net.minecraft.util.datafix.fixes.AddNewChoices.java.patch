@@ -1,7 +1,7 @@
 ﻿diff -r -U 3 minecraft\net\minecraft\util\datafix\fixes\AddNewChoices.java minecraft_patched\net\minecraft\util\datafix\fixes\AddNewChoices.java
 --- minecraft\net\minecraft\util\datafix\fixes\AddNewChoices.java
 +++ minecraft_patched\net\minecraft\util\datafix\fixes\AddNewChoices.java
-@@ -26,9 +26,9 @@
+@@ -27,9 +27,9 @@
        if (p_14639_.getKeyType() != p_14640_.getKeyType()) {
           throw new IllegalStateException("Could not inject: key type is not the same");
        } else {
@@ -10,7 +10,7 @@
              return (p_145061_) -> {
 -               if (!p_14640_.hasType(p_145061_.getFirst())) {
 +               if (!((TaggedChoice.TaggedChoiceType<K>)p_14640_).hasType(p_145061_.getFirst())) {
-                   throw new IllegalArgumentException(String.format("Unknown type %s in %s ", p_145061_.getFirst(), this.f_14626_));
+                   throw new IllegalArgumentException(String.format(Locale.ROOT, "Unknown type %s in %s ", p_145061_.getFirst(), this.f_14626_));
                 } else {
                    return p_145061_;
 

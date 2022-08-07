@@ -39,20 +39,20 @@ public class Installer extends JPanel  implements PropertyChangeListener
 	private static final long serialVersionUID = -562178983462626162L;
 	private String tempDir = System.getProperty("java.io.tmpdir");
 	/* DO NOT RENAME THESE STRING CONSTS - THEY ARE USED IN (AND THE VALUES UPDATED BY) THE AUTOMATED BUILD SCRIPTS */
-    private static final boolean ALLOW_FORGE_INSTALL  = false;
-    private static final boolean ALLOW_FORGE_EXTRACT  = false;
+    private static final boolean ALLOW_FORGE_INSTALL  = true;
+    private static final boolean ALLOW_FORGE_EXTRACT  = true;
     private static final boolean DEFAULT_FORGE_INSTALL= false;
     private static final boolean ALLOW_KATVR_INSTALL  = true;
     private static final boolean ALLOW_KIOSK_INSTALL  = true;
     private static final boolean ALLOW_HRTF_INSTALL   = false;
     private static final boolean PROMPT_REMOVE_HRTF   = false;
-    private static final String MINECRAFT_VERSION     = "1.19";
-    private static final String MC_VERSION            = "1.19";
-    private static final String MC_MD5                = "c4b4e3aa6b9a79bdb9224cbdc801d7dd";
-    private static final String OF_FILE_NAME          = "1.19_HD_U_H8";
-    private static final String OF_MD5                = "5abefaa840d23d1ff261397b8c2c1217";
+    private static final String MINECRAFT_VERSION     = "1.19.2";
+    private static final String MC_VERSION            = "1.19.2";
+    private static final String MC_MD5                = "1d212151584e17590e1cdd1a3722818b";
+    private static final String OF_FILE_NAME          = "1.19.1_HD_U_H9_pre1";
+    private static final String OF_MD5                = "fef61faaca5d568cbc2b79f54ba87454";
     private static final String OF_VERSION_EXT        = ".jar";
-    private static String FORGE_VERSION               = "41.0.63";
+    private static String FORGE_VERSION               = "43.0.0";
     private static final String HOMEPAGE_LINK         = "http://www.vivecraft.org";
     private static final String DONATION_LINK         = "https://www.patreon.com/jrbudda";
     private static final String PROJECT_NAME          = "Vivecraft";
@@ -173,7 +173,7 @@ public class Installer extends JPanel  implements PropertyChangeListener
 		logoSplash.add(tag);
 
 		logoSplash.add(Box.createRigidArea(new Dimension(5,20)));
-		tag = new JLabel("Select path to minecraft. (Only change this if using MultiMC.)");
+		tag = new JLabel("Select path to minecraft. (Only change this if using MultiMC or PolyMC.)");
 		tag.setAlignmentX(LEFT_ALIGNMENT);
 		tag.setAlignmentY(CENTER_ALIGNMENT);
 		logoSplash.add(tag);
@@ -536,11 +536,53 @@ public class Installer extends JPanel  implements PropertyChangeListener
 				}
 				//
 	
+				//check for polymc
+				if (targetDir.exists())
+				for(File f : targetDir.listFiles()){
+					if(f.getName().equalsIgnoreCase("polymc.exe") || (f.getName().equalsIgnoreCase("polymc") && f.isFile()) || f.getName().equalsIgnoreCase("polymc.cfg")){
+						ArrayList<File> ilist = new ArrayList<File>();
+						File insts = new File(targetDir, "instances");
+						try (BufferedReader br = new BufferedReader(new FileReader(new File(targetDir, "polymc.cfg")))) {
+							String line;
+							while ((line = br.readLine()) != null) {
+								String[] split = line.split("=", 2);
+								if (split[0].equals("InstanceDir")) {
+									insts = new File(split[1]);
+									if (!insts.isAbsolute())
+										insts = new File(targetDir, split[1]);
+									break;
+								}
+							}
+						} catch (IOException ex) {
+							ex.printStackTrace();
+						}
+						if (!insts.exists()) {
+							JOptionPane.showMessageDialog(null, "polymc files were detected in the install path, but the instances directory is missing, so we're going to assume it isn't polymc.\nIf it actually is polymc, set up an instance for Vivecraft first, then run this installer again.", "polymc Detection Failed", JOptionPane.WARNING_MESSAGE);
+							break;
+						}
+						for(File inst : insts.listFiles()){
+							if(inst.isDirectory() && !inst.getName().startsWith("_") && !inst.getName().startsWith("."))
+								ilist.add(inst);
+						}
+						JComboBox icb = new JComboBox(ilist.toArray());
+						File sel =(File) JOptionPane.showInputDialog(null,"Select polymc Instance.","polymc Detected", JOptionPane.PLAIN_MESSAGE, null, ilist.toArray(), null);
+						if(sel != null){
+							mmcinst = sel;
+							isMultiMC = true;
+						} else {
+							dialog.dispose();
+							emptyFrame.dispose();
+							done = true;
+						}
+						break; // don't ask multiple times
+					}
+				}
+				//
 				int option = 0;
 				String msg = "Please ensure you have closed the Minecraft Launcher before proceeding.";
 	
 				if(isMultiMC)
-					msg = "Please ensure you have closed MultiMC before proceeding.";
+					msg = "Please ensure you have closed the MultiMC/PolyMC before proceeding.";
 	
 				if(createProfile.isSelected() || isMultiMC)
 					option = JOptionPane.showOptionDialog(
@@ -855,7 +897,7 @@ public class Installer extends JPanel  implements PropertyChangeListener
 			}
 			else {
 				if(isMultiMC && mmcinst != null)
-					if (profileCreated) finalMessage = "Installed successfully!. MultiMC Instance: " + mmcinst.toString();
+					if (profileCreated) finalMessage = "Installed successfully!. Instance: " + mmcinst.toString();
 					else finalMessage = "Installed but failed to update instance, launch may fail. See vivecraft.org for manual configuration.";
 				else
 					finalMessage = "Installed successfully! Restart Minecraft" +
@@ -1498,7 +1540,12 @@ public class Installer extends JPanel  implements PropertyChangeListener
 				String javaPath = "javaw";
 				boolean requiredJavaSetGlobally = false;
 				if (setupJavaPath) {
-					try (BufferedReader br = new BufferedReader(new FileReader(new File(targetDir, "multimc.cfg")))) {
+					File f = new File(targetDir, "multimc.cfg");
+					if (!f.exists())
+						f = new File(targetDir, "polymc.cfg");
+					if (!f.exists())
+						return result;
+					try (BufferedReader br = new BufferedReader(new FileReader(f))) {
 						String line;
 						while ((line = br.readLine()) != null) {
 							String[] split = line.split("=", 2);
