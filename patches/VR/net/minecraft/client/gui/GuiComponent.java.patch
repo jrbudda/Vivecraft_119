@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/GuiComponent.java
 +++ b/net/minecraft/client/gui/GuiComponent.java
-@@ -198,6 +198,10 @@
+@@ -217,6 +217,10 @@
      private static void innerBlit(Matrix4f pMatrix, int pX1, int pX2, int pY1, int pY2, int pBlitOffset, float pMinU, float pMaxU, float pMinV, float pMaxV)
      {
          RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -11,7 +11,7 @@
          BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
          bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
          bufferbuilder.vertex(pMatrix, (float)pX1, (float)pY2, (float)pBlitOffset).uv(pMinU, pMaxV).endVertex();
-@@ -205,6 +209,9 @@
+@@ -224,6 +228,9 @@
          bufferbuilder.vertex(pMatrix, (float)pX2, (float)pY1, (float)pBlitOffset).uv(pMaxU, pMinV).endVertex();
          bufferbuilder.vertex(pMatrix, (float)pX1, (float)pY1, (float)pBlitOffset).uv(pMinU, pMinV).endVertex();
          BufferUploader.drawWithShader(bufferbuilder.end());

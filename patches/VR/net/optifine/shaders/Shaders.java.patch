@@ -419,7 +419,7 @@
          GlStateManager._depthMask(false);
          bindTextures(0, customTextures);
          framebuffer.bindColorImages(true);
-@@ -6382,9 +6458,9 @@
+@@ -6384,9 +6460,9 @@
      {
          try
          {
@@ -431,7 +431,7 @@
          {
              return;
          }
-@@ -6412,6 +6488,7 @@
+@@ -6414,6 +6490,7 @@
      private static void loadShaderPackResources()
      {
          shaderPackResources = new HashMap<>();
@@ -439,7 +439,7 @@
  
          if (shaderPackLoaded)
          {
-@@ -6445,13 +6522,14 @@
+@@ -6447,13 +6524,14 @@
                          {
                              String s6 = properties.getProperty(s5);
                              shaderPackResources.put(s5, s6);

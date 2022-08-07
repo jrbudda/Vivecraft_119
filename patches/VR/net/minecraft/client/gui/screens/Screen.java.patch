@@ -19,7 +19,7 @@
      public boolean passEvents;
      protected Font font;
      @Nullable
-@@ -486,7 +489,9 @@
+@@ -484,7 +487,9 @@
      {
          if (this.minecraft.level != null)
          {

@@ -20,7 +20,7 @@
      @DontObfuscate
      public static void main(String[] pArgs)
      {
-@@ -54,6 +60,12 @@
+@@ -64,6 +70,12 @@
          optionparser.accepts("demo");
          optionparser.accepts("disableMultiplayer");
          optionparser.accepts("disableChat");
@@ -33,7 +33,7 @@
          optionparser.accepts("fullscreen");
          optionparser.accepts("checkGlErrors");
          OptionSpec<Void> optionspec = optionparser.accepts("jfrProfile");
-@@ -72,8 +84,8 @@
+@@ -82,8 +94,8 @@
          OptionSpec<String> optionspec13 = optionparser.accepts("clientId").withOptionalArg().defaultsTo("");
          OptionSpec<String> optionspec14 = optionparser.accepts("accessToken").withRequiredArg().required();
          OptionSpec<String> optionspec15 = optionparser.accepts("version").withRequiredArg().required();
@@ -44,7 +44,7 @@
          OptionSpec<Integer> optionspec18 = optionparser.accepts("fullscreenWidth").withRequiredArg().ofType(Integer.class);
          OptionSpec<Integer> optionspec19 = optionparser.accepts("fullscreenHeight").withRequiredArg().ofType(Integer.class);
          OptionSpec<String> optionspec20 = optionparser.accepts("userProperties").withRequiredArg().defaultsTo("{}");
-@@ -124,6 +136,26 @@
+@@ -134,6 +146,26 @@
          OptionalInt optionalint1 = ofNullable(parseArgument(optionset, optionspec19));
          boolean flag = optionset.has("fullscreen");
          boolean flag1 = optionset.has("demo");
@@ -71,7 +71,7 @@
          boolean flag2 = optionset.has("disableMultiplayer");
          boolean flag3 = optionset.has("disableChat");
          String s3 = parseArgument(optionset, optionspec15);
-@@ -147,7 +179,19 @@
+@@ -157,7 +189,19 @@
          }
  
          CrashReport.preload();
@@ -92,7 +92,7 @@
          Bootstrap.validate();
          Util.startTimerHackThread();
          String s10 = optionspec23.value(optionset);
-@@ -189,13 +233,14 @@
+@@ -199,13 +243,14 @@
              minecraft = new Minecraft(gameconfig);
              RenderSystem.finishInitialization();
          }
@@ -108,7 +108,7 @@
              CrashReport crashreport = CrashReport.forThrowable(throwable1, "Initializing game");
              CrashReportCategory crashreportcategory = crashreport.addCategory("Initialization");
              NativeModuleLister.addCrashSection(crashreportcategory);
-@@ -255,9 +300,9 @@
+@@ -265,9 +310,9 @@
                  thread1.join();
              }
          }
@@ -120,7 +120,7 @@
          }
          finally
          {
-@@ -305,6 +350,6 @@
+@@ -315,6 +360,6 @@
  
      static
      {

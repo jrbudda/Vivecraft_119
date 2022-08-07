@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/multiplayer/ClientPacketListener.java
 +++ b/net/minecraft/client/multiplayer/ClientPacketListener.java
-@@ -278,7 +278,11 @@
+@@ -285,7 +285,11 @@
  import net.minecraft.world.scores.Scoreboard;
  import net.minecraft.world.scores.Team;
  import net.minecraft.world.scores.criteria.ObjectiveCriteria;
@@ -12,7 +12,7 @@
  
  public class ClientPacketListener implements ClientGamePacketListener
  {
-@@ -313,6 +317,8 @@
+@@ -327,6 +331,8 @@
          this.advancements = new ClientAdvancements(p_194193_);
          this.suggestionsProvider = new ClientSuggestionProvider(this, p_194193_);
          this.telemetryManager = p_194197_;
@@ -21,7 +21,7 @@
      }
  
      public ClientSuggestionProvider getSuggestionsProvider()
-@@ -371,6 +377,9 @@
+@@ -385,6 +391,9 @@
  
          this.minecraft.debugRenderer.clear();
          this.minecraft.player.resetPos();
@@ -31,7 +31,7 @@
          int i = pPacket.playerId();
          this.minecraft.player.setId(i);
          this.level.addPlayer(i, this.minecraft.player);
-@@ -383,10 +392,15 @@
+@@ -397,10 +406,15 @@
          this.minecraft.player.setLastDeathLocation(pPacket.lastDeathLocation());
          this.minecraft.gameMode.setLocalMode(pPacket.gameType(), pPacket.previousGameType());
          this.minecraft.options.setServerRenderDistance(pPacket.chunkRadius());
@@ -47,7 +47,7 @@
      }
  
      public void handleAddEntity(ClientboundAddEntityPacket pPacket)
-@@ -1077,6 +1091,8 @@
+@@ -1082,6 +1096,8 @@
              this.level.addMapData(map);
              this.minecraft.setLevel(this.level);
              this.minecraft.setScreen(new ReceivingLevelScreen());
@@ -56,7 +56,7 @@
          }
  
          String s = localplayer.getServerBrand();
-@@ -1097,9 +1113,12 @@
+@@ -1108,9 +1124,12 @@
          {
              localplayer1.getAttributes().assignValues(localplayer.getAttributes());
          }
@@ -70,7 +70,7 @@
          this.level.addPlayer(i, localplayer1);
          localplayer1.setYRot(-180.0F);
          localplayer1.input = new KeyboardInput(this.minecraft.options);
-@@ -1233,13 +1252,18 @@
+@@ -1244,13 +1263,18 @@
          BlockPos blockpos = pPacket.getPos();
          this.minecraft.level.getBlockEntity(blockpos, pPacket.getType()).ifPresent((p_205557_) ->
          {
@@ -90,7 +90,7 @@
              if (p_205557_ instanceof CommandBlockEntity && this.minecraft.screen instanceof CommandBlockEditScreen)
              {
                  ((CommandBlockEditScreen)this.minecraft.screen).updateGui();
-@@ -2041,6 +2065,7 @@
+@@ -2063,6 +2087,7 @@
          PacketUtils.ensureRunningOnSameThread(pPacket, this, this.minecraft);
          ResourceLocation resourcelocation = pPacket.getIdentifier();
          FriendlyByteBuf friendlybytebuf = null;
@@ -98,7 +98,7 @@
  
          try
          {
-@@ -2286,14 +2311,86 @@
+@@ -2308,14 +2333,86 @@
                  int j5 = friendlybytebuf.readVarInt();
                  this.minecraft.debugRenderer.gameEventListenerRenderer.trackListener(positionsource, j5);
              }
@@ -187,7 +187,7 @@
              {
                  friendlybytebuf.release();
              }
-@@ -2482,28 +2579,27 @@
+@@ -2504,28 +2601,27 @@
              {
                  throw new IllegalStateException("Server tried to update attributes of a non-living entity (actually: " + entity + ")");
              }
@@ -230,9 +230,9 @@
                  }
              }
          }
-@@ -2685,4 +2781,16 @@
-     {
-         return this.registryAccess;
+@@ -2741,4 +2837,16 @@
+             }
+         }
      }
 +    boolean tryParseInt(String value)
 +    {

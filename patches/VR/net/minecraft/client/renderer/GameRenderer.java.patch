@@ -143,10 +143,11 @@
      private long lastServerTime = 0L;
      private int lastServerTicks = 0;
      private int serverWaitTime = 0;
-@@ -258,6 +300,47 @@
-     private float avgServerTickDiff = 0.0F;
+@@ -259,7 +301,47 @@
      private PostChain[] fxaaShaders = new PostChain[10];
      private boolean guiLoadingVisible = false;
+     private static float renderPartialTicks;
+-
 +    //Vivecraft additions ********
 +    public float minClipDistance = 0.02F;
 +    public Vec3 crossVec;
@@ -188,10 +189,10 @@
 +    Vec3i tpUnlimitedColor = new Vec3i(-83, -40, -26);
 +    Vec3i tpLimitedColor = new Vec3i(-51, -87, -51);
 +    Vec3i tpInvalidColor = new Vec3i(83, 83, 83);
- 
      public GameRenderer(Minecraft p_234219_, ItemInHandRenderer p_234220_, ResourceManager p_234221_, RenderBuffers p_234222_)
      {
-@@ -268,6 +351,13 @@
+         this.minecraft = p_234219_;
+@@ -269,6 +351,13 @@
          this.lightTexture = new LightTexture(this, p_234219_);
          this.renderBuffers = p_234222_;
          this.postEffect = null;
@@ -205,7 +206,7 @@
      }
  
      public void close()
-@@ -785,13 +875,16 @@
+@@ -786,13 +875,16 @@
      {
          Entity entity = this.minecraft.getCameraEntity();
  
@@ -225,7 +226,7 @@
              boolean flag = false;
              int i = 3;
              double d1 = d0;
-@@ -833,14 +926,16 @@
+@@ -834,14 +926,16 @@
              {
                  d1 = this.minecraft.hitResult.getLocation().distanceToSqr(vec3);
              }
@@ -245,7 +246,7 @@
              }, d1);
  
              if (entityhitresult != null)
-@@ -895,7 +990,11 @@
+@@ -896,7 +990,11 @@
  
      public double getFov(Camera pActiveRenderInfo, float pPartialTicks, boolean pUseFOVSetting)
      {
@@ -258,7 +259,7 @@
          {
              return 90.0D;
          }
-@@ -1086,25 +1185,56 @@
+@@ -1087,25 +1185,56 @@
          RenderSystem.setProjectionMatrix(pMatrix);
      }
  
@@ -321,104 +322,146 @@
          return posestack.last().pose();
      }
  
-@@ -1121,9 +1251,11 @@
+@@ -1122,46 +1251,91 @@
  
      public void render(float pPartialTicks, long pNanoTime, boolean p_109096_)
      {
+-        this.frameInit();
+-        renderPartialTicks = pPartialTicks;
+-
+-        if (!this.minecraft.isWindowActive() && this.minecraft.options.pauseOnLostFocus && (!this.minecraft.options.touchscreen().get() || !this.minecraft.mouseHandler.isRightPressed()))
+-        {
+-            if (Util.getMillis() - this.lastActiveTime > 500L)
+-            {
+-                this.minecraft.pauseGame(false);
+-            }
+-        }
+-        else
+-        {
+-            this.lastActiveTime = Util.getMillis();
+-        }
 +    	if (this.minecraft.currentPass == RenderPass.LEFT)
 +    	{
-         this.frameInit();
++    		this.frameInit();
++    		renderPartialTicks = pPartialTicks;
++
++    		if (!this.always_true && !this.minecraft.isWindowActive() && this.minecraft.options.pauseOnLostFocus && (!this.minecraft.options.touchscreen().get() || !this.minecraft.mouseHandler.isRightPressed()))
++    		{
++    			if (Util.getMillis() - this.lastActiveTime > 500L)
++    			{
++    				this.minecraft.pauseGame(false);
++    			}
++    		}
++    		else
++    		{
++    			this.lastActiveTime = Util.getMillis();
++    		}
++    	}
++
++    	if (!this.minecraft.noRender)
++    	{
++    		int i = (int)(this.minecraft.mouseHandler.xpos() * (double)this.minecraft.getWindow().getGuiScaledWidth() / (double)this.minecraft.getWindow().getScreenWidth());
++    		int j = (int)(this.minecraft.mouseHandler.ypos() * (double)this.minecraft.getWindow().getGuiScaledHeight() / (double)this.minecraft.getWindow().getScreenHeight());
++    		RenderSystem.viewport(0, 0, this.minecraft.getWindow().getWidth(), this.minecraft.getWindow().getHeight());
++
++    		this.resetProjectionMatrix(this.getProjectionMatrix(minecraft.options.fov().get()));
++    		RenderSystem.getModelViewStack().setIdentity();
++    		RenderSystem.applyModelViewMatrix();
++
++    		if (p_109096_ && this.minecraft.level != null && !Config.isReloadingResources())
++    		{
++    			this.minecraft.getProfiler().push("level");
++    			PoseStack posestack = new PoseStack();
++    			this.renderLevel(pPartialTicks, pNanoTime, posestack);
++
++    			if (this.minecraft.currentPass != RenderPass.THIRD && this.minecraft.currentPass != RenderPass.CAMERA)
++    			{
++    				this.renderFaceOverlay(pPartialTicks, posestack);
++    			}
++
++    			this.tryTakeScreenshotIfNeeded();
++    			this.minecraft.levelRenderer.doEntityOutline();
++
++    			if (this.postEffect != null && this.effectActive && this.minecraft.currentPass != RenderPass.THIRD)
++    			{
++    				RenderSystem.disableBlend();
++    				RenderSystem.disableDepthTest();
++    				RenderSystem.enableTexture();
++    				RenderSystem.resetTextureMatrix();
++    				this.postEffect.process(pPartialTicks);
++    				RenderSystem.enableTexture();
++    			}
++
++    			this.minecraft.getMainRenderTarget().bindWrite(true);
++    		}
++    		else {
++    			//In the main menu room
++    			this.minecraft.getProfiler().push("MainMenu");
++    			GL11.glDisable(GL11.GL_STENCIL_TEST);
++
++    			PoseStack pMatrixStack = new PoseStack();
++    			applyVRModelView(this.minecraft.currentPass, pMatrixStack);
++    			this.renderGuiLayer(pPartialTicks, true, pMatrixStack);
++
++    			if (KeyboardHandler.Showing)
++    			{
++    				if (this.minecraft.vrSettings.physicalKeyboard)
++    				{
++    					this.renderPhysicalKeyboard(pPartialTicks, pMatrixStack);
++    				}
++    				else
++    				{
++    					this.render2D(pPartialTicks, KeyboardHandler.Framebuffer, KeyboardHandler.Pos_room, KeyboardHandler.Rotation_room, false, pMatrixStack);
++    				}
++    			}
++
++    			if ((this.minecraft.currentPass != RenderPass.THIRD || this.minecraft.vrSettings.mixedRealityRenderHands) && this.minecraft.currentPass != RenderPass.CAMERA)
++    			{
++    				this.renderVRHands(pPartialTicks, true, true, true, true, pMatrixStack);
++    			}
++    		}
  
--        if (!this.minecraft.isWindowActive() && this.minecraft.options.pauseOnLostFocus && (!this.minecraft.options.touchscreen().get() || !this.minecraft.mouseHandler.isRightPressed()))
-+        if (!this.always_true && !this.minecraft.isWindowActive() && this.minecraft.options.pauseOnLostFocus && (!this.minecraft.options.touchscreen().get() || !this.minecraft.mouseHandler.isRightPressed()))
-         {
-             if (Util.getMillis() - this.lastActiveTime > 500L)
-             {
-@@ -1134,20 +1266,33 @@
-         {
-             this.lastActiveTime = Util.getMillis();
-         }
+-        if (!this.minecraft.noRender)
+-        {
+-            int i = (int)(this.minecraft.mouseHandler.xpos() * (double)this.minecraft.getWindow().getGuiScaledWidth() / (double)this.minecraft.getWindow().getScreenWidth());
+-            int j = (int)(this.minecraft.mouseHandler.ypos() * (double)this.minecraft.getWindow().getGuiScaledHeight() / (double)this.minecraft.getWindow().getScreenHeight());
++    		this.minecraft.getProfiler().pop();
 +    	}
  
-         if (!this.minecraft.noRender)
-         {
-             int i = (int)(this.minecraft.mouseHandler.xpos() * (double)this.minecraft.getWindow().getGuiScaledWidth() / (double)this.minecraft.getWindow().getScreenWidth());
-             int j = (int)(this.minecraft.mouseHandler.ypos() * (double)this.minecraft.getWindow().getGuiScaledHeight() / (double)this.minecraft.getWindow().getScreenHeight());
-+        	RenderSystem.viewport(0, 0, this.minecraft.getWindow().getWidth(), this.minecraft.getWindow().getHeight());
-+            
-+    		this.resetProjectionMatrix(this.getProjectionMatrix(minecraft.options.fov().get()));
-+            RenderSystem.getModelViewStack().setIdentity();
-+            RenderSystem.applyModelViewMatrix();
- 
-             if (p_109096_ && this.minecraft.level != null && !Config.isReloadingResources())
-             {
-                 this.minecraft.getProfiler().push("level");
+-            if (p_109096_ && this.minecraft.level != null && !Config.isReloadingResources())
+-            {
+-                this.minecraft.getProfiler().push("level");
 -                this.renderLevel(pPartialTicks, pNanoTime, new PoseStack());
-+                PoseStack posestack = new PoseStack();
-+                this.renderLevel(pPartialTicks, pNanoTime, posestack);
-+
-+                if (this.minecraft.currentPass != RenderPass.THIRD && this.minecraft.currentPass != RenderPass.CAMERA)
-+        		{
-+        			this.renderFaceOverlay(pPartialTicks, posestack);
-+        		}
-+        		
-                 this.tryTakeScreenshotIfNeeded();
-                 this.minecraft.levelRenderer.doEntityOutline();
- 
+-                this.tryTakeScreenshotIfNeeded();
+-                this.minecraft.levelRenderer.doEntityOutline();
+-
 -                if (this.postEffect != null && this.effectActive)
-+                if (this.postEffect != null && this.effectActive && this.minecraft.currentPass != RenderPass.THIRD)
-                 {
-                     RenderSystem.disableBlend();
-                     RenderSystem.disableDepthTest();
-@@ -1159,7 +1304,37 @@
- 
-                 this.minecraft.getMainRenderTarget().bindWrite(true);
-             }
+-                {
+-                    RenderSystem.disableBlend();
+-                    RenderSystem.disableDepthTest();
+-                    RenderSystem.enableTexture();
+-                    RenderSystem.resetTextureMatrix();
+-                    this.postEffect.process(pPartialTicks);
+-                    RenderSystem.enableTexture();
+-                }
+-
+-                this.minecraft.getMainRenderTarget().bindWrite(true);
+-            }
 -            else
-+        	else {
-+        		//In the main menu room
-+        		this.minecraft.getProfiler().push("MainMenu");
-+        		GL11.glDisable(GL11.GL_STENCIL_TEST);
-+        		
-+        		PoseStack pMatrixStack = new PoseStack();
-+        		applyVRModelView(this.minecraft.currentPass, pMatrixStack);
-+        		this.renderGuiLayer(pPartialTicks, true, pMatrixStack);
-+
-+        		if (KeyboardHandler.Showing)
-+        		{
-+        			if (this.minecraft.vrSettings.physicalKeyboard)
-+        			{
-+        				this.renderPhysicalKeyboard(pPartialTicks, pMatrixStack);
-+        			}
-+                    else
-+                    {
-+        				this.render2D(pPartialTicks, KeyboardHandler.Framebuffer, KeyboardHandler.Pos_room, KeyboardHandler.Rotation_room, false, pMatrixStack);
-+        			}
-+        		}
-+
-+        		if ((this.minecraft.currentPass != RenderPass.THIRD || this.minecraft.vrSettings.mixedRealityRenderHands) && this.minecraft.currentPass != RenderPass.CAMERA)
-+        		{
-+        			this.renderVRHands(pPartialTicks, true, true, true, true, pMatrixStack);
-+        		}
-+        	}
-+
-+        	this.minecraft.getProfiler().pop();
-+        }
-+            
-+            /*	Vivecraft nope, do all this in drawFramebuffer
++    	/*	Vivecraft nope, do all this in drawFramebuffer
              {
                  RenderSystem.viewport(0, 0, this.minecraft.getWindow().getWidth(), this.minecraft.getWindow().getHeight());
              }
-@@ -1318,7 +1493,7 @@
+@@ -1320,7 +1494,7 @@
          {
              this.minecraft.options.renderDebugCharts = true;
          }
 -    }
-+    */}
++    	 */}
  
      private void tryTakeScreenshotIfNeeded()
      {
-@@ -1393,9 +1568,9 @@
+@@ -1395,9 +1569,9 @@
  
                      nativeimage1.close();
                  }
@@ -430,7 +473,7 @@
                  }
                  finally {
                      nativeimage.close();
-@@ -1404,13 +1579,10 @@
+@@ -1406,13 +1580,10 @@
          }
      }
  
@@ -446,7 +489,7 @@
          {
              Entity entity = this.minecraft.getCameraEntity();
              boolean flag = entity instanceof Player && !this.minecraft.options.hideGui;
-@@ -1440,18 +1612,42 @@
+@@ -1442,18 +1613,42 @@
  
              return flag;
          }
@@ -492,7 +535,7 @@
  
          if (Config.isShaders())
          {
-@@ -1480,11 +1676,13 @@
+@@ -1482,11 +1677,13 @@
              posestack = p_109092_;
          }
  
@@ -508,7 +551,7 @@
          }
  
          float f = this.minecraft.options.screenEffectScale().get().floatValue();
-@@ -1495,6 +1693,10 @@
+@@ -1497,6 +1694,10 @@
              int i = this.minecraft.player.hasEffect(MobEffects.CONFUSION) ? 7 : 20;
              float f2 = 5.0F / (f1 * f1 + 5.0F) - f1 * 0.04F;
              f2 *= f2;
@@ -519,38 +562,37 @@
              Vector3f vector3f = new Vector3f(0.0F, Mth.SQRT_OF_TWO / 2.0F, Mth.SQRT_OF_TWO / 2.0F);
              posestack.mulPose(vector3f.rotationDegrees(((float)this.tick + pPartialTicks) * (float)i));
              posestack.scale(1.0F / f2, 1.0F, 1.0F);
-@@ -1513,16 +1715,22 @@
+@@ -1515,16 +1716,21 @@
  
          if (Reflector.ForgeHooksClient_onCameraSetup.exists())
          {
 -            Object object = Reflector.ForgeHooksClient_onCameraSetup.call(this, camera, pPartialTicks);
--            float f5 = Reflector.callFloat(object, Reflector.EntityViewRenderEvent_CameraSetup_getYaw);
--            float f6 = Reflector.callFloat(object, Reflector.EntityViewRenderEvent_CameraSetup_getPitch);
--            float f4 = Reflector.callFloat(object, Reflector.EntityViewRenderEvent_CameraSetup_getRoll);
+-            float f5 = Reflector.callFloat(object, Reflector.ViewportEvent_ComputeCameraAngles_getYaw);
+-            float f6 = Reflector.callFloat(object, Reflector.ViewportEvent_ComputeCameraAngles_getPitch);
+-            float f4 = Reflector.callFloat(object, Reflector.ViewportEvent_ComputeCameraAngles_getRoll);
 -            camera.setAnglesInternal(f5, f6);
 -            p_109092_.mulPose(Vector3f.ZP.rotationDegrees(f4));
 +        	if(minecraft.currentPass != RenderPass.LEFT && minecraft.currentPass != RenderPass.RIGHT) {
-+	        	//do what you want, mods, just dont do it to my eyeballs.
-+	            Object object = Reflector.ForgeHooksClient_onCameraSetup.call(this, camera, pPartialTicks);
-+	            float f5 = Reflector.callFloat(object, Reflector.EntityViewRenderEvent_CameraSetup_getYaw);
-+	            float f6 = Reflector.callFloat(object, Reflector.EntityViewRenderEvent_CameraSetup_getPitch);
-+	            float f4 = Reflector.callFloat(object, Reflector.EntityViewRenderEvent_CameraSetup_getRoll);
-+	            camera.setAnglesInternal(f5, f6);
-+	            p_109092_.mulPose(Vector3f.ZP.rotationDegrees(f4));
-+            }
++        		//do what you want, mods, just dont do it to my eyeballs.
++        		Object object = Reflector.ForgeHooksClient_onCameraSetup.call(this, camera, pPartialTicks);
++        		float f5 = Reflector.callFloat(object, Reflector.ViewportEvent_ComputeCameraAngles_getYaw);
++        		float f6 = Reflector.callFloat(object, Reflector.ViewportEvent_ComputeCameraAngles_getPitch);
++        		float f4 = Reflector.callFloat(object, Reflector.ViewportEvent_ComputeCameraAngles_getRoll);
++        		camera.setAnglesInternal(f5, f6);
++        		p_109092_.mulPose(Vector3f.ZP.rotationDegrees(f4));
++        	}
          }
  
 -        p_109092_.mulPose(Vector3f.XP.rotationDegrees(camera.getXRot()));
 -        p_109092_.mulPose(Vector3f.YP.rotationDegrees(camera.getYRot() + 180.0F));
 +        applyVRModelView(minecraft.currentPass, p_109092_); //this is just rotation.
 +        //this is not the way
-+
 +        //p_109092_.mulPose(Vector3f.XP.rotationDegrees(camera.getXRot()));
-+        //p_109092_.mulPose(Vector3f.YP.rotationDegrees(camera.getYRot() + 180.0F));
++        //p_109092_.mulPose(Vector3f.YP.rotationDegrees(camera.getYRot() + 180.0F));    
          Matrix3f matrix3f = p_109092_.last().normal().copy();
  
          if (matrix3f.invert())
-@@ -1539,26 +1747,13 @@
+@@ -1541,26 +1747,13 @@
              Reflector.callVoid(Reflector.ForgeHooksClient_dispatchRenderLast, this.minecraft.levelRenderer, p_109092_, pPartialTicks, matrix4f, pFinishTimeNano);
          }
  
@@ -582,7 +624,7 @@
          }
  
          if (flag)
-@@ -1566,6 +1761,7 @@
+@@ -1568,6 +1761,7 @@
              Shaders.endRender();
          }
  
@@ -590,7 +632,7 @@
          this.minecraft.getProfiler().pop();
      }
  
-@@ -1678,8 +1874,6 @@
+@@ -1680,8 +1874,6 @@
  
          if (!this.initialized)
          {
@@ -599,7 +641,7 @@
              if (Config.getBitsOs() == 64 && Config.getBitsJre() == 32)
              {
                  Config.setNotify64BitJava(true);
-@@ -1805,11 +1999,17 @@
+@@ -1812,11 +2004,17 @@
              float f5 = this.itemActivationOffX * (float)(pWidthsp / 4);
              float f6 = this.itemActivationOffY * (float)(pHeightScaled / 4);
              RenderSystem.enableDepthTest();
@@ -619,7 +661,7 @@
              posestack.scale(f7, -f7, f7);
              posestack.mulPose(Vector3f.YP.rotationDegrees(900.0F * Mth.abs(Mth.sin(f4))));
              posestack.mulPose(Vector3f.XP.rotationDegrees(6.0F * Mth.cos(f * 8.0F)));
-@@ -1820,6 +2020,8 @@
+@@ -1827,6 +2025,8 @@
              multibuffersource$buffersource.endBatch();
              RenderSystem.enableCull();
              RenderSystem.disableDepthTest();
@@ -628,7 +670,7 @@
          }
      }
  
-@@ -2216,4 +2418,2248 @@
+@@ -2223,4 +2423,2250 @@
      {
          return rendertypeCrumblingShader;
      }
@@ -1075,8 +1117,10 @@
 +	    {
 +	        Vec3 vec3 = this.minecraft.vrPlayer.vrdata_world_render.getEye(this.minecraft.currentPass).getPosition();
 +	        Triple<Float, BlockState, BlockPos> triple = this.itemInHandRenderer.getNearOpaqueBlock(vec3, (double)this.minClipDistance);
-+	
-+	        if (triple != null && !Reflector.callBoolean(Reflector.ForgeHooksClient_renderBlockOverlay, this.minecraft.player, new PoseStack(), Reflector.getFieldValue(Reflector.RenderBlockOverlayEvent_OverlayType_BLOCK), triple.getMiddle(), triple.getRight()))
++
++	        //Forge look into this
++	        
++	        if (triple != null) //&& !Reflector.callBoolean(Reflector.ForgeHooksClient_renderBlockOverlay, this.minecraft.player, new PoseStack(), Reflector.getFieldValue(Reflector.RenderBlockOverlayEvent_OverlayType_BLOCK), triple.getMiddle(), triple.getRight()))
 +	        {
 +	            this.inBlock = triple.getLeft();
 +	        }

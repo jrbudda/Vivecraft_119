@@ -17,11 +17,12 @@
  
  public class ModelBakery
  {
-@@ -206,7 +209,13 @@
+@@ -196,7 +199,15 @@
                  this.loadTopLevel(BlockModelShaper.stateToModelLocation(stateIn));
              });
          }
 -
++        
 +        //Vivecraft
 +        this.loadTopLevel(TelescopeTracker.scopeModel);
 +        this.loadTopLevel(GameRenderer.thirdPersonCameraModel);
@@ -29,6 +30,7 @@
 +        this.loadTopLevel(CameraTracker.cameraModel);
 +        this.loadTopLevel(CameraTracker.cameraDisplayModel);
 +        //
-         profilerIn.popPush("items");
++        
+         pProfiler.popPush("items");
  
-         for (ResourceLocation resourcelocation : Registry.ITEM.keySet())
+         for (ResourceLocation resourcelocation1 : Registry.ITEM.keySet())

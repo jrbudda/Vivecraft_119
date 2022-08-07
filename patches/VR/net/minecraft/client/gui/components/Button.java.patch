@@ -8,8 +8,8 @@
 +    public static final Button.OnTooltip NO_TOOLTIP = (button, matrixStack, mouseX, mouseY) ->
      {
      };
-     protected final Button.OnPress onPress;
-@@ -55,6 +55,11 @@
+     public static final int SMALL_WIDTH = 120;
+@@ -58,6 +58,11 @@
          });
      }
  

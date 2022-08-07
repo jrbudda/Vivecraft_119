@@ -1,25 +1,28 @@
 --- a/net/optifine/reflect/Reflector.java
 +++ b/net/optifine/reflect/Reflector.java
-@@ -1,6 +1,9 @@
+@@ -1,18 +1,26 @@
  package net.optifine.reflect;
  
- import com.google.common.collect.ImmutableMap;
-+import com.google.common.collect.ImmutableMap.Builder;
-+import com.google.gson.JsonObject;
-+import com.mojang.authlib.properties.PropertyMap;
- import com.mojang.blaze3d.vertex.PoseStack;
- import com.mojang.math.Matrix4f;
+-import com.google.common.collect.ImmutableMap;
+-import com.mojang.blaze3d.vertex.PoseStack;
+-import com.mojang.math.Matrix4f;
  import java.lang.reflect.Constructor;
-@@ -8,11 +11,16 @@
+ import java.lang.reflect.Field;
  import java.lang.reflect.InvocationTargetException;
  import java.lang.reflect.Method;
  import java.util.List;
-+import java.util.Locale;
  import java.util.Map;
-+import java.util.Set;
-+import java.util.function.Consumer;
++import java.util.function.BiPredicate;
  import java.util.function.Supplier;
-+import net.minecraft.CrashReport;
++
++import org.apache.logging.log4j.LogManager;
++import org.apache.logging.log4j.Logger;
++
++import com.google.common.collect.ImmutableMap;
++import com.mojang.authlib.properties.PropertyMap;
++import com.mojang.blaze3d.vertex.PoseStack;
++import com.mojang.math.Matrix4f;
++
  import net.minecraft.client.Camera;
  import net.minecraft.client.KeyMapping;
  import net.minecraft.client.Minecraft;
@@ -27,44 +30,42 @@
  import net.minecraft.client.color.block.BlockColors;
  import net.minecraft.client.gui.Font;
  import net.minecraft.client.gui.components.Button;
-@@ -31,6 +39,7 @@
+@@ -23,7 +31,6 @@
+ import net.minecraft.client.model.ArmorStandModel;
+ import net.minecraft.client.model.AxolotlModel;
+ import net.minecraft.client.model.BeeModel;
+-import net.minecraft.client.model.BlazeModel;
+ import net.minecraft.client.model.BookModel;
+ import net.minecraft.client.model.ChestedHorseModel;
+ import net.minecraft.client.model.ChickenModel;
+@@ -31,16 +38,12 @@
  import net.minecraft.client.model.EntityModel;
  import net.minecraft.client.model.EvokerFangsModel;
  import net.minecraft.client.model.FoxModel;
-+import net.minecraft.client.model.GhastModel;
- import net.minecraft.client.model.GuardianModel;
+-import net.minecraft.client.model.GuardianModel;
  import net.minecraft.client.model.HoglinModel;
  import net.minecraft.client.model.HorseModel;
-@@ -47,6 +56,8 @@
- import net.minecraft.client.model.ShulkerBulletModel;
- import net.minecraft.client.model.ShulkerModel;
- import net.minecraft.client.model.SkullModel;
-+import net.minecraft.client.model.SnowGolemModel;
-+import net.minecraft.client.model.StriderModel;
- import net.minecraft.client.model.TadpoleModel;
- import net.minecraft.client.model.TridentModel;
- import net.minecraft.client.model.TropicalFishModelA;
-@@ -57,8 +68,11 @@
+-import net.minecraft.client.model.IllagerModel;
+-import net.minecraft.client.model.IronGolemModel;
+ import net.minecraft.client.model.LeashKnotModel;
+ import net.minecraft.client.model.LlamaModel;
+ import net.minecraft.client.model.LlamaSpitModel;
+ import net.minecraft.client.model.OcelotModel;
+-import net.minecraft.client.model.PhantomModel;
+ import net.minecraft.client.model.PiglinModel;
+ import net.minecraft.client.model.QuadrupedModel;
+ import net.minecraft.client.model.RabbitModel;
+@@ -57,7 +60,9 @@
  import net.minecraft.client.model.dragon.DragonHeadModel;
  import net.minecraft.client.model.geom.EntityModelSet;
  import net.minecraft.client.model.geom.ModelPart;
 +import net.minecraft.client.multiplayer.MultiPlayerGameMode;
  import net.minecraft.client.particle.TerrainParticle;
 +import net.minecraft.client.player.LocalPlayer;
- import net.minecraft.client.renderer.DimensionSpecialEffects;
-+import net.minecraft.client.renderer.FogRenderer;
- import net.minecraft.client.renderer.GameRenderer;
- import net.minecraft.client.renderer.ItemBlockRenderTypes;
  import net.minecraft.client.renderer.LevelRenderer;
-@@ -75,6 +89,7 @@
- import net.minecraft.client.renderer.blockentity.LecternRenderer;
- import net.minecraft.client.renderer.blockentity.ShulkerBoxRenderer;
- import net.minecraft.client.renderer.blockentity.SignRenderer;
-+import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
- import net.minecraft.client.renderer.entity.BoatRenderer;
- import net.minecraft.client.renderer.entity.EndCrystalRenderer;
- import net.minecraft.client.renderer.entity.EnderDragonRenderer;
-@@ -92,42 +107,71 @@
+ import net.minecraft.client.renderer.MultiBufferSource;
+ import net.minecraft.client.renderer.RenderType;
+@@ -92,6 +97,7 @@
  import net.minecraft.client.renderer.entity.WitherSkullRenderer;
  import net.minecraft.client.renderer.entity.layers.LlamaDecorLayer;
  import net.minecraft.client.renderer.entity.layers.TropicalFishPatternLayer;
@@ -72,81 +73,52 @@
  import net.minecraft.client.resources.LegacyPackResourcesAdapter;
  import net.minecraft.client.resources.PackResourcesAdapterV4;
  import net.minecraft.client.resources.model.ModelManager;
- import net.minecraft.core.BlockPos;
+@@ -99,17 +105,27 @@
  import net.minecraft.nbt.CompoundTag;
  import net.minecraft.network.chat.Component;
-+import net.minecraft.network.protocol.game.ServerboundClientInformationPacket;
  import net.minecraft.network.syncher.EntityDataAccessor;
 +import net.minecraft.resources.ResourceKey;
  import net.minecraft.resources.ResourceLocation;
  import net.minecraft.server.level.ChunkHolder;
-+import net.minecraft.server.level.ServerLevel;
-+import net.minecraft.server.level.ServerPlayer;
  import net.minecraft.server.level.Ticket;
-+import net.minecraft.server.level.TicketType;
 +import net.minecraft.server.network.ServerGamePacketListenerImpl;
  import net.minecraft.server.packs.PackResources;
-+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 +import net.minecraft.server.packs.repository.Pack;
-+import net.minecraft.server.packs.repository.PackCompatibility;
 +import net.minecraft.server.packs.repository.PackRepository;
-+import net.minecraft.server.packs.repository.PackSource;
 +import net.minecraft.server.packs.resources.ReloadableResourceManager;
  import net.minecraft.server.packs.resources.ResourceManager;
  import net.minecraft.tags.ItemTags;
 +import net.minecraft.world.InteractionHand;
- import net.minecraft.world.effect.MobEffect;
- import net.minecraft.world.effect.MobEffectInstance;
  import net.minecraft.world.entity.Entity;
-+import net.minecraft.world.entity.EntityType;
  import net.minecraft.world.entity.LivingEntity;
  import net.minecraft.world.entity.decoration.ItemFrame;
  import net.minecraft.world.entity.item.ItemEntity;
- import net.minecraft.world.entity.player.Player;
++import net.minecraft.world.entity.player.Player;
  import net.minecraft.world.entity.projectile.AbstractArrow;
-+import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 +import net.minecraft.world.entity.projectile.FishingHook;
 +import net.minecraft.world.entity.projectile.Projectile;
-+import net.minecraft.world.entity.projectile.ThrowableProjectile;
 +import net.minecraft.world.inventory.AbstractContainerMenu;
-+import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.Item;
  import net.minecraft.world.item.ItemStack;
  import net.minecraft.world.item.Rarity;
-+import net.minecraft.world.level.BlockAndTintGetter;
- import net.minecraft.world.level.BlockGetter;
-+import net.minecraft.world.level.ChunkPos;
-+import net.minecraft.world.level.DataPackConfig;
- import net.minecraft.world.level.Level;
- import net.minecraft.world.level.LevelAccessor;
- import net.minecraft.world.level.LevelReader;
- import net.minecraft.world.level.block.entity.BeaconBlockEntity;
+@@ -121,12 +137,12 @@
  import net.minecraft.world.level.block.state.BlockState;
  import net.minecraft.world.level.chunk.ChunkAccess;
-+import net.minecraft.world.level.dimension.LevelStem;
-+import net.minecraft.world.level.material.Fluid;
- import net.minecraft.world.level.material.FluidState;
+ import net.minecraft.world.level.saveddata.maps.MapDecoration;
 +import net.minecraft.world.phys.HitResult;
 +import net.minecraft.world.phys.Vec3;
+ import net.minecraftforge.client.event.RenderLevelStageEvent;
  import net.minecraftforge.eventbus.api.Event;
  import net.optifine.Log;
  import net.optifine.util.ArrayUtils;
- import org.apache.logging.log4j.LogManager;
- import org.apache.logging.log4j.Logger;
-+import org.vivecraft.tweaker.VivecraftTransformer;
+-import org.apache.logging.log4j.LogManager;
+-import org.apache.logging.log4j.Logger;
  
  public class Reflector
  {
-@@ -138,7 +182,6 @@
-     public static ReflectorMethod BrandingControl_getBrandings = new ReflectorMethod(BrandingControl, "getBrandings");
-     public static ReflectorMethod BrandingControl_forEachLine = new ReflectorMethod(BrandingControl, "forEachLine");
-     public static ReflectorMethod BrandingControl_forEachAboveCopyrightLine = new ReflectorMethod(BrandingControl, "forEachAboveCopyrightLine");
--    public static ReflectorClass ICapabilityProvider = new ReflectorClass("net.minecraftforge.common.capabilities.ICapabilityProvider");
-     public static ReflectorClass CapabilityProvider = new ReflectorClass("net.minecraftforge.common.capabilities.CapabilityProvider");
-     public static ReflectorMethod CapabilityProvider_gatherCapabilities = new ReflectorMethod(CapabilityProvider, "gatherCapabilities", new Class[0]);
-     public static ReflectorClass ClientModLoader = new ReflectorClass("net.minecraftforge.client.loading.ClientModLoader");
-@@ -150,6 +193,9 @@
+@@ -156,6 +172,9 @@
      public static ReflectorConstructor ChunkEvent_Load_Constructor = new ReflectorConstructor(ChunkEvent_Load, new Class[] {ChunkAccess.class});
-     public static ReflectorClass ChunkEvent_Unload = new ReflectorClass("net.minecraftforge.event.world.ChunkEvent$Unload");
+     public static ReflectorClass ChunkEvent_Unload = new ReflectorClass("net.minecraftforge.event.level.ChunkEvent$Unload");
      public static ReflectorConstructor ChunkEvent_Unload_Constructor = new ReflectorConstructor(ChunkEvent_Unload, new Class[] {ChunkAccess.class});
 +    //public static ReflectorClass ClientHooks = new ReflectorClass("net.minecraftforge.fmlclient.ClientHooks");
 +    //public static ReflectorMethod ClientHooks_trackBrokenTexture = new ReflectorMethod(ClientHooks, "trackBrokenTexture");
@@ -154,24 +126,7 @@
      public static ReflectorClass CrashReportExtender = new ReflectorClass("net.minecraftforge.logging.CrashReportExtender");
      public static ReflectorMethod CrashReportExtender_addCrashReportHeader = new ReflectorMethod(CrashReportExtender, "addCrashReportHeader");
      public static ReflectorMethod CrashReportExtender_extendSystemReport = new ReflectorMethod(CrashReportExtender, "extendSystemReport");
-@@ -180,7 +226,7 @@
-     public static ReflectorField Event_Result_ALLOW = new ReflectorField(Event_Result, "ALLOW");
-     public static ReflectorField Event_Result_DEFAULT = new ReflectorField(Event_Result, "DEFAULT");
-     public static ReflectorClass FluidType = new ReflectorClass("net.minecraftforge.fluids.FluidType");
--    public static ReflectorMethod FluidType_isAir = FluidType.makeMethod("isAir");
-+    public static ReflectorMethod FluidType_isAir = new ReflectorMethod(FluidType, "isAir");
-     public static ReflectorClass ForgeBlockModelRenderer = new ReflectorClass("net.minecraftforge.client.model.pipeline.ForgeBlockModelRenderer");
-     public static ReflectorConstructor ForgeBlockModelRenderer_Constructor = new ReflectorConstructor(ForgeBlockModelRenderer, new Class[] {BlockColors.class});
-     public static ReflectorClass ForgeBlockModelShapes = new ReflectorClass(BlockModelShaper.class);
-@@ -238,7 +284,6 @@
-     public static ReflectorMethod ForgeHooksClient_getFluidSprites = new ReflectorMethod(ForgeHooksClient, "getFluidSprites");
-     public static ReflectorMethod ForgeHooksClient_getFieldOfView2 = new ReflectorMethod(ForgeHooksClient, "getFieldOfView", new Class[] {Player.class, Float.TYPE});
-     public static ReflectorMethod ForgeHooksClient_getFieldOfView4 = new ReflectorMethod(ForgeHooksClient, "getFieldOfView", new Class[] {GameRenderer.class, Camera.class, Double.TYPE, Double.TYPE});
--    public static ReflectorMethod ForgeHooksClient_getGuiFarPlane = new ReflectorMethod(ForgeHooksClient, "getGuiFarPlane");
-     public static ReflectorMethod ForgeHooksClient_isNameplateInRenderDistance = new ReflectorMethod(ForgeHooksClient, "isNameplateInRenderDistance");
-     public static ReflectorMethod ForgeHooksClient_loadEntityShader = new ReflectorMethod(ForgeHooksClient, "loadEntityShader");
-     public static ReflectorMethod ForgeHooksClient_loadTextureAtlasSprite = new ReflectorMethod(ForgeHooksClient, "loadTextureAtlasSprite");
-@@ -276,20 +321,12 @@
+@@ -282,20 +301,12 @@
      public static ReflectorClass ForgeIChunk = new ReflectorClass(ChunkAccess.class);
      public static ReflectorMethod ForgeIChunk_getWorldForge = new ReflectorMethod(ForgeIChunk, "getWorldForge");
      public static ReflectorClass IForgeItem = new ReflectorClass("net.minecraftforge.common.extensions.IForgeItem");
@@ -192,31 +147,15 @@
      public static ReflectorClass ForgeKeyBinding = new ReflectorClass(KeyMapping.class);
      public static ReflectorMethod ForgeKeyBinding_setKeyConflictContext = new ReflectorMethod(ForgeKeyBinding, "setKeyConflictContext");
      public static ReflectorMethod ForgeKeyBinding_setKeyModifierAndCode = new ReflectorMethod(ForgeKeyBinding, "setKeyModifierAndCode");
-@@ -323,7 +360,6 @@
-     public static ReflectorClass MinecraftForge = new ReflectorClass("net.minecraftforge.common.MinecraftForge");
-     public static ReflectorField MinecraftForge_EVENT_BUS = new ReflectorField(MinecraftForge, "EVENT_BUS");
-     public static ReflectorClass MinecraftForgeClient = new ReflectorClass("net.minecraftforge.client.MinecraftForgeClient");
--    public static ReflectorMethod MinecraftForgeClient_getImageLayer = new ReflectorMethod(MinecraftForgeClient, "getImageLayer");
-     public static ReflectorClass ModContainer = new ReflectorClass("net.minecraftforge.fml.ModContainer");
-     public static ReflectorMethod ModContainer_getModId = new ReflectorMethod(ModContainer, "getModId");
-     public static ReflectorClass ModelLoaderRegistry = new ReflectorClass("net.minecraftforge.client.model.ModelLoaderRegistry");
-@@ -361,7 +397,6 @@
-     public static ReflectorMethod RenderNameplateEvent_getContent = new ReflectorMethod(RenderNameplateEvent, "getContent");
-     public static ReflectorClass RenderProperties = new ReflectorClass("net.minecraftforge.client.RenderProperties");
-     public static ReflectorMethod RenderProperties_getIS = RenderProperties.makeMethod("get", new Class[] {ItemStack.class});
--    public static ReflectorMethod RenderProperties_getEffectRendererME = RenderProperties.makeMethod("getEffectRenderer", new Class[] {MobEffect.class});
-     public static ReflectorMethod RenderProperties_getEffectRendererMEI = RenderProperties.makeMethod("getEffectRenderer", new Class[] {MobEffectInstance.class});
-     public static ReflectorClass ScreenshotEvent = new ReflectorClass("net.minecraftforge.client.event.ScreenshotEvent");
-     public static ReflectorMethod ScreenshotEvent_getCancelMessage = new ReflectorMethod(ScreenshotEvent, "getCancelMessage");
-@@ -375,7 +410,6 @@
-     public static ReflectorClass WorldEvent_Load = new ReflectorClass("net.minecraftforge.event.world.WorldEvent$Load");
-     public static ReflectorConstructor WorldEvent_Load_Constructor = new ReflectorConstructor(WorldEvent_Load, new Class[] {LevelAccessor.class});
+@@ -377,7 +388,6 @@
+     public static ReflectorClass LevelEvent_Load = new ReflectorClass("net.minecraftforge.event.level.LevelEvent$Load");
+     public static ReflectorConstructor LevelEvent_Load_Constructor = new ReflectorConstructor(LevelEvent_Load, new Class[] {LevelAccessor.class});
      private static boolean logVanilla = registerResolvable("*** Reflector Vanilla ***");
 -    public static ReflectorClass AbstractArrow = new ReflectorClass(AbstractArrow.class);
      public static ReflectorField AbstractArrow_inGround = new ReflectorField(new FieldLocatorTypes(AbstractArrow.class, new Class[] {BlockState.class}, Boolean.TYPE, new Class[] {Integer.TYPE}, "AbstractArrow.inGround"));
      public static ReflectorClass EntityItem = new ReflectorClass(ItemEntity.class);
      public static ReflectorField EntityItem_ITEM = new ReflectorField(EntityItem, EntityDataAccessor.class);
-@@ -398,9 +432,6 @@
+@@ -400,9 +410,6 @@
      public static ReflectorFields ModelArmorStand_ModelRenderers = new ReflectorFields(ModelArmorStand, ModelPart.class, 4);
      public static ReflectorClass ModelBee = new ReflectorClass(BeeModel.class);
      public static ReflectorFields ModelBee_ModelRenderers = new ReflectorFields(ModelBee, ModelPart.class, 2);
@@ -226,7 +165,7 @@
      public static ReflectorClass ModelBoar = new ReflectorClass(HoglinModel.class);
      public static ReflectorFields ModelBoar_ModelRenderers = new ReflectorFields(ModelBoar, ModelPart.class, 9);
      public static ReflectorClass ModelBook = new ReflectorClass(BookModel.class);
-@@ -411,11 +442,6 @@
+@@ -413,11 +420,6 @@
      public static ReflectorFields ModelDragon_ModelRenderers = new ReflectorFields(ModelDragon, ModelPart.class, 20);
      public static ReflectorClass RenderEnderCrystal = new ReflectorClass(EndCrystalRenderer.class);
      public static ReflectorFields RenderEnderCrystal_modelRenderers = new ReflectorFields(RenderEnderCrystal, ModelPart.class, 3);
@@ -238,7 +177,7 @@
      public static ReflectorClass ModelDragonHead = new ReflectorClass(DragonHeadModel.class);
      public static ReflectorField ModelDragonHead_head = new ReflectorField(ModelDragonHead, ModelPart.class, 0);
      public static ReflectorField ModelDragonHead_jaw = new ReflectorField(ModelDragonHead, ModelPart.class, 1);
-@@ -423,24 +449,16 @@
+@@ -425,24 +427,16 @@
      public static ReflectorFields ModelHorse_ModelRenderers = new ReflectorFields(ModelHorse, ModelPart.class, 11);
      public static ReflectorClass ModelHorseChests = new ReflectorClass(ChestedHorseModel.class);
      public static ReflectorFields ModelHorseChests_ModelRenderers = new ReflectorFields(ModelHorseChests, ModelPart.class, 2);
@@ -263,7 +202,7 @@
      public static ReflectorClass ModelPiglin = new ReflectorClass(PiglinModel.class);
      public static ReflectorFields ModelPiglin_ModelRenderers = new ReflectorFields(ModelPiglin, ModelPart.class, 2);
      public static ReflectorClass ModelQuadruped = new ReflectorClass(QuadrupedModel.class);
-@@ -526,9 +544,9 @@
+@@ -528,9 +522,9 @@
  
              method.invoke((Object)null, params);
          }
@@ -275,7 +214,7 @@
          }
      }
  
-@@ -548,9 +566,9 @@
+@@ -550,9 +544,9 @@
                  return obool;
              }
          }
@@ -287,7 +226,7 @@
              return false;
          }
      }
-@@ -571,9 +589,9 @@
+@@ -573,9 +567,9 @@
                  return integer;
              }
          }
@@ -299,7 +238,7 @@
              return 0;
          }
      }
-@@ -594,9 +612,9 @@
+@@ -596,9 +590,9 @@
                  return olong;
              }
          }
@@ -311,7 +250,7 @@
              return 0L;
          }
      }
-@@ -617,9 +635,9 @@
+@@ -619,9 +613,9 @@
                  return f;
              }
          }
@@ -323,7 +262,7 @@
              return 0.0F;
          }
      }
-@@ -640,9 +658,9 @@
+@@ -642,9 +636,9 @@
                  return d0;
              }
          }
@@ -335,7 +274,7 @@
              return 0.0D;
          }
      }
-@@ -654,9 +672,9 @@
+@@ -656,9 +650,9 @@
              Method method = refMethod.getTargetMethod();
              return method == null ? null : (String)method.invoke((Object)null, params);
          }
@@ -347,7 +286,7 @@
              return null;
          }
      }
-@@ -668,9 +686,9 @@
+@@ -670,9 +664,9 @@
              Method method = refMethod.getTargetMethod();
              return method == null ? null : method.invoke((Object)null, params);
          }
@@ -359,7 +298,7 @@
              return null;
          }
      }
-@@ -693,9 +711,9 @@
+@@ -695,9 +689,9 @@
  
              method.invoke(obj, params);
          }
@@ -371,7 +310,7 @@
          }
      }
  
-@@ -715,9 +733,9 @@
+@@ -717,9 +711,9 @@
                  return obool;
              }
          }
@@ -383,7 +322,7 @@
              return false;
          }
      }
-@@ -738,9 +756,9 @@
+@@ -740,9 +734,9 @@
                  return integer;
              }
          }
@@ -395,7 +334,7 @@
              return 0;
          }
      }
-@@ -761,9 +779,9 @@
+@@ -763,9 +757,9 @@
                  return olong;
              }
          }
@@ -407,7 +346,7 @@
              return 0L;
          }
      }
-@@ -784,9 +802,9 @@
+@@ -786,9 +780,9 @@
                  return f;
              }
          }
@@ -419,7 +358,7 @@
              return 0.0F;
          }
      }
-@@ -807,9 +825,9 @@
+@@ -809,9 +803,9 @@
                  return d0;
              }
          }
@@ -431,7 +370,7 @@
              return 0.0D;
          }
      }
-@@ -821,9 +839,9 @@
+@@ -823,9 +817,9 @@
              Method method = refMethod.getTargetMethod();
              return method == null ? null : (String)method.invoke(obj, params);
          }
@@ -443,7 +382,7 @@
              return null;
          }
      }
-@@ -835,9 +853,9 @@
+@@ -837,9 +831,9 @@
              Method method = refMethod.getTargetMethod();
              return method == null ? null : method.invoke(obj, params);
          }
@@ -455,7 +394,7 @@
              return null;
          }
      }
-@@ -854,9 +872,9 @@
+@@ -856,9 +850,9 @@
              Field field = refField.getTargetField();
              return field == null ? null : field.get(obj);
          }
@@ -467,7 +406,7 @@
              return null;
          }
      }
-@@ -868,9 +886,9 @@
+@@ -870,9 +864,9 @@
              Field field = refField.getTargetField();
              return field == null ? def : field.getBoolean(obj);
          }
@@ -479,7 +418,7 @@
              return def;
          }
      }
-@@ -894,9 +912,9 @@
+@@ -896,9 +890,9 @@
              Field field = refField.getTargetField();
              return field == null ? def : field.getFloat(obj);
          }
@@ -491,7 +430,7 @@
              return def;
          }
      }
-@@ -913,9 +931,9 @@
+@@ -915,9 +909,9 @@
              Field field = refField.getTargetField();
              return field == null ? def : field.getInt(obj);
          }
@@ -503,7 +442,7 @@
              return def;
          }
      }
-@@ -927,9 +945,9 @@
+@@ -929,9 +923,9 @@
              Field field = refField.getTargetField();
              return field == null ? def : field.getLong(obj);
          }
@@ -515,7 +454,7 @@
              return def;
          }
      }
-@@ -998,9 +1016,9 @@
+@@ -1000,9 +994,9 @@
                  return true;
              }
          }
@@ -527,7 +466,7 @@
              return false;
          }
      }
-@@ -1140,10 +1158,8 @@
+@@ -1142,10 +1136,8 @@
                  RuntimeException runtimeexception = (RuntimeException)throwable;
                  throw runtimeexception;
              }
@@ -540,7 +479,7 @@
          }
          else
          {
-@@ -1237,4 +1253,171 @@
+@@ -1239,4 +1231,170 @@
          ReflectorResolver.register(iresolvable);
          return true;
      }
@@ -588,9 +527,9 @@
 +    public static ReflectorClass ForgeItem = new ReflectorClass(Item.class);
 +    public static ReflectorMethod ForgeItem_getTags = new ReflectorMethod(ForgeItem, "getTags");
 +    public static ReflectorMethod ServerLifecycleHooks_handleExit = new ReflectorMethod(ServerLifecycleHooks, "handleExit", new Class[] {Integer.TYPE});
-+    public static ReflectorClass ScreenOpenEvent = new ReflectorClass("net.minecraftforge.client.event.ScreenOpenEvent");
-+    public static ReflectorConstructor ScreenOpenEvent_Constructor = new ReflectorConstructor(ScreenOpenEvent, new Class[] {Screen.class});
-+    public static ReflectorMethod ScreenOpenEvent_getScreen = new ReflectorMethod(ScreenOpenEvent, "getScreen");
++    public static ReflectorClass ScreenOpenEvent = new ReflectorClass("net.minecraftforge.client.event.ScreenEvent$Opening");
++    public static ReflectorConstructor ScreenOpenEvent_Constructor = new ReflectorConstructor(ScreenOpenEvent, new Class[] {Screen.class, Screen.class});
++    public static ReflectorMethod ScreenOpenEvent_getScreen = new ReflectorMethod(ScreenOpenEvent, "getNewScreen");
 +    public static ReflectorMethod BasicEventHooks_onRenderTickStart = new ReflectorMethod(ForgeEventFactory, "onRenderTickStart", new Class[] {Float.TYPE});
 +    public static ReflectorMethod BasicEventHooks_onRenderTickEnd = new ReflectorMethod(ForgeEventFactory, "onRenderTickEnd", new Class[] {Float.TYPE});
 +    public static ReflectorMethod BasicEventHooks_onPreClientTick = new ReflectorMethod(ForgeEventFactory, "onPreClientTick");
@@ -664,15 +603,14 @@
 +    public static ReflectorMethod ForgeHooksClient_onGuiMouseClickedPost = new ReflectorMethod(ForgeHooksClient, "onScreenMouseClickedPost");
 +    public static ReflectorMethod ForgeHooksClient_onGuiMouseReleasedPre = new ReflectorMethod(ForgeHooksClient, "onScreenMouseReleasedPre");
 +    public static ReflectorMethod ForgeHooksClient_onGuiMouseReleasedPost = new ReflectorMethod(ForgeHooksClient, "onScreenMouseReleasedPost");
-+    public static ReflectorMethod ForgeHooksClient_onRawMouseClicked = new ReflectorMethod(ForgeHooksClient, "onRawMouseClicked");
-+    public static ReflectorMethod ForgeHooksClient_fireMouseInput = new ReflectorMethod(ForgeHooksClient, "fireMouseInput");
++    public static ReflectorMethod ForgeHooksClient_onMouseButtonPre = new ReflectorMethod(ForgeHooksClient, "onMouseButtonPre");
++    public static ReflectorMethod ForgeHooksClient_onMouseButtonPost = new ReflectorMethod(ForgeHooksClient, "onMouseButtonPost");
 +    public static ReflectorMethod ForgeHooksClient_onGuiMouseScrollPre = new ReflectorMethod(ForgeHooksClient, "onScreenMouseScrollPre");
 +    public static ReflectorMethod ForgeHooksClient_onGuiMouseScrollPost = new ReflectorMethod(ForgeHooksClient, "onScreenMouseScrollPost");
 +    public static ReflectorMethod ForgeHooksClient_onMouseScroll = new ReflectorMethod(ForgeHooksClient, "onMouseScroll");
 +    public static ReflectorMethod ForgeHooksClient_onGuiMouseDragPre = new ReflectorMethod(ForgeHooksClient, "onScreenMouseDragPre");
 +    public static ReflectorMethod ForgeHooksClient_onGuiMouseDragPost = new ReflectorMethod(ForgeHooksClient, "onScreenMouseDragPost");
 +    public static ReflectorMethod ForgeHooksClient_clearGuiLayers = new ReflectorMethod(ForgeHooksClient, "clearGuiLayers");
-+    public static ReflectorMethod ForgeHooksClient_getGuiFarPlane = new ReflectorMethod(ForgeHooksClient, "getGuiFarPlane");
 +
 +    public static ReflectorMethod ForgeEventFactory_onClientSendMessage = new ReflectorMethod(ForgeEventFactory, "onClientSendMessage");
 +    public static ReflectorMethod ForgeHooksClient_pushGuiLayer = new ReflectorMethod(ForgeHooksClient, "pushGuiLayer");
@@ -702,7 +640,7 @@
 +    public static ReflectorField FMLLoader_progressWindowTick = new ReflectorField(FMLLoader,"progressWindowTick");
 +
 +    public static ReflectorMethod IForgeEntity_canStartSwimming = new ReflectorMethod(IForgeEntity, "canStartSwimming");
-+    public static ReflectorMethod IForgeEntity_isInFluidType = new ReflectorMethod(IForgeEntity, "isInFluidType");
++    public static ReflectorMethod IForgeEntity_isInFluidType = new ReflectorMethod(IForgeEntity, "isInFluidType", new Class[] {BiPredicate.class});
 +    public static ReflectorMethod IForgeEntity_canSwimInFluidType = new ReflectorMethod(IForgeEntity, "canSwimInFluidType");
 +    public static ReflectorMethod IForgeEntity_getMaxHeightFluidType = new ReflectorMethod(IForgeEntity, "getMaxHeightFluidType");
 +    public static ReflectorMethod IForgeEntity_sinkInFluid = new ReflectorMethod(IForgeEntity, "sinkInFluid");

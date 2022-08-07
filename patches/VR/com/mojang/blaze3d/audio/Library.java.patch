@@ -1,26 +1,43 @@
 --- a/com/mojang/blaze3d/audio/Library.java
 +++ b/com/mojang/blaze3d/audio/Library.java
-@@ -3,14 +3,19 @@
- import com.google.common.collect.Sets;
- import com.mojang.logging.LogUtils;
+@@ -1,17 +1,18 @@
+ package com.mojang.blaze3d.audio;
+ 
+-import com.google.common.collect.Sets;
+-import com.mojang.logging.LogUtils;
++import java.nio.Buffer;
  import java.nio.IntBuffer;
 +import java.util.ArrayList;
  import java.util.Collections;
  import java.util.List;
+ import java.util.Locale;
  import java.util.Objects;
  import java.util.OptionalLong;
  import java.util.Set;
-+import java.nio.Buffer;
++
  import javax.annotation.Nullable;
- import net.minecraft.SharedConstants;
-+import net.minecraft.client.Minecraft;
- import net.minecraft.util.Mth;
+-import net.minecraft.SharedConstants;
+-import net.minecraft.util.Mth;
 +
 +import org.lwjgl.BufferUtils;
  import org.lwjgl.openal.AL;
  import org.lwjgl.openal.AL10;
  import org.lwjgl.openal.ALC;
-@@ -59,6 +64,7 @@
+@@ -24,6 +25,13 @@
+ import org.lwjgl.system.MemoryStack;
+ import org.slf4j.Logger;
+ 
++import com.google.common.collect.Sets;
++import com.mojang.logging.LogUtils;
++
++import net.minecraft.SharedConstants;
++import net.minecraft.client.Minecraft;
++import net.minecraft.util.Mth;
++
+ public class Library
+ {
+     static final Logger LOGGER = LogUtils.getLogger();
+@@ -60,6 +68,7 @@
      private Library.ChannelPool staticChannels = EMPTY;
      private Library.ChannelPool streamingChannels = EMPTY;
      private final Listener listener = new Listener();
@@ -28,7 +45,7 @@
  
      public Library()
      {
-@@ -95,6 +101,103 @@
+@@ -92,6 +101,103 @@
              this.streamingChannels = new Library.CountingChannelPool(j);
              ALCapabilities alcapabilities = AL.createCapabilities(alccapabilities);
              OpenAlUtil.checkALError("Initialization");

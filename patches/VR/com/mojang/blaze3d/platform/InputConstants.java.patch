@@ -16,7 +16,7 @@
  
  public class InputConstants
  {
-@@ -182,9 +184,12 @@
+@@ -189,9 +191,12 @@
  
      public static boolean isKeyDown(long pWindow, int p_84832_)
      {
@@ -31,7 +31,7 @@
      public static void setupKeyboardCallbacks(long pWindow, GLFWKeyCallbackI p_84846_, GLFWCharModsCallbackI pKeyCallback)
      {
          GLFW.glfwSetKeyCallback(pWindow, p_84846_);
-@@ -236,14 +241,14 @@
+@@ -243,14 +248,14 @@
          {
              methodhandle = lookup.findStatic(GLFW.class, "glfwRawMouseMotionSupported", methodtype);
              MethodHandle methodhandle1 = lookup.findStaticGetter(GLFW.class, "GLFW_RAW_MOUSE_MOTION", Integer.TYPE);
@@ -50,7 +50,7 @@
          }
  
          GLFW_RAW_MOUSE_MOTION_SUPPORTED = methodhandle;
-@@ -363,17 +368,17 @@
+@@ -370,17 +375,17 @@
  
          public InputConstants.Key getOrCreate(int pKeyCode)
          {

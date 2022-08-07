@@ -1,22 +1,22 @@
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -35,6 +35,7 @@
+@@ -34,6 +34,7 @@
  import net.minecraft.Util;
  import net.minecraft.advancements.Advancement;
  import net.minecraft.advancements.CriteriaTriggers;
 +import net.minecraft.client.Minecraft;
+ import net.minecraft.commands.CommandSigningContext;
  import net.minecraft.commands.CommandSourceStack;
- import net.minecraft.commands.arguments.PreviewedArgument;
- import net.minecraft.core.BlockPos;
-@@ -44,6 +45,7 @@
+ import net.minecraft.commands.Commands;
+@@ -45,6 +46,7 @@
  import net.minecraft.nbt.ListTag;
  import net.minecraft.nbt.StringTag;
  import net.minecraft.network.Connection;
 +import net.minecraft.network.FriendlyByteBuf;
- import net.minecraft.network.chat.ChatDecorator;
- import net.minecraft.network.chat.ChatPreviewThrottler;
- import net.minecraft.network.chat.ChatType;
-@@ -129,6 +131,7 @@
+ import net.minecraft.network.PacketSendListener;
+ import net.minecraft.network.TickablePacketListener;
+ import net.minecraft.network.chat.ChatMessageContent;
+@@ -140,6 +142,7 @@
  import net.minecraft.world.entity.HasCustomInventoryScreen;
  import net.minecraft.world.entity.MoverType;
  import net.minecraft.world.entity.PlayerRideableJumping;
@@ -24,7 +24,7 @@
  import net.minecraft.world.entity.item.ItemEntity;
  import net.minecraft.world.entity.player.ChatVisiblity;
  import net.minecraft.world.entity.player.Inventory;
-@@ -165,8 +168,19 @@
+@@ -177,8 +180,19 @@
  import net.minecraft.world.phys.shapes.BooleanOp;
  import net.minecraft.world.phys.shapes.Shapes;
  import net.minecraft.world.phys.shapes.VoxelShape;
@@ -42,9 +42,9 @@
 +import java.io.IOException;
 +import java.io.InputStreamReader;
  
- public class ServerGamePacketListenerImpl implements ServerPlayerConnection, ServerGamePacketListener
+ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, TickablePacketListener, ServerGamePacketListener
  {
-@@ -219,6 +233,20 @@
+@@ -236,6 +250,20 @@
          this.player = p_9772_;
          p_9772_.connection = this;
          this.keepAliveTime = Util.getMillis();
@@ -63,9 +63,9 @@
 +        }
 +        //
          p_9772_.getTextFilter().join();
-     }
+         ProfilePublicKey profilepublickey = p_9772_.getProfilePublicKey();
  
-@@ -470,11 +498,17 @@
+@@ -491,11 +519,17 @@
                  }
  
                  entity.absMoveTo(d3, d4, d5, f, f1);
@@ -83,7 +83,7 @@
                      this.connection.send(new ClientboundMoveVehiclePacket(entity));
                      return;
                  }
-@@ -487,11 +521,16 @@
+@@ -508,11 +542,16 @@
                  this.vehicleLastGoodZ = entity.getZ();
              }
          }
@@ -101,7 +101,7 @@
      }
  
      public void handleAcceptTeleportPacket(ServerboundAcceptTeleportationPacket pPacket)
-@@ -1248,8 +1287,8 @@
+@@ -1289,8 +1328,8 @@
          Vec3 vec3 = blockhitresult.getLocation();
          BlockPos blockpos = blockhitresult.getBlockPos();
          Vec3 vec31 = Vec3.atCenterOf(blockpos);
@@ -112,7 +112,7 @@
          {
              Vec3 vec32 = vec3.subtract(vec31);
              double d0 = 1.0000001D;
-@@ -1259,10 +1298,10 @@
+@@ -1300,10 +1339,10 @@
                  Direction direction = blockhitresult.getDirection();
                  this.player.resetLastActionTime();
                  int i = this.player.level.getMaxBuildHeight();
@@ -125,7 +125,7 @@
                      {
                          InteractionResult interactionresult = this.player.gameMode.useItemOn(this.player, serverlevel, itemstack, interactionhand, blockhitresult);
  
-@@ -1397,9 +1436,9 @@
+@@ -1438,9 +1477,9 @@
          {
              this.connection.send(pPacket, pFutureListeners);
          }
@@ -137,7 +137,7 @@
              CrashReportCategory crashreportcategory = crashreport.addCategory("Packet being sent");
              crashreportcategory.setDetail("Packet class", () ->
              {
-@@ -1759,16 +1798,21 @@
+@@ -1943,16 +1982,21 @@
              {
                  return;
              }
@@ -161,7 +161,7 @@
                          if (interactionresult.consumesAction())
                          {
                              CriteriaTriggers.PLAYER_INTERACTED_WITH_ENTITY.trigger(ServerGamePacketListenerImpl.this.player, itemstack, entity);
-@@ -1794,7 +1838,8 @@
+@@ -1978,7 +2022,8 @@
                      {
                          if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrb) && !(entity instanceof AbstractArrow) && entity != ServerGamePacketListenerImpl.this.player)
                          {
@@ -171,7 +171,7 @@
                          }
                          else
                          {
-@@ -2044,6 +2089,130 @@
+@@ -2250,6 +2295,130 @@
  
      public void handleCustomPayload(ServerboundCustomPayloadPacket pPacket)
      {

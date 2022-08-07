@@ -28,7 +28,7 @@
                  this.activeButton = -1;
              }
  
-+            if (Reflector.callBoolean(Reflector.ForgeHooksClient_onRawMouseClicked, p_91532_, pButton, pAction))
++            if (Reflector.callBoolean(Reflector.ForgeHooksClient_onMouseButtonPre, p_91532_, pButton, pAction))
 +            {
 +                return;
 +            }
@@ -53,7 +53,7 @@
 +
 +                                if (!aboolean[0])
 +                                {
-+                                    aboolean[0] = Reflector.callBoolean(Reflector.ForgeHooksClient_onGuiMouseClickedPost, this.minecraft.screen, d0, d1, i);
++                                    aboolean[0] = Reflector.callBoolean(Reflector.ForgeHooksClient_onGuiMouseClickedPost, this.minecraft.screen, d0, d1, i, aboolean[0]);
 +                                }
 +                            }
 +                            else {
@@ -69,7 +69,7 @@
 -                        }, "mouseReleased event handler", screen.getClass().getCanonicalName());
 +                            if (Reflector.ForgeHooksClient_onGuiMouseReleasedPre.exists())
 +                            {
-+                                aboolean[0] = Reflector.callBoolean(Reflector.ForgeHooksClient_onGuiMouseReleasedPre, this.minecraft.screen, d0, d1, i, aboolean[0]);
++                                aboolean[0] = Reflector.callBoolean(Reflector.ForgeHooksClient_onGuiMouseReleasedPre, this.minecraft.screen, d0, d1, i);
 +
 +                                if (!aboolean[0])
 +                                {
@@ -102,7 +102,7 @@
                  }
              }
 +
-+            Reflector.call(Reflector.ForgeHooksClient_fireMouseInput, p_91532_, pButton, pAction);
++            Reflector.call(Reflector.ForgeHooksClient_onMouseButtonPost, p_91532_, pButton, pAction);
          }
      }
  

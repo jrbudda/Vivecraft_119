@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/screens/PauseScreen.java
 +++ b/net/minecraft/client/gui/screens/PauseScreen.java
-@@ -1,13 +1,23 @@
+@@ -1,14 +1,23 @@
  package net.minecraft.client.gui.screens;
  
 +import org.vivecraft.gameplay.screenhandlers.KeyboardHandler;
@@ -19,12 +19,12 @@
  import net.minecraft.client.gui.screens.achievement.StatsScreen;
  import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
  import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
-+import net.minecraft.client.gui.screens.social.SocialInteractionsScreen;
+ import net.minecraft.client.gui.screens.social.SocialInteractionsScreen;
 +import net.minecraft.client.main.Main;
  import net.minecraft.network.chat.Component;
  
  public class PauseScreen extends Screen
-@@ -29,6 +39,86 @@
+@@ -30,6 +39,86 @@
          {
              this.createPauseMenu();
          }
@@ -111,7 +111,7 @@
      }
  
      private void createPauseMenu()
-@@ -48,30 +138,30 @@
+@@ -49,30 +138,30 @@
          {
              this.minecraft.setScreen(new StatsScreen(this, this.minecraft.player.getStats()));
          }));
@@ -166,9 +166,9 @@
          this.addRenderableWidget(new Button(this.width / 2 - 102, this.height / 4 + 96 + -16, 98, 20, Component.translatable("menu.options"), (p_96323_) ->
          {
              this.minecraft.setScreen(new OptionsScreen(this, this.minecraft.options));
-@@ -82,7 +172,8 @@
-         }));
-         button1.active = this.minecraft.hasSingleplayerServer() && !this.minecraft.getSingleplayerServer().isPublished();
+@@ -94,7 +183,8 @@
+         }
+ 
          Component component = this.minecraft.isLocalServer() ? Component.translatable("menu.returnToMenu") : Component.translatable("menu.disconnect");
 -        this.addRenderableWidget(new Button(this.width / 2 - 102, this.height / 4 + 120 + -16, 204, 20, component, (p_96315_) ->
 +        //vivecraft move down

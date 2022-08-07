@@ -1,21 +1,30 @@
 --- a/net/minecraft/client/gui/screens/ChatScreen.java
 +++ b/net/minecraft/client/gui/screens/ChatScreen.java
-@@ -219,7 +219,17 @@
+@@ -254,12 +254,21 @@
+         }
          else
          {
-             this.handleChatInput(this.input.getValue(), true);
--            this.minecraft.setScreen((Screen)null);
-+            //Vivecraft
-+            if (this.minecraft.vrSettings.seated)
-+            {
-+            	this.minecraft.setScreen((Screen)null);
-+            }
-+            else
-+            {
-+                this.input.setValue(this.initial);
-+                this.historyPos = this.minecraft.gui.getChat().getRecentChat().size();
-+            }
-+            //
-             return true;
+-            if (this.handleChatInput(this.input.getValue(), true))
+-            {
+-                this.minecraft.setScreen((Screen)null);
+-            }
+-
+-            return true;
++        	if (this.handleChatInput(this.input.getValue(), true))
++        	{
++        		//Vivecraft
++        		if (this.minecraft.vrSettings.seated)
++        		{
++        			this.minecraft.setScreen((Screen)null);
++        		}
++        		else
++        		{
++        			this.input.setValue(this.initial);
++        			this.historyPos = this.minecraft.gui.getChat().getRecentChat().size();
++        		}
++        		//
++        	}
++        	return true;
          }
      }
+ 
