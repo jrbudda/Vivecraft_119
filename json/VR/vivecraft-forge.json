@@ -127,13 +127,13 @@
 			}
 		},
 		{
-			"name": "net.minecraftforge:eventbus:6.0.0",
+            "name": "net.minecraftforge:eventbus:6.0.3",
 			"downloads": {
 				"artifact": {
-					"path": "net/minecraftforge/eventbus/6.0.0/eventbus-6.0.0.jar",
-					"url": "https://maven.minecraftforge.net/net/minecraftforge/eventbus/6.0.0/eventbus-6.0.0.jar",
-					"sha1": "c1d8864e41bd27e16905f39af9bacd6998abd95d",
-					"size": 43477
+                    "path": "net/minecraftforge/eventbus/6.0.3/eventbus-6.0.3.jar",
+                    "url": "https://maven.minecraftforge.net/net/minecraftforge/eventbus/6.0.3/eventbus-6.0.3.jar",
+                    "sha1": "42fe522ace1bbcbcbba9c880c42411857baf36a9",
+                    "size": 52624
 				}
 			}
 		},
@@ -325,13 +325,13 @@
 			}
 		},
 		{
-			"name": "net.minecraftforge:fmlloader:1.19.2-43.0.0",
+            "name": "net.minecraftforge:fmlloader:1.19.2-43.0.7",
 			"downloads": {
 				"artifact": {
-					"path": "net/minecraftforge/fmlloader/1.19.2-43.0.0/fmlloader-1.19.2-43.0.0.jar",
-					"url": "https://maven.minecraftforge.net/net/minecraftforge/fmlloader/1.19.2-43.0.0/fmlloader-1.19.2-43.0.0.jar",
-					"sha1": "a170585c15f4069509c184b94ef442d3e7c1783c",
-					"size": 260328
+                    "path": "net/minecraftforge/fmlloader/1.19.2-43.0.7/fmlloader-1.19.2-43.0.7.jar",
+                    "url": "https://maven.minecraftforge.net/net/minecraftforge/fmlloader/1.19.2-43.0.7/fmlloader-1.19.2-43.0.7.jar",
+                    "sha1": "96b06b8b2553a16710b56619a933b7af24970053",
+                    "size": 260524
 				}
 			}
 		},

@@ -236,6 +236,7 @@ public class VivecraftTransformer implements ITransformer<ClassNode>
             return null;
         }
     }
+    
         //below is just for loading vanillapack resources  
     public static synchronized InputStream getResourceStream(String name)
     {
@@ -244,7 +245,7 @@ public class VivecraftTransformer implements ITransformer<ClassNode>
     	try {
     		inputstream = getResourceStreamZip(name);
     	} catch (URISyntaxException | IOException e) {
-    		System.out.println("failed to get Vivecraft Resource " + name + " " + e.getMessage());
+    		//System.out.println("failed to get Vivecraft Resource " + name + " " + e.getMessage());
     	}
     	return inputstream;
     }

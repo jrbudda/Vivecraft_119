@@ -541,8 +541,8 @@
 +    public static ReflectorClass ForgeSession = new ReflectorClass(User.class);
 +    public static ReflectorMethod ForgeSession_hasCachedProperties = new ReflectorMethod(ForgeSession, "hasCachedProperties");
 +    public static ReflectorMethod ForgeSession_setProperties = new ReflectorMethod(ForgeSession, "setProperties", new Class[] {PropertyMap.class});
-+    public static ReflectorClass WorldEvent_Unload = new ReflectorClass("net.minecraftforge.event.world.WorldEvent$Unload");
-+    public static ReflectorConstructor WorldEvent_Unload_Constructor = new ReflectorConstructor(WorldEvent_Unload, new Class[] {LevelAccessor.class});
++    //public static ReflectorClass WorldEvent_Unload = new ReflectorClass("net.minecraftforge.event.world.WorldEvent$Unload");
++    //public static ReflectorConstructor WorldEvent_Unload_Constructor = new ReflectorConstructor(WorldEvent_Unload, new Class[] {LevelAccessor.class});
 +    public static ReflectorMethod ClientHooks_firePlayerLogout = new ReflectorMethod(ForgeHooksClient, "firePlayerLogout", new Class[] {MultiPlayerGameMode.class, LocalPlayer.class});
 +    public static ReflectorMethod ClientHooks_handleClientWorldClosing = new ReflectorMethod(ForgeHooksClient, "handleClientLevelClosing");
 +    //public static ReflectorClass IForgeResourcePack = new ReflectorClass("net.minecraftforge.common.extensions.IForgeResourcePack");

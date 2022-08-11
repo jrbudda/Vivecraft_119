@@ -227,7 +227,7 @@
 +    private boolean lastClick;
 +    public boolean resourcePacksChanged;
 +    public int tickCounter;
-+    public final String minecriftVerString = "Vivecraft 1.19.2  jrbudda-VR-2-b1";
++    public final String minecriftVerString = "Vivecraft 1.19.2  jrbudda-VR-2-b2";
      public static final boolean ON_OSX = Util.getPlatform() == Util.OS.OSX;
      private static final int MAX_TICKS_PER_UPDATE = 10;
      public static final ResourceLocation DEFAULT_FONT = new ResourceLocation("default");
@@ -627,7 +627,7 @@
 +        Reflector.call(Reflector.ForgeHooksClient_clearGuiLayers, this);      
 +        Screen old = this.screen;
 +        if(pGuiScreen != null) {
-+        	Object object = Reflector.newInstance(Reflector.ScreenOpenEvent_Constructor, pGuiScreen);
++        	Object object = Reflector.newInstance(Reflector.ScreenOpenEvent_Constructor, old, pGuiScreen);
 +        	if (object != null)
 +        	{
 +        		if (Reflector.postForgeBusEvent(object))

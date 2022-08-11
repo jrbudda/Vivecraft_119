@@ -126,7 +126,7 @@
 +                        return;
 +                    }
 +                    
-+                    Reflector.callBoolean(Reflector.ForgeHooksClient_onGuiMouseScrollPost, this, this.minecraft.screen, d0);
++                    Reflector.call(Reflector.ForgeHooksClient_onGuiMouseScrollPost, this, this.minecraft.screen, d0);
 +
                      this.minecraft.screen.mouseScrolled(d1, d2, d0);
                      this.minecraft.screen.afterMouseAction();

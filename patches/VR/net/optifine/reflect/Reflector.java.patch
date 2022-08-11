@@ -479,7 +479,7 @@
          }
          else
          {
-@@ -1239,4 +1231,170 @@
+@@ -1239,4 +1231,171 @@
          ReflectorResolver.register(iresolvable);
          return true;
      }
@@ -493,7 +493,7 @@
 +    public static ReflectorClass RegisterStageEvent = new ReflectorClass("net.minecraftforge.client.event.RenderLevelStageEvent$RegisterStageEvent");
 +    public static ReflectorConstructor RegisterStageEvent_Constructor = new ReflectorConstructor(RegisterStageEvent, new Class[0]);
 +    public static ReflectorMethod ForgeHooksClient_onRegisterParticleProviders = new ReflectorMethod(ForgeHooksClient, "onRegisterParticleProviders");
-+    public static ReflectorClass ForgeIngameGui = new ReflectorClass("net.minecraftforge.client.gui.Overlay.ForgeGui");
++    public static ReflectorClass ForgeIngameGui = new ReflectorClass("net.minecraftforge.client.gui.overlay.ForgeGui");
 +    public static ReflectorConstructor ForgeIngameGui_Constructor = new ReflectorConstructor(ForgeIngameGui, new Class[] {Minecraft.class});
 +    
 +    public static ReflectorClass TextureAtlasSpriteLoaderManager = new ReflectorClass("net.minecraftforge.client.textures.TextureAtlasSpriteLoaderManager");
@@ -535,7 +535,7 @@
 +    public static ReflectorMethod BasicEventHooks_onPreClientTick = new ReflectorMethod(ForgeEventFactory, "onPreClientTick");
 +    public static ReflectorMethod BasicEventHooks_onPostClientTick = new ReflectorMethod(ForgeEventFactory, "onPostClientTick");
 +    public static ReflectorMethod ForgeHooksClient_OnClickInput = new ReflectorMethod(ForgeHooksClient, "onClickInput");
-+    public static ReflectorClass ClickInputEvent = new ReflectorClass("net.minecraftforge.client.event.InputEvent$ClickInputEvent");
++    public static ReflectorClass ClickInputEvent = new ReflectorClass("net.minecraftforge.client.event.InputEvent$InteractionKeyMappingTriggered");
 +    public static ReflectorMethod ClickInputEvent_shouldSwingHand = new ReflectorMethod(ClickInputEvent, "shouldSwingHand");
 +    public static ReflectorMethod ForgeHooks_onEmptyLeftClick = new ReflectorMethod(ForgeHooks, "onEmptyLeftClick");
 +    public static ReflectorMethod ForgeHooks_onEmptyClick = new ReflectorMethod(ForgeHooks, "onEmptyClick");
@@ -543,7 +543,7 @@
 +    public static ReflectorClass ForgeSession = new ReflectorClass(User.class);
 +    public static ReflectorMethod ForgeSession_hasCachedProperties = new ReflectorMethod(ForgeSession, "hasCachedProperties");
 +    public static ReflectorMethod ForgeSession_setProperties = new ReflectorMethod(ForgeSession, "setProperties", new Class[] {PropertyMap.class});
-+    public static ReflectorClass WorldEvent_Unload = new ReflectorClass("net.minecraftforge.event.world.WorldEvent$Unload");
++    public static ReflectorClass WorldEvent_Unload = new ReflectorClass("net.minecraftforge.event.level.LevelEvent$Unload");
 +    public static ReflectorConstructor WorldEvent_Unload_Constructor = new ReflectorConstructor(WorldEvent_Unload, new Class[] {LevelAccessor.class});
 +    public static ReflectorMethod ClientHooks_firePlayerLogout = new ReflectorMethod(ForgeHooksClient, "firePlayerLogout", new Class[] {MultiPlayerGameMode.class, LocalPlayer.class});
 +    public static ReflectorMethod ClientHooks_handleClientWorldClosing = new ReflectorMethod(ForgeHooksClient, "handleClientLevelClosing");
@@ -557,7 +557,8 @@
 +    public static ReflectorMethod RegistryObject_get = new ReflectorMethod(RegistryObject, "get");
 +    public static ReflectorMethod ForgeHooks_onServerChatEvent = new ReflectorMethod(ForgeHooks, "onServerChatEvent", new Class[] {ServerGamePacketListenerImpl.class, String.class, Component.class});
 +    public static ReflectorMethod ForgeHooks_onInteractEntityAt = new ReflectorMethod(ForgeHooks, "onInteractEntityAt", new Class[] {Player.class, Entity.class, Vec3.class, InteractionHand.class});
-+    public static ReflectorMethod IForgePlayer_canInteractWith = IForgePlayer.makeMethod("canInteractWith");
++    public static ReflectorMethod IForgePlayer_canInteractWith_Block = new ReflectorMethod(IForgePlayer, "canInteractWith", new Class[] {BlockPos.class, Double.TYPE});
++    public static ReflectorMethod IForgePlayer_canInteractWith_Entity = new ReflectorMethod(IForgePlayer, "canInteractWith", new Class[] {Entity.class, Double.TYPE});
 +    public static ReflectorClass NetworkHooks = new ReflectorClass("net.minecraftforge.network.NetworkHooks");
 +    public static ReflectorMethod NetworkHooks_onCustomPayload = new ReflectorMethod(NetworkHooks, "onCustomPayload");
 +    public static ReflectorClass Entity = new ReflectorClass(Entity.class);
