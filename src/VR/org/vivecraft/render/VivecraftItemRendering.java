@@ -87,6 +87,10 @@ public class VivecraftItemRendering
                     }
                 }
             }
+            else if (pStack.getUseAnimation() == UseAnim.TOOT_HORN)
+            {
+                rendertype = VivecraftItemTransformType.Horn;
+            }
             else if (item instanceof SwordItem)
             {
                 rendertype = VivecraftItemTransformType.Sword;
@@ -293,59 +297,58 @@ public class VivecraftItemRendering
                 rotation.mul(Vector3f.XP.rotationDegrees(-45.0F));
                 rotation.mul(Vector3f.XP.rotationDegrees((float)gunAngle));
             }
+            else if (rendertype == VivecraftItemTransformType.Horn)
+            {
+                scale = (double)0.3F;
+                rotation = Vector3f.XP.rotationDegrees(0.0F);
+                translateY += -0.105D + 0.06D * gunAngle / 40.0D;
+                translateZ += (double) - 0.1F;
+                rotation.mul(Vector3f.XP.rotationDegrees(-45.0F));
+                rotation.mul(Vector3f.XP.rotationDegrees((float)gunAngle));
+            }
             else if (rendertype == VivecraftItemTransformType.Shield)
             {
-				boolean reverse = minecraft.vrSettings.reverseHands && !minecraft.vrSettings.seated;
-				if(reverse)k*=-1;
-                scale = (double)0.4F;
+            	boolean reverse = minecraft.vrSettings.reverseHands && !minecraft.vrSettings.seated;
+            	if(reverse)k*=-1;
+            	scale = (double)0.4F;
 
-				translateY += (double)0.21F;
-				//    					
-				if (k==1)
-                {
-					rotation.mul(Vector3f.XP.rotationDegrees((float)(105.0D - gunAngle)));
-                    translateX += (double)0.11F;
-                }
-                else
-                {
-					rotation.mul(Vector3f.XP.rotationDegrees((float)(115.0D - gunAngle)));
-                    translateX += -0.015D;
-                }
-				////
-				translateZ += 0.1F;
-
-                if (pPlayer.isUsingItem() && pPlayer.getUseItemRemainingTicks() > 0 && pPlayer.getUsedItemHand() == pHand)
-                {
-					rotation.mul(Vector3f.XP.rotationDegrees(k*5F));
-					rotation.mul(Vector3f.ZP.rotationDegrees(-5F));
-
-					if (k==1)
-					{
-						translateY += (double) -0.12F;
-						translateZ += -.1F;   
-						translateX += .04F;
-					}
-					else
-					{
-						translateY += -0.12F;
-						translateZ += -.11F;
-						translateX += 0.19F;
-					}
+            	translateY += (double)0.18F;
+            	//    					
+            	if (k==1)
+            	{
+            		rotation.mul(Vector3f.XP.rotationDegrees((float)(105.0D - gunAngle)));
+            		translateX += (double)0.11F;
+            	}
+            	else
+            	{
+            		rotation.mul(Vector3f.XP.rotationDegrees((float)(115.0D - gunAngle)));
+            		translateX += -0.015D;
+            	}
+            	////
+            	translateZ += 0.1F;
 
 
-					////
-                    if (pPlayer.isBlocking())
-                    {
-                        rotation.mul(Vector3f.YP.rotationDegrees((float)k * 90.0F));
-                    }
-                    else
-                    {
-                        rotation.mul(Vector3f.YP.rotationDegrees((1.0F - pEquippedProgress) * (float)k * 90.0F));
-                    }
-					////    						
-                }
-				////
-                rotation.mul(Vector3f.YP.rotationDegrees((float)k * -90.0F));
+            	if (pPlayer.isUsingItem() && pPlayer.getUseItemRemainingTicks() > 0 && pPlayer.getUsedItemHand() == pHand) {
+
+            		if (k==1)
+            		{
+            			translateZ -= 0.110F;
+            		}
+            		else
+            		{
+            			translateZ -= 0.115F;
+            		}
+
+            		if (pPlayer.getUseItemRemainingTicks() > 0 ) {
+            			preRotation.mul(Vector3f.YP.rotationDegrees((1.0F - pEquippedProgress) * (float)k * 90.0F));
+
+            		} else if (pPlayer.isBlocking()) {
+            			preRotation.mul(Vector3f.YP.rotationDegrees((float)k * 90.0F));
+
+            		}
+            	}
+
+            	rotation.mul(Vector3f.YP.rotationDegrees((float)k * -90.0F));
             }
             else if (rendertype == VivecraftItemTransformType.Spear)
             {
@@ -480,7 +483,8 @@ public class VivecraftItemRendering
     Noms,
     Crossbow,
     Telescope,
-    Compass;
+    Compass,
+    Horn;
 }
 	
 }

@@ -3,6 +3,7 @@ package org.vivecraft.render;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -132,44 +133,42 @@ public class VRWidgetHelper
         RenderSystem.enableDepthTest();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+        
         if (minecraft.level != null)
             RenderSystem.setShader(GameRenderer::getRendertypeCutoutShader);
         else
             RenderSystem.setShader(GameRenderer::getPositionTexColorNormalShader);
+        
         minecraft.gameRenderer.lightTexture().turnOnLightLayer();
 
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder bufferbuilder = tesselator.getBuilder();
+        BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
         bufferbuilder.begin(Mode.QUADS, DefaultVertexFormat.BLOCK);
         minecraft.getBlockRenderer().getModelRenderer().renderModel((new PoseStack()).last(), bufferbuilder, (BlockState)null, minecraft.getModelManager().getModel(model), 1.0F, 1.0F, 1.0F, i, OverlayTexture.NO_OVERLAY);
-        tesselator.end();
+    	BufferUploader.drawWithShader(bufferbuilder.end());
 
         minecraft.gameRenderer.lightTexture().turnOffLightLayer();
         RenderSystem.disableBlend();
-        GlStateManager.alphaFunc(519, 0.0F);
+
         displayBindFunc.run();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorNormalShader);
-
-        BufferBuilder bufferbuilder1 = tesselator.getBuilder();
-        bufferbuilder1.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_LMAP_COLOR_NORMAL);
-
+        RenderSystem.setShader(GameRenderer::getRendertypeCutoutShader);
+        BufferBuilder bufferbuilder1 = Tesselator.getInstance().getBuilder();
+        bufferbuilder1.begin(Mode.QUADS, DefaultVertexFormat.BLOCK);
         for (BakedQuad bakedquad : minecraft.getModelManager().getModel(displayModel).getQuads((BlockState)null, (Direction)null, random))
         {
             if (displayFaceFunc.apply(bakedquad.getDirection()) != VRWidgetHelper.DisplayFace.NONE && bakedquad.getSprite().getName().equals(new ResourceLocation("vivecraft:transparent")))
             {
-                QuadBounds quadbounds = bakedquad.getQuadBounds();
-                boolean flag = displayFaceFunc.apply(bakedquad.getDirection()) == VRWidgetHelper.DisplayFace.MIRROR;
+            	QuadBounds quadbounds = bakedquad.getQuadBounds();
+            	boolean flag = displayFaceFunc.apply(bakedquad.getDirection()) == VRWidgetHelper.DisplayFace.MIRROR;
                 int j = LightTexture.pack(15, 15);
-                bufferbuilder1.vertex(flag ? (double)quadbounds.getMaxX() : (double)quadbounds.getMinX(), (double)quadbounds.getMinY(), (double)quadbounds.getMinZ()).uv(flag ? 1.0F : 0.0F, 0.0F).uv2(j).color(1.0F, 1.0F, 1.0F, 1.0F).normal(0.0F, 0.0F, flag ? -1.0F : 1.0F).endVertex();
-                bufferbuilder1.vertex(flag ? (double)quadbounds.getMinX() : (double)quadbounds.getMaxX(), (double)quadbounds.getMinY(), (double)quadbounds.getMinZ()).uv(flag ? 0.0F : 1.0F, 0.0F).uv2(j).color(1.0F, 1.0F, 1.0F, 1.0F).normal(0.0F, 0.0F, flag ? -1.0F : 1.0F).endVertex();
-                bufferbuilder1.vertex(flag ? (double)quadbounds.getMinX() : (double)quadbounds.getMaxX(), (double)quadbounds.getMaxY(), (double)quadbounds.getMinZ()).uv(flag ? 0.0F : 1.0F, 1.0F).uv2(j).color(1.0F, 1.0F, 1.0F, 1.0F).normal(0.0F, 0.0F, flag ? -1.0F : 1.0F).endVertex();
-                bufferbuilder1.vertex(flag ? (double)quadbounds.getMaxX() : (double)quadbounds.getMinX(), (double)quadbounds.getMaxY(), (double)quadbounds.getMinZ()).uv(flag ? 1.0F : 0.0F, 1.0F).uv2(j).color(1.0F, 1.0F, 1.0F, 1.0F).normal(0.0F, 0.0F, flag ? -1.0F : 1.0F).endVertex();
+                bufferbuilder1.vertex(flag ? (double)quadbounds.getMaxX() : (double)quadbounds.getMinX(), (double)quadbounds.getMinY(), (double)quadbounds.getMinZ()).color(1.0F, 1.0F, 1.0F, 1.0F).uv(flag ? 1.0F : 0.0F, 0.0F).uv2(j).normal(0.0F, 0.0F, flag ? -1.0F : 1.0F).endVertex();
+                bufferbuilder1.vertex(flag ? (double)quadbounds.getMinX() : (double)quadbounds.getMaxX(), (double)quadbounds.getMinY(), (double)quadbounds.getMinZ()).color(1.0F, 1.0F, 1.0F, 1.0F).uv(flag ? 0.0F : 1.0F, 0.0F).uv2(j).normal(0.0F, 0.0F, flag ? -1.0F : 1.0F).endVertex();
+                bufferbuilder1.vertex(flag ? (double)quadbounds.getMinX() : (double)quadbounds.getMaxX(), (double)quadbounds.getMaxY(), (double)quadbounds.getMinZ()).color(1.0F, 1.0F, 1.0F, 1.0F).uv(flag ? 0.0F : 1.0F, 1.0F).uv2(j).normal(0.0F, 0.0F, flag ? -1.0F : 1.0F).endVertex();
+                bufferbuilder1.vertex(flag ? (double)quadbounds.getMaxX() : (double)quadbounds.getMinX(), (double)quadbounds.getMaxY(), (double)quadbounds.getMinZ()).color(1.0F, 1.0F, 1.0F, 1.0F).uv(flag ? 1.0F : 0.0F, 1.0F).uv2(j).normal(0.0F, 0.0F, flag ? -1.0F : 1.0F).endVertex();
             }
         }
-
-        tesselator.end();
+        
+    	BufferUploader.drawWithShader(bufferbuilder1.end());
         RenderSystem.enableBlend();
-        GlStateManager.alphaFunc(519, 0.1F);
         poseStack.popPose();
         RenderSystem.applyModelViewMatrix();
     }

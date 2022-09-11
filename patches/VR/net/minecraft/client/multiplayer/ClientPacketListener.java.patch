@@ -114,7 +114,7 @@
 -            }
 -
 +    		//Forge
-+    		if(Reflector.IForgeTileEntity_handleUpdateTag.exists()) {
++    		if(Reflector.IForgeTileEntity_onDataPacket.exists()) {
 +    			Reflector.call(p_205557_, Reflector.IForgeTileEntity_onDataPacket, connection, pPacket);
 +    		} else {
 +    		//

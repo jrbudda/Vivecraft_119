@@ -12,7 +12,7 @@
  import net.minecraft.CrashReport;
  import net.minecraft.CrashReportCategory;
  import net.minecraft.ReportedException;
-@@ -65,6 +70,7 @@
+@@ -66,6 +71,7 @@
  import net.optifine.CustomItems;
  import net.optifine.EmissiveTextures;
  import net.optifine.reflect.Reflector;
@@ -20,7 +20,7 @@
  import net.optifine.render.VertexBuilderWrapper;
  import net.optifine.shaders.Shaders;
  import net.optifine.util.SingleIterable;
-@@ -85,6 +91,11 @@
+@@ -86,6 +92,11 @@
      private final BlockEntityWithoutLevelRenderer blockEntityRenderer;
      public ModelManager modelManager = null;
      private static boolean renderItemGui = false;
@@ -32,7 +32,7 @@
  
      public ItemRenderer(TextureManager p_174225_, ModelManager p_174226_, ItemColors p_174227_, BlockEntityWithoutLevelRenderer p_174228_)
      {
-@@ -167,6 +178,19 @@
+@@ -168,6 +179,19 @@
              }
  
              pMatrixStack.translate(-0.5D, -0.5D, -0.5D);
@@ -52,7 +52,7 @@
  
              if (!pModel.isCustomRenderer() && (!pItemStack.is(Items.TRIDENT) || flag))
              {
-@@ -186,6 +210,13 @@
+@@ -187,6 +211,13 @@
                  Iterable<BakedModel> iterable = (Iterable<BakedModel>)(flag2 ? pModel.getRenderPasses(pItemStack, flag1) : new SingleIterable<>(pModel));
                  Iterable<RenderType> iterable1 = (Iterable<RenderType>)(flag2 ? pModel.getRenderTypes(pItemStack, flag1) : new SingleIterable<>(ItemBlockRenderTypes.getRenderType(pItemStack, flag1)));
  
@@ -66,7 +66,7 @@
                  for (BakedModel bakedmodel : iterable)
                  {
                      pModel = bakedmodel;
-@@ -364,6 +395,19 @@
+@@ -365,6 +396,19 @@
                      l = CustomColors.getColorFromItemStack(pItemStack, bakedquad.getTintIndex(), l);
                  }
              }
@@ -86,7 +86,7 @@
  
              float f = (float)(l >> 16 & 255) / 255.0F;
              float f1 = (float)(l >> 8 & 255) / 255.0F;
-@@ -375,7 +419,7 @@
+@@ -376,7 +420,7 @@
              }
              else
              {
@@ -95,7 +95,7 @@
              }
          }
      }
-@@ -436,6 +480,10 @@
+@@ -437,6 +481,10 @@
          RenderSystem.enableBlend();
          RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
          RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -106,7 +106,7 @@
          PoseStack posestack = RenderSystem.getModelViewStack();
          posestack.pushPose();
          posestack.translate((double)pX, (double)pY, (double)(100.0F + this.blitOffset));
-@@ -622,4 +670,24 @@
+@@ -625,4 +673,24 @@
      {
          return this.blockEntityRenderer;
      }

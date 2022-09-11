@@ -1,6 +1,18 @@
 --- a/net/minecraft/client/KeyboardHandler.java
 +++ b/net/minecraft/client/KeyboardHandler.java
-@@ -14,6 +14,7 @@
+@@ -7,6 +7,11 @@
+ import java.text.MessageFormat;
+ import java.util.Locale;
+ import javax.annotation.Nullable;
++
++import org.vivecraft.gameplay.screenhandlers.RadialHandler;
++import org.vivecraft.provider.ControllerType;
++import org.vivecraft.settings.VRHotkeys;
++
+ import net.minecraft.ChatFormatting;
+ import net.minecraft.CrashReport;
+ import net.minecraft.CrashReportCategory;
+@@ -14,6 +19,7 @@
  import net.minecraft.Util;
  import net.minecraft.client.gui.components.ChatComponent;
  import net.minecraft.client.gui.components.EditBox;
@@ -8,17 +20,7 @@
  import net.minecraft.client.gui.screens.Screen;
  import net.minecraft.client.gui.screens.SimpleOptionsSubScreen;
  import net.minecraft.client.gui.screens.controls.KeyBindsScreen;
-@@ -42,6 +43,9 @@
- import net.optifine.reflect.Reflector;
- import net.optifine.shaders.Shaders;
- import net.optifine.shaders.gui.GuiShaderOptions;
-+import org.vivecraft.gameplay.screenhandlers.RadialHandler;
-+import org.vivecraft.provider.ControllerType;
-+import org.vivecraft.settings.VRHotkeys;
- 
- public class KeyboardHandler
- {
-@@ -409,6 +413,29 @@
+@@ -412,6 +418,29 @@
      {
          if (pWindowPointer == this.minecraft.getWindow().getWindow())
          {
@@ -48,7 +50,7 @@
              if (this.debugCrashKeyTime > 0L)
              {
                  if (!InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), 67) || !InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), 292))
-@@ -442,13 +469,15 @@
+@@ -445,13 +474,15 @@
                          if (Screen.hasControlDown())
                          {
                          }
@@ -71,7 +73,7 @@
                          return;
                      }
                  }
-@@ -533,7 +562,7 @@
+@@ -536,7 +567,7 @@
                  }
              }
  
@@ -80,7 +82,7 @@
              {
                  InputConstants.Key inputconstants$key = InputConstants.getKey(p_90895_, pKey);
  
-@@ -591,6 +620,7 @@
+@@ -594,6 +625,7 @@
                          if (p_90895_ == 290)
                          {
                              this.minecraft.options.hideGui = !this.minecraft.options.hideGui;
@@ -88,7 +90,7 @@
                          }
                      }
  
-@@ -615,7 +645,7 @@
+@@ -618,7 +650,7 @@
          }
      }
  

@@ -157,7 +157,7 @@
          Vec3 vec31 = Vec3.atCenterOf(blockpos);
 -
 -        if (!(this.player.getEyePosition().distanceToSqr(vec31) > MAX_INTERACTION_DISTANCE))
-+        boolean flag = Reflector.IForgePlayer_canInteractWith.exists() || !(this.player.getEyePosition().distanceToSqr(vec31) > MAX_INTERACTION_DISTANCE);
++        boolean flag = Reflector.IForgePlayer_canInteractWith_Block.exists() || !(this.player.getEyePosition().distanceToSqr(vec31) > MAX_INTERACTION_DISTANCE);
 +        if (flag)
          {
              Vec3 vec32 = vec3.subtract(vec31);
@@ -170,8 +170,8 @@
                  if (blockpos.getY() < i)
                  {
 -                    if (this.awaitingPositionFromClient == null && this.player.distanceToSqr((double)blockpos.getX() + 0.5D, (double)blockpos.getY() + 0.5D, (double)blockpos.getZ() + 0.5D) < 64.0D && serverlevel.mayInteract(this.player, blockpos))
-+                	boolean flag1 = !Reflector.IForgePlayer_canInteractWith.exists() && this.player.distanceToSqr((double)blockpos.getX() + 0.5D, (double)blockpos.getY() + 0.5D, (double)blockpos.getZ() + 0.5D) < 64.0;
-+                    if (this.awaitingPositionFromClient == null && (flag1 || Reflector.callBoolean(player,Reflector.IForgePlayer_canInteractWith,blockpos,3)) && serverlevel.mayInteract(this.player, blockpos))
++                	boolean flag1 = !Reflector.IForgePlayer_canInteractWith_Block.exists() && this.player.distanceToSqr((double)blockpos.getX() + 0.5D, (double)blockpos.getY() + 0.5D, (double)blockpos.getZ() + 0.5D) < 64.0;
++                    if (this.awaitingPositionFromClient == null && (flag1 || Reflector.callBoolean(player,Reflector.IForgePlayer_canInteractWith_Block,blockpos,3)) && serverlevel.mayInteract(this.player, blockpos))
                      {
                          InteractionResult interactionresult = this.player.gameMode.useItemOn(this.player, serverlevel, itemstack, interactionhand, blockhitresult);
  
@@ -191,7 +191,7 @@
              {
                  return;
              }
-+            boolean flag = Reflector.IForgePlayer_canInteractWith.exists() || entity.distanceToSqr(this.player.getEyePosition()) < MAX_INTERACTION_DISTANCE;
++            boolean flag = Reflector.IForgePlayer_canInteractWith_Entity.exists() || entity.distanceToSqr(this.player.getEyePosition()) < MAX_INTERACTION_DISTANCE;
  
 -            if (entity.distanceToSqr(this.player.getEyePosition()) < MAX_INTERACTION_DISTANCE)
 +            if (flag)
@@ -201,7 +201,7 @@
                      private void performInteraction(InteractionHand p_143679_, ServerGamePacketListenerImpl.EntityInteraction p_143680_)
                      {
 +                    	//Forge: If the entity cannot be reached, do nothing. Original check was dist < 6, range is 4.5, so vanilla used padding=1.5
-+                        if(Reflector.IForgePlayer_canInteractWith.exists() && !Reflector.callBoolean(player,Reflector.IForgePlayer_canInteractWith, entity, 1.5D)) return; 
++                        if(Reflector.IForgePlayer_canInteractWith_Entity.exists() && !Reflector.callBoolean(player,Reflector.IForgePlayer_canInteractWith_Entity, entity, 1.5D)) return; 
                          ItemStack itemstack = ServerGamePacketListenerImpl.this.player.getItemInHand(p_143679_).copy();
                          InteractionResult interactionresult = p_143680_.run(ServerGamePacketListenerImpl.this.player, entity, p_143679_);
 -

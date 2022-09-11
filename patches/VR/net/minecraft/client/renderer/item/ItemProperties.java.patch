@@ -1,0 +1,49 @@
+--- a/net/minecraft/client/renderer/item/ItemProperties.java
++++ b/net/minecraft/client/renderer/item/ItemProperties.java
+@@ -3,6 +3,8 @@
+ import com.google.common.collect.Maps;
+ import java.util.Map;
+ import javax.annotation.Nullable;
++
++import net.minecraft.client.Minecraft;
+ import net.minecraft.client.multiplayer.ClientLevel;
+ import net.minecraft.core.GlobalPos;
+ import net.minecraft.nbt.CompoundTag;
+@@ -40,7 +42,8 @@
+     };
+     private static final Map<Item, Map<ResourceLocation, ItemPropertyFunction>> PROPERTIES = Maps.newHashMap();
+ 
+-    private static ClampedItemPropertyFunction registerGeneric(ResourceLocation pName, ClampedItemPropertyFunction pProperty)
++    //Forge make public
++    public static ItemPropertyFunction registerGeneric(ResourceLocation pName, ItemPropertyFunction pProperty)
+     {
+         GENERIC_PROPERTIES.put(pName, pProperty);
+         return pProperty;
+@@ -51,7 +54,8 @@
+         GENERIC_PROPERTIES.put(new ResourceLocation("custom_model_data"), pProperty);
+     }
+ 
+-    private static void register(Item pItem, ResourceLocation pName, ClampedItemPropertyFunction pProperty)
++    //Forge make public
++    public static void register(Item pItem, ResourceLocation pName, ItemPropertyFunction pProperty)
+     {
+         PROPERTIES.computeIfAbsent(pItem, (p_117828_) ->
+         {
+@@ -237,6 +241,8 @@
+         });
+         register(Items.SHIELD, new ResourceLocation("blocking"), (p_174575_, p_174576_, p_174577_, p_174578_) ->
+         {
++        	//Vivecraft why didn't I do this sooner?
++        	if (p_174577_ == Minecraft.getInstance().player) return 0;
+             return p_174577_ != null && p_174577_.isUsingItem() && p_174577_.getUseItem() == p_174575_ ? 1.0F : 0.0F;
+         });
+         register(Items.TRIDENT, new ResourceLocation("throwing"), (p_234996_, p_234997_, p_234998_, p_234999_) ->
+@@ -266,6 +272,8 @@
+         });
+         register(Items.GOAT_HORN, new ResourceLocation("tooting"), (p_234978_, p_234979_, p_234980_, p_234981_) ->
+         {
++        	//Vivecraft could you just not please;
++        	if (p_234980_ == Minecraft.getInstance().player) return 0;
+             return p_234980_ != null && p_234980_.isUsingItem() && p_234980_.getUseItem() == p_234978_ ? 1.0F : 0.0F;
+         });
+     }

@@ -1,6 +1,6 @@
 --- a/optifine/Installer.java
 +++ b/optifine/Installer.java
-@@ -389,7 +389,7 @@
+@@ -384,7 +384,7 @@
  
          try
          {
