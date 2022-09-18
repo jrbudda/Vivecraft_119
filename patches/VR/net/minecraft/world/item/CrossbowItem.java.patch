@@ -20,7 +20,7 @@
 +                if (serverviveplayer != null && serverviveplayer.isVR())
 +                {
 +                    vec3 = serverviveplayer.getControllerDir(serverviveplayer.activeHand);
-+                    serverviveplayer.getControllerVectorCustom(serverviveplayer.activeHand, new Vector3(0.0F, 1.0F, 0.0F));
++                    vec31 = serverviveplayer.getControllerVectorCustom(serverviveplayer.activeHand, new Vector3(0.0F, 1.0F, 0.0F));
 +                }
 +                //
                  Vector3f vector3f = new Vector3f(vec3);

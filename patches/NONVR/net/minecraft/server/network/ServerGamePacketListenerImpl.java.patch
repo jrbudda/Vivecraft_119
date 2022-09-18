@@ -115,7 +115,17 @@
          p_9772_.getTextFilter().join();
          ProfilePublicKey profilepublickey = p_9772_.getProfilePublicKey();
  
-@@ -491,11 +522,17 @@
+@@ -352,6 +383,9 @@
+         }
+ 
+         this.chatPreviewThrottler.tick();
++        //Vivecraft
++        NetworkHelper.sendPosData(this.player);
++        //
+     }
+ 
+     public void resetPosition()
+@@ -491,11 +525,17 @@
                  }
  
                  entity.absMoveTo(d3, d4, d5, f, f1);
@@ -133,13 +143,7 @@
                      this.connection.send(new ClientboundMoveVehiclePacket(entity));
                      return;
                  }
-@@ -508,11 +545,16 @@
-                 this.vehicleLastGoodZ = entity.getZ();
-             }
-         }
-+
-+        NetworkHelper.sendPosData(this.player);
-     }
+@@ -512,7 +552,10 @@
  
      private boolean noBlocksAround(Entity p_9794_)
      {
@@ -151,7 +155,7 @@
      }
  
      public void handleAcceptTeleportPacket(ServerboundAcceptTeleportationPacket pPacket)
-@@ -1289,8 +1331,8 @@
+@@ -1289,8 +1332,8 @@
          Vec3 vec3 = blockhitresult.getLocation();
          BlockPos blockpos = blockhitresult.getBlockPos();
          Vec3 vec31 = Vec3.atCenterOf(blockpos);
@@ -162,7 +166,7 @@
          {
              Vec3 vec32 = vec3.subtract(vec31);
              double d0 = 1.0000001D;
-@@ -1300,10 +1342,10 @@
+@@ -1300,10 +1343,10 @@
                  Direction direction = blockhitresult.getDirection();
                  this.player.resetLastActionTime();
                  int i = this.player.level.getMaxBuildHeight();
@@ -175,7 +179,7 @@
                      {
                          InteractionResult interactionresult = this.player.gameMode.useItemOn(this.player, serverlevel, itemstack, interactionhand, blockhitresult);
  
-@@ -1438,9 +1480,9 @@
+@@ -1438,9 +1481,9 @@
          {
              this.connection.send(pPacket, pFutureListeners);
          }
@@ -187,7 +191,7 @@
              CrashReportCategory crashreportcategory = crashreport.addCategory("Packet being sent");
              crashreportcategory.setDetail("Packet class", () ->
              {
-@@ -1943,16 +1985,21 @@
+@@ -1943,16 +1986,21 @@
              {
                  return;
              }
@@ -211,7 +215,7 @@
                          if (interactionresult.consumesAction())
                          {
                              CriteriaTriggers.PLAYER_INTERACTED_WITH_ENTITY.trigger(ServerGamePacketListenerImpl.this.player, itemstack, entity);
-@@ -1978,7 +2025,8 @@
+@@ -1978,7 +2026,8 @@
                      {
                          if (!(entity instanceof ItemEntity) && !(entity instanceof ExperienceOrb) && !(entity instanceof AbstractArrow) && entity != ServerGamePacketListenerImpl.this.player)
                          {
@@ -221,7 +225,7 @@
                          }
                          else
                          {
-@@ -2250,6 +2298,130 @@
+@@ -2250,6 +2299,130 @@
  
      public void handleCustomPayload(ServerboundCustomPayloadPacket pPacket)
      {
