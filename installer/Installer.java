@@ -313,8 +313,8 @@ public class Installer extends JPanel  implements PropertyChangeListener
 		ramAllocation.setSelectedIndex(1);
 		ramAllocation.setToolTipText(
 				"<html>" +
-						"Select the amount of RAM, in GB to allocate to the Vivecraft profile.<br>" +
-						"3 GB is recommended. More than 1 GB of RAM requires 64-bit PC and Java." +
+						"Select the amount of RAM in GB to allocate to the Vivecraft profile.<br>" +
+						"3 GB of RAM is recommended. More than 1 GB of RAM requires a 64-bit PC and Java." +
 						"</html>");
 		ramAllocation.setAlignmentX(LEFT_ALIGNMENT);
 		ramAllocation.setMaximumSize( new Dimension((int)ramAllocation.getPreferredSize().getWidth(), 20));
