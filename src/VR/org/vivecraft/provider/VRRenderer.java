@@ -444,11 +444,6 @@ public abstract class VRRenderer
             int i = minecraft.getWindow().getScreenWidth() < 1 ? 1 : minecraft.getWindow().getScreenWidth();
             int j = minecraft.getWindow().getScreenHeight() < 1 ? 1 : minecraft.getWindow().getScreenHeight();
 
-            if (Config.openGlRenderer.toLowerCase().contains("intel"))
-            {
-                throw new RenderConfigException("Incompatible", LangHelper.get("vivecraft.messages.intelgraphics", Config.openGlRenderer));
-            }
-
             if (!this.isInitialized())
             {
                 throw new RenderConfigException(RENDER_SETUP_FAILURE_MESSAGE + this.getName(), LangHelper.get(this.getinitError()));
